@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="0" time="29.101" errors="0" skipped="0" tests="12" name="TestSuite">
+<testsuite failures="0" time="29.618" errors="0" skipped="0" tests="12" name="TestSuite">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Libraries"/>
@@ -16,13 +16,13 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.os.patch.level" value="unknown"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="/Users/nelz/code/ssm/cach3/integration-test"/>
+    <property name="user.dir" value="/Users/nelz/code/cach3/integration-test"/>
     <property name="java.runtime.version" value="1.6.0_26-b03-384-10M3425"/>
     <property name="java.awt.graphicsenv" value="apple.awt.CGraphicsEnvironment"/>
-    <property name="basedir" value="/Users/nelz/code/ssm/cach3/integration-test"/>
+    <property name="basedir" value="/Users/nelz/code/cach3/integration-test"/>
     <property name="java.endorsed.dirs" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home/lib/endorsed"/>
     <property name="os.arch" value="x86_64"/>
-    <property name="surefire.real.class.path" value="/var/folders/QR/QRn92Cf5GWaHt4J7EKVUwk+++TI/-Tmp-/surefirebooter2967528236799168550.jar"/>
+    <property name="surefire.real.class.path" value="/var/folders/QR/QRn92Cf5GWaHt4J7EKVUwk+++TI/-Tmp-/surefirebooter2938011378110352490.jar"/>
     <property name="java.io.tmpdir" value="/var/folders/QR/QRn92Cf5GWaHt4J7EKVUwk+++TI/-Tmp-/"/>
     <property name="line.separator" value="
 "/>
@@ -30,7 +30,7 @@
     <property name="os.name" value="Mac OS X"/>
     <property name="sun.jnu.encoding" value="MacRoman"/>
     <property name="java.library.path" value=".:/Users/nelz/Library/Java/Extensions:/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java"/>
-    <property name="surefire.test.class.path" value="/Users/nelz/code/ssm/cach3/integration-test/target/test-classes:/Users/nelz/code/ssm/cach3/integration-test/target/classes:/Users/nelz/code/ssm/cach3/cach3/target/cach3-0.1-SNAPSHOT.jar:/Users/nelz/.m2/repository/spy/memcached/2.7.1/memcached-2.7.1.jar:/Users/nelz/.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4.jar:/Users/nelz/.m2/repository/org/springframework/spring-core/3.0.5.RELEASE/spring-core-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-asm/3.0.5.RELEASE/spring-asm-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:/Users/nelz/.m2/repository/org/springframework/spring-context/3.0.5.RELEASE/spring-context-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-aop/3.0.5.RELEASE/spring-aop-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar:/Users/nelz/.m2/repository/org/springframework/spring-beans/3.0.5.RELEASE/spring-beans-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-expression/3.0.5.RELEASE/spring-expression-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/aspectj/aspectjrt/1.6.11/aspectjrt-1.6.11.jar:/Users/nelz/.m2/repository/org/aspectj/aspectjweaver/1.6.11/aspectjweaver-1.6.11.jar:/Users/nelz/.m2/repository/log4j/log4j/1.2.11/log4j-1.2.11.jar:/Users/nelz/.m2/repository/org/testng/testng/5.8/testng-5.8-jdk15.jar:/Users/nelz/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/Users/nelz/.m2/repository/org/easymock/easymock/2.5/easymock-2.5.jar:"/>
+    <property name="surefire.test.class.path" value="/Users/nelz/code/cach3/integration-test/target/test-classes:/Users/nelz/code/cach3/integration-test/target/classes:/Users/nelz/code/cach3/cach3/target/cach3-0.1-SNAPSHOT.jar:/Users/nelz/.m2/repository/spy/memcached/2.7.1/memcached-2.7.1.jar:/Users/nelz/.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4.jar:/Users/nelz/.m2/repository/org/springframework/spring-core/3.0.5.RELEASE/spring-core-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-asm/3.0.5.RELEASE/spring-asm-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:/Users/nelz/.m2/repository/org/springframework/spring-context/3.0.5.RELEASE/spring-context-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-aop/3.0.5.RELEASE/spring-aop-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar:/Users/nelz/.m2/repository/org/springframework/spring-beans/3.0.5.RELEASE/spring-beans-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-expression/3.0.5.RELEASE/spring-expression-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/aspectj/aspectjrt/1.6.11/aspectjrt-1.6.11.jar:/Users/nelz/.m2/repository/org/aspectj/aspectjweaver/1.6.11/aspectjweaver-1.6.11.jar:/Users/nelz/.m2/repository/log4j/log4j/1.2.11/log4j-1.2.11.jar:/Users/nelz/.m2/repository/org/testng/testng/5.8/testng-5.8-jdk15.jar:/Users/nelz/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/Users/nelz/.m2/repository/org/easymock/easymock/2.5/easymock-2.5.jar:"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.class.version" value="50.0"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
@@ -42,11 +42,11 @@
     <property name="java.specification.version" value="1.6"/>
     <property name="file.encoding" value="MacRoman"/>
     <property name="user.name" value="nelz"/>
-    <property name="java.class.path" value="/Users/nelz/code/ssm/cach3/integration-test/target/test-classes:/Users/nelz/code/ssm/cach3/integration-test/target/classes:/Users/nelz/code/ssm/cach3/cach3/target/cach3-0.1-SNAPSHOT.jar:/Users/nelz/.m2/repository/spy/memcached/2.7.1/memcached-2.7.1.jar:/Users/nelz/.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4.jar:/Users/nelz/.m2/repository/org/springframework/spring-core/3.0.5.RELEASE/spring-core-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-asm/3.0.5.RELEASE/spring-asm-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:/Users/nelz/.m2/repository/org/springframework/spring-context/3.0.5.RELEASE/spring-context-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-aop/3.0.5.RELEASE/spring-aop-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar:/Users/nelz/.m2/repository/org/springframework/spring-beans/3.0.5.RELEASE/spring-beans-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-expression/3.0.5.RELEASE/spring-expression-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/aspectj/aspectjrt/1.6.11/aspectjrt-1.6.11.jar:/Users/nelz/.m2/repository/org/aspectj/aspectjweaver/1.6.11/aspectjweaver-1.6.11.jar:/Users/nelz/.m2/repository/log4j/log4j/1.2.11/log4j-1.2.11.jar:/Users/nelz/.m2/repository/org/testng/testng/5.8/testng-5.8-jdk15.jar:/Users/nelz/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/Users/nelz/.m2/repository/org/easymock/easymock/2.5/easymock-2.5.jar:"/>
+    <property name="java.class.path" value="/Users/nelz/code/cach3/integration-test/target/test-classes:/Users/nelz/code/cach3/integration-test/target/classes:/Users/nelz/code/cach3/cach3/target/cach3-0.1-SNAPSHOT.jar:/Users/nelz/.m2/repository/spy/memcached/2.7.1/memcached-2.7.1.jar:/Users/nelz/.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4.jar:/Users/nelz/.m2/repository/org/springframework/spring-core/3.0.5.RELEASE/spring-core-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-asm/3.0.5.RELEASE/spring-asm-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:/Users/nelz/.m2/repository/org/springframework/spring-context/3.0.5.RELEASE/spring-context-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-aop/3.0.5.RELEASE/spring-aop-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar:/Users/nelz/.m2/repository/org/springframework/spring-beans/3.0.5.RELEASE/spring-beans-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/springframework/spring-expression/3.0.5.RELEASE/spring-expression-3.0.5.RELEASE.jar:/Users/nelz/.m2/repository/org/aspectj/aspectjrt/1.6.11/aspectjrt-1.6.11.jar:/Users/nelz/.m2/repository/org/aspectj/aspectjweaver/1.6.11/aspectjweaver-1.6.11.jar:/Users/nelz/.m2/repository/log4j/log4j/1.2.11/log4j-1.2.11.jar:/Users/nelz/.m2/repository/org/testng/testng/5.8/testng-5.8-jdk15.jar:/Users/nelz/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/Users/nelz/.m2/repository/org/easymock/easymock/2.5/easymock-2.5.jar:"/>
     <property name="java.vm.specification.version" value="1.0"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.home" value="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home"/>
-    <property name="sun.java.command" value="/var/folders/QR/QRn92Cf5GWaHt4J7EKVUwk+++TI/-Tmp-/surefirebooter2967528236799168550.jar /var/folders/QR/QRn92Cf5GWaHt4J7EKVUwk+++TI/-Tmp-/surefire4348770587688302495tmp /var/folders/QR/QRn92Cf5GWaHt4J7EKVUwk+++TI/-Tmp-/surefire5961034268063297394tmp"/>
+    <property name="sun.java.command" value="/var/folders/QR/QRn92Cf5GWaHt4J7EKVUwk+++TI/-Tmp-/surefirebooter2938011378110352490.jar /var/folders/QR/QRn92Cf5GWaHt4J7EKVUwk+++TI/-Tmp-/surefire8277035662938268978tmp /var/folders/QR/QRn92Cf5GWaHt4J7EKVUwk+++TI/-Tmp-/surefire3533380558375449882tmp"/>
     <property name="java.specification.vendor" value="Sun Microsystems Inc."/>
     <property name="user.language" value="en"/>
     <property name="awt.toolkit" value="apple.awt.CToolkit"/>
@@ -65,16 +65,16 @@
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase time="0.552" classname="org.flite.cach3.test.InvalidateAssignCacheTest" name="test"/>
-  <testcase time="1.63" classname="org.flite.cach3.test.InvalidateMultiCacheTest" name="test"/>
-  <testcase time="3.028" classname="org.flite.cach3.test.InvalidateSingleCacheTest" name="test"/>
+  <testcase time="0.553" classname="org.flite.cach3.test.InvalidateAssignCacheTest" name="test"/>
+  <testcase time="1.624" classname="org.flite.cach3.test.InvalidateMultiCacheTest" name="test"/>
+  <testcase time="3.033" classname="org.flite.cach3.test.InvalidateSingleCacheTest" name="test"/>
   <testcase time="0.005" classname="org.flite.cach3.test.ReadThroughAssignCacheTest" name="test"/>
-  <testcase time="3.03" classname="org.flite.cach3.test.ReadThroughMultiCacheTest" name="test"/>
-  <testcase time="0.008" classname="org.flite.cach3.test.ReadThroughMultiCacheTest" name="testMemcached"/>
-  <testcase time="1.511" classname="org.flite.cach3.test.ReadThroughSingleCacheTest" name="test"/>
-  <testcase time="0.033" classname="org.flite.cach3.test.UpdateAssignCacheTest" name="test"/>
-  <testcase time="1.616" classname="org.flite.cach3.test.UpdateMultiCacheTest" name="test"/>
-  <testcase time="1.514" classname="org.flite.cach3.test.UpdateMultiCacheTest" name="testDataIndex"/>
+  <testcase time="3.031" classname="org.flite.cach3.test.ReadThroughMultiCacheTest" name="test"/>
+  <testcase time="0.002" classname="org.flite.cach3.test.ReadThroughMultiCacheTest" name="testMemcached"/>
+  <testcase time="1.513" classname="org.flite.cach3.test.ReadThroughSingleCacheTest" name="test"/>
+  <testcase time="0.01" classname="org.flite.cach3.test.UpdateAssignCacheTest" name="test"/>
+  <testcase time="1.618" classname="org.flite.cach3.test.UpdateMultiCacheTest" name="test"/>
+  <testcase time="1.517" classname="org.flite.cach3.test.UpdateMultiCacheTest" name="testDataIndex"/>
   <testcase time="1.506" classname="org.flite.cach3.test.UpdateSingleCacheTest" name="testDataIndex"/>
-  <testcase time="2.622" classname="org.flite.cach3.test.UpdateSingleCacheTest" name="test"/>
+  <testcase time="2.728" classname="org.flite.cach3.test.UpdateSingleCacheTest" name="test"/>
 </testsuite>

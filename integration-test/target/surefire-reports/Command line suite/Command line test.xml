@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="Command line test" failures="0" tests="12" time="28.743" errors="0">
+<testsuite name="Command line test" failures="0" tests="12" time="29.267" errors="0">
   <properties/>
-  <testcase name="test" time="0.551" classname="org.flite.cach3.test.InvalidateAssignCacheTest"/>
-  <testcase name="test" time="1.63" classname="org.flite.cach3.test.InvalidateMultiCacheTest"/>
-  <testcase name="test" time="3.028" classname="org.flite.cach3.test.InvalidateSingleCacheTest"/>
+  <testcase name="test" time="0.554" classname="org.flite.cach3.test.InvalidateAssignCacheTest"/>
+  <testcase name="test" time="1.624" classname="org.flite.cach3.test.InvalidateMultiCacheTest"/>
+  <testcase name="test" time="3.033" classname="org.flite.cach3.test.InvalidateSingleCacheTest"/>
   <testcase name="test" time="0.0050" classname="org.flite.cach3.test.ReadThroughAssignCacheTest"/>
-  <testcase name="test" time="3.03" classname="org.flite.cach3.test.ReadThroughMultiCacheTest"/>
-  <testcase name="testMemcached" time="0.0080" classname="org.flite.cach3.test.ReadThroughMultiCacheTest"/>
-  <testcase name="test" time="1.511" classname="org.flite.cach3.test.ReadThroughSingleCacheTest"/>
-  <testcase name="test" time="0.033" classname="org.flite.cach3.test.UpdateAssignCacheTest"/>
-  <testcase name="test" time="1.616" classname="org.flite.cach3.test.UpdateMultiCacheTest"/>
-  <testcase name="testDataIndex" time="1.514" classname="org.flite.cach3.test.UpdateMultiCacheTest"/>
-  <testcase name="testDataIndex" time="1.507" classname="org.flite.cach3.test.UpdateSingleCacheTest"/>
-  <testcase name="test" time="2.621" classname="org.flite.cach3.test.UpdateSingleCacheTest"/>
+  <testcase name="test" time="3.029" classname="org.flite.cach3.test.ReadThroughMultiCacheTest"/>
+  <testcase name="testMemcached" time="0.0020" classname="org.flite.cach3.test.ReadThroughMultiCacheTest"/>
+  <testcase name="test" time="1.514" classname="org.flite.cach3.test.ReadThroughSingleCacheTest"/>
+  <testcase name="test" time="0.011" classname="org.flite.cach3.test.UpdateAssignCacheTest"/>
+  <testcase name="test" time="1.617" classname="org.flite.cach3.test.UpdateMultiCacheTest"/>
+  <testcase name="testDataIndex" time="1.517" classname="org.flite.cach3.test.UpdateMultiCacheTest"/>
+  <testcase name="testDataIndex" time="1.506" classname="org.flite.cach3.test.UpdateSingleCacheTest"/>
+  <testcase name="test" time="2.728" classname="org.flite.cach3.test.UpdateSingleCacheTest"/>
 </testsuite>
