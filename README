@@ -1,2 +1,3 @@
-To Be Implemented.
-
+# TODO List
+* Variable Page Sizes (LongList support for Multi's)
+* Velocity (or other?) Templating for ID generation
