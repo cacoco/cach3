@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+<!-- mode: ${mode} -->
+
+  <!--<aop:aspectj-autoproxy />-->
+
+	<bean id="memcachedClientFactory" class="org.flite.cach3.config.MemcachedClientFactory" >
+		<property name="bean" ref="memcachedConnectionBean" />
+	</bean>
+
+	<bean id="memcachedClient" factory-bean="memcachedClientFactory" factory-method="createMemcachedClient" />
+
+	<bean id="methodStore" class="org.flite.cach3.aop.CacheKeyMethodStoreImpl" />
+
+	<bean id="readThroughSingleCache" class="org.flite.cach3.aop.ReadThroughSingleCacheAdvice">
+		<property name="cache" ref="memcachedClient" />
+		<property name="methodStore" ref="methodStore" />
+	</bean>
+	<bean id="readThroughMultiCache" class="org.flite.cach3.aop.ReadThroughMultiCacheAdvice">
+		<property name="cache" ref="memcachedClient" />
+		<property name="methodStore" ref="methodStore" />
+	</bean>
+  <bean id="readThroughAssignCache" class="org.flite.cach3.aop.ReadThroughAssignCacheAdvice">
+    <property name="cache" ref="memcachedClient" />
+    <property name="methodStore" ref="methodStore" />
+  </bean>
+	<bean id="updateSingleCache" class="org.flite.cach3.aop.UpdateSingleCacheAdvice">
+		<property name="cache" ref="memcachedClient" />
+		<property name="methodStore" ref="methodStore" />
+	</bean>
+	<bean id="updateMultiCache" class="org.flite.cach3.aop.UpdateMultiCacheAdvice">
+		<property name="cache" ref="memcachedClient" />
+		<property name="methodStore" ref="methodStore" />
+	</bean>
+  <bean id="updateAssignCache" class="org.flite.cach3.aop.UpdateAssignCacheAdvice">
+    <property name="cache" ref="memcachedClient" />
+    <property name="methodStore" ref="methodStore" />
+  </bean>
+  <bean id="invalidateSingleCache" class="org.flite.cach3.aop.InvalidateSingleCacheAdvice">
+      <property name="cache" ref="memcachedClient" />
+      <property name="methodStore" ref="methodStore" />
+  </bean>
+  <bean id="invalidateMultiCache" class="org.flite.cach3.aop.InvalidateMultiCacheAdvice">
+      <property name="cache" ref="memcachedClient" />
+      <property name="methodStore" ref="methodStore" />
+  </bean>
+  <bean id="invalidateAssignCache" class="org.flite.cach3.aop.InvalidateAssignCacheAdvice">
+      <property name="cache" ref="memcachedClient" />
+      <property name="methodStore" ref="methodStore" />
+  </bean>
+
+</beans>

@@ -1,0 +1,120 @@
+<testng-results>
+  <reporter-output>
+  </reporter-output>
+  <suite name="Command line suite">
+    <groups>
+    </groups>
+    <test name="Command line test">
+      <class name="org.flite.cach3.annotations.AnnotationsTest">
+        <test-method status="PASS" signature="testIndividual()" name="testIndividual" duration-ms="7" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+      <class name="org.flite.cach3.aop.ReadThroughAssignCacheTest">
+        <test-method status="PASS" signature="beforeClass()" name="beforeClass" is-config="true" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testAnnotationValidation()" name="testAnnotationValidation" duration-ms="6" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+      <class name="org.flite.cach3.config.MemcachedClientFactoryTest">
+        <test-method status="PASS" signature="testCreateClient()" name="testCreateClient" duration-ms="143" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testCreateClientException()" name="testCreateClientException" duration-ms="3" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+      <class name="org.flite.cach3.aop.UpdateMultiCacheAdviceTest">
+        <test-method status="PASS" signature="testGetKeyObjects()" name="testGetKeyObjects" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testUpdateCache()" name="testUpdateCache" duration-ms="4" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeClass()" name="beforeClass" is-config="true" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testGetCacheKeys()" name="testGetCacheKeys" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+      <class name="org.flite.cach3.aop.UpdateSingleCacheAdviceTest">
+        <test-method status="PASS" signature="testGetObjectId()" name="testGetObjectId" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeClass()" name="beforeClass" is-config="true" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+      <class name="org.flite.cach3.aop.CacheBaseTest">
+        <test-method status="PASS" signature="testReturnTypeChecking()" name="testReturnTypeChecking" duration-ms="3" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testKeyMethodArgs()" name="testKeyMethodArgs" duration-ms="9" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testBuildCacheKey()" name="testBuildCacheKey" duration-ms="4" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeClass()" name="beforeClass" is-config="true" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testGenerateCacheKey()" name="testGenerateCacheKey" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+      <class name="org.flite.cach3.aop.ReadThroughSingleCacheMockTest">
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testTopLevelCacheIndividualCachePreException()" name="testTopLevelCacheIndividualCachePreException" duration-ms="20" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testTopLevelCacheIndividualCacheMissWithNull()" name="testTopLevelCacheIndividualCacheMissWithNull" duration-ms="3" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testTopLevelCacheIndividualCacheHit()" name="testTopLevelCacheIndividualCacheHit" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testTopLevelCacheIndividualCacheHitNull()" name="testTopLevelCacheIndividualCacheHitNull" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeClass()" name="beforeClass" is-config="true" duration-ms="75" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testTopLevelCacheIndividualCacheMissWithData()" name="testTopLevelCacheIndividualCacheMissWithData" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testKeyObject()" name="testKeyObject" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testGetObjectId()" name="testGetObjectId" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+      <class name="org.flite.cach3.config.MemcachedConnectionBeanTest">
+        <test-method status="PASS" signature="testInAndOut()" name="testInAndOut" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+      <class name="org.flite.cach3.aop.PertinentNegativeNullTest">
+        <test-method status="PASS" signature="testNull()" name="testNull" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+      <class name="org.flite.cach3.aop.InvalidateMultiCacheAdviceTest">
+        <test-method status="PASS" signature="testConvertToKeyObjects()" name="testConvertToKeyObjects" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeClass()" name="beforeClass" is-config="true" duration-ms="72" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+      <class name="org.flite.cach3.aop.ReadThroughMultiCacheTest">
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testGenerateResultsException()" name="testGenerateResultsException" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testGenerateResults()" name="testGenerateResults" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testInitialKey2Result()" name="testInitialKey2Result" duration-ms="3" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeMethod()" name="beforeMethod" is-config="true" duration-ms="0" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="testConvertIdObject()" name="testConvertIdObject" duration-ms="5" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+        <test-method status="PASS" signature="beforeClass()" name="beforeClass" is-config="true" duration-ms="1" started-at="2011-09-13T18:01:08Z" finished-at="2011-09-13T18:01:08Z">
+        </test-method>
+      </class>
+    </test>
+  </suite>
+</testng-results>

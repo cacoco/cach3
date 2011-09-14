@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Command line test" failures="0" tests="26" time="0.396" errors="0">
+  <properties/>
+  <testcase name="testIndividual" time="0.0070" classname="org.flite.cach3.annotations.AnnotationsTest"/>
+  <testcase name="testGenerateCacheKey" time="0.0010" classname="org.flite.cach3.aop.CacheBaseTest"/>
+  <testcase name="testKeyMethodArgs" time="0.0090" classname="org.flite.cach3.aop.CacheBaseTest"/>
+  <testcase name="testBuildCacheKey" time="0.0040" classname="org.flite.cach3.aop.CacheBaseTest"/>
+  <testcase name="testReturnTypeChecking" time="0.0030" classname="org.flite.cach3.aop.CacheBaseTest"/>
+  <testcase name="testConvertToKeyObjects" time="0.0" classname="org.flite.cach3.aop.InvalidateMultiCacheAdviceTest"/>
+  <testcase name="testNull" time="0.0010" classname="org.flite.cach3.aop.PertinentNegativeNullTest"/>
+  <testcase name="testAnnotationValidation" time="0.0060" classname="org.flite.cach3.aop.ReadThroughAssignCacheTest"/>
+  <testcase name="testGenerateResultsException" time="0.0010" classname="org.flite.cach3.aop.ReadThroughMultiCacheTest"/>
+  <testcase name="testInitialKey2Result" time="0.0030" classname="org.flite.cach3.aop.ReadThroughMultiCacheTest"/>
+  <testcase name="testConvertIdObject" time="0.0050" classname="org.flite.cach3.aop.ReadThroughMultiCacheTest"/>
+  <testcase name="testGenerateResults" time="0.0" classname="org.flite.cach3.aop.ReadThroughMultiCacheTest"/>
+  <testcase name="testTopLevelCacheIndividualCachePreException" time="0.02" classname="org.flite.cach3.aop.ReadThroughSingleCacheMockTest"/>
+  <testcase name="testTopLevelCacheIndividualCacheMissWithNull" time="0.0030" classname="org.flite.cach3.aop.ReadThroughSingleCacheMockTest"/>
+  <testcase name="testGetObjectId" time="0.0010" classname="org.flite.cach3.aop.ReadThroughSingleCacheMockTest"/>
+  <testcase name="testTopLevelCacheIndividualCacheHit" time="0.0010" classname="org.flite.cach3.aop.ReadThroughSingleCacheMockTest"/>
+  <testcase name="testKeyObject" time="0.0010" classname="org.flite.cach3.aop.ReadThroughSingleCacheMockTest"/>
+  <testcase name="testTopLevelCacheIndividualCacheMissWithData" time="0.0" classname="org.flite.cach3.aop.ReadThroughSingleCacheMockTest"/>
+  <testcase name="testTopLevelCacheIndividualCacheHitNull" time="0.0" classname="org.flite.cach3.aop.ReadThroughSingleCacheMockTest"/>
+  <testcase name="testUpdateCache" time="0.0040" classname="org.flite.cach3.aop.UpdateMultiCacheAdviceTest"/>
+  <testcase name="testGetKeyObjects" time="0.0" classname="org.flite.cach3.aop.UpdateMultiCacheAdviceTest"/>
+  <testcase name="testGetCacheKeys" time="0.0" classname="org.flite.cach3.aop.UpdateMultiCacheAdviceTest"/>
+  <testcase name="testGetObjectId" time="0.0010" classname="org.flite.cach3.aop.UpdateSingleCacheAdviceTest"/>
+  <testcase name="testCreateClientException" time="0.0030" classname="org.flite.cach3.config.MemcachedClientFactoryTest"/>
+  <testcase name="testCreateClient" time="0.143" classname="org.flite.cach3.config.MemcachedClientFactoryTest"/>
+  <testcase name="testInAndOut" time="0.0010" classname="org.flite.cach3.config.MemcachedConnectionBeanTest"/>
+</testsuite>
