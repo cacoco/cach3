@@ -56,7 +56,7 @@ You will need to inform your ApplicationContext of Simple-Spring-Memcached's con
         <import resource="simplesm-context.xml" />
 Simple-Spring-Memcached also requires an annotation to enable AOP access, which in turn requires the AOP namespace being defined:
 
-<beans xmlns="http://www.springframework.org/schema/beans" 
+<beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:aop="http://www.springframework.org/schema/aop"
     xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
 
@@ -80,6 +80,7 @@ Any discussion of Memcached usage requires an understanding of keys and values. 
 In SSM, you are able to identify 'key objects'. These are the objects that Simple-Spring-Memcached will rely upon to generate a (non-namespaced) unique key for referring to values within the cache. For any given key object, it will first be checked if any of its methods are annotated with @CacheKeyMethod. If a @CacheKeyMethod is found, and it conforms to the required signature (no-arg, with an output of type String), this is the method that will be relied upon to generate a unique key. If there is no conforming @CacheKeyMethod, then the basic Object.toString() method will be used.
 
 The Big 9 Annotations
+---------------------
 The next 9 annotations are the real meat of this project. These are the annotations that mark where caching is to be applied. There are two dimensions that these annotations cover: cardinality (are we working with a single value with an assigned key, a single value with a calculated key, or a 'multiplexed' set of values with calculated keys); and usage pattern (read-through, update, or invalidate).
 
 @ReadThroughSingleCache, @ReadThroughMultiCache, @ReadThroughAssignCache
@@ -142,9 +143,3 @@ Externalizable
 Any of the objects being saved to the cache must implement java.io.Serializable in the very least, but it is highly recommended that you implement java.io.Externalizable in as many classes of the cache data as is possible.
 
 
-
-
-TODO List
-=========
-* Variable Page Sizes (LongList support for Multi's)
-* Velocity (or other?) Templating for ID generation
