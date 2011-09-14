@@ -53,7 +53,7 @@ Configuration
 =============
 You will need to inform your ApplicationContext of Simple-Spring-Memcached's configuration. This is done with an import configuration directive:
 
-        <import resource="simplesm-context.xml" />
+        <import resource="cach3-context.xml" />
 Simple-Spring-Memcached also requires an annotation to enable AOP access, which in turn requires the AOP namespace being defined:
 
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -65,7 +65,7 @@ Simple-Spring-Memcached also requires an annotation to enable AOP access, which 
         <aop:aspectj-autoproxy />
 In order to tell Simple-Spring-Memcached about the specifics of your environment, you need to create a bean:
 
-        <bean id="memcachedConnectionBean" class="net.nelz.simplesm.config.MemcachedConnectionBean">
+        <bean id="memcachedConnectionBean" class="org.flite.cach3.config.MemcachedConnectionBean">
                 <property name="consistentHashing" value="true" />
                 <property name="nodeList" value="127.0.0.1:11211 127.0.0.1:11311" />
         </bean>

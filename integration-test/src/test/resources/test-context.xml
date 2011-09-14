@@ -12,7 +12,7 @@
            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
 <!-- mode: ${mode} -->
 
-	<import resource="simplesm-context.xml" />
+	<import resource="cach3-context.xml" />
 	<bean id="memcachedConnectionBean" class="org.flite.cach3.config.MemcachedConnectionBean">
 		<property name="consistentHashing" value="true" />
 		<property name="nodeList" value="127.0.0.1:11211" />
