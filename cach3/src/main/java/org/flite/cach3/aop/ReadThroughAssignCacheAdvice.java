@@ -39,7 +39,13 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
     public void getSingleAssign() {}
 
     @Around("getSingleAssign()")
-    public Object cacheSingleAssign(final ProceedingJoinPoint pjp) throws Throwable {
+    public Object cacheAssign(final ProceedingJoinPoint pjp) throws Throwable {
+        // If we've disabled the caching programmatically (or via properties file) just flow through.
+        if (isCacheDisabled()) {
+            LOG.debug("Caching is disabled.");
+            return pjp.proceed();
+        }
+
         // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
         // but do not let it surface up past the AOP injection itself.
         final String cacheKey;

@@ -1,17 +1,13 @@
 package org.flite.cach3.aop;
 
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.*;
+import org.aspectj.lang.*;
+import org.aspectj.lang.annotation.*;
+import org.flite.cach3.annotations.*;
+import org.flite.cach3.exceptions.*;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
-import org.flite.cach3.annotations.InvalidateMultiCache;
-import org.flite.cach3.exceptions.InvalidAnnotationException;
+import java.lang.reflect.*;
+import java.util.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -43,6 +39,12 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
 
     @Around("invalidateMulti()")
     public Object cacheInvalidateMulti(final ProceedingJoinPoint pjp) throws Throwable {
+        // If we've disabled the caching programmatically (or via properties file) just flow through.
+        if (isCacheDisabled()) {
+            LOG.debug("Caching is disabled.");
+            return pjp.proceed();
+        }
+
         // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
         // but do not let it surface up past the AOP injection itself.
         List<String> cacheKeys = null;

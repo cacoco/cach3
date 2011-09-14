@@ -1,16 +1,12 @@
 package org.flite.cach3.aop;
 
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.*;
+import org.aspectj.lang.*;
+import org.aspectj.lang.annotation.*;
+import org.flite.cach3.annotations.*;
 
-import java.lang.reflect.Method;
-import java.security.InvalidParameterException;
-
-import org.flite.cach3.annotations.InvalidateAssignCache;
+import java.lang.reflect.*;
+import java.security.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -43,6 +39,12 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
     @Around("invalidateAssign()")
     public Object cacheInvalidateAssign(final ProceedingJoinPoint pjp) throws Throwable {
         final Object result = pjp.proceed();
+
+        // If we've disabled the caching programmatically (or via properties file) just flow through.
+        if (isCacheDisabled()) {
+            LOG.debug("Caching is disabled.");
+            return result;
+        }
 
         // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
         // but do not let it surface up past the AOP injection itself.

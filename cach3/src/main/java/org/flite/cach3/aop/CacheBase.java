@@ -39,7 +39,17 @@ public class CacheBase {
 	protected MemcachedClientIF cache;
 	CacheKeyMethodStore methodStore;
 
-	public void setCache(MemcachedClientIF cache) {
+    private boolean cacheDisabled = false;
+
+    /*default*/ boolean isCacheDisabled() {
+        return cacheDisabled;
+    }
+
+    /*default*/ void setCacheDisabled(boolean cacheDisabled) {
+        this.cacheDisabled = cacheDisabled;
+    }
+
+    public void setCache(MemcachedClientIF cache) {
 		this.cache = cache;
 	}
 
@@ -239,5 +249,4 @@ public class CacheBase {
 
         return results;
     }
-
 }

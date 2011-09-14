@@ -137,7 +137,7 @@ public class ReadThroughSingleCacheMockTest {
 
 		replayAll();
 
-		final String result = (String) cut.cacheGetSingle(pjp);
+		final String result = (String) cut.cacheSingle(pjp);
 
 		verifyAll();
 		assertEquals(cachedResult, result);
@@ -156,7 +156,7 @@ public class ReadThroughSingleCacheMockTest {
 
 		replayAll();
 
-		final String result = (String) cut.cacheGetSingle(pjp);
+		final String result = (String) cut.cacheSingle(pjp);
 
 		verifyAll();
 		assertNull(result);
@@ -171,7 +171,7 @@ public class ReadThroughSingleCacheMockTest {
 
 		replayAll();
 
-		final String result = (String) cut.cacheGetSingle(pjp);
+		final String result = (String) cut.cacheSingle(pjp);
 
 		verifyAll();
 		assertEquals(targetResult, result);
@@ -194,7 +194,7 @@ public class ReadThroughSingleCacheMockTest {
 
 		replayAll();
 
-		final String result = (String) cut.cacheGetSingle(pjp);
+		final String result = (String) cut.cacheSingle(pjp);
 
 		verifyAll();
 		assertEquals(targetResult, result);
@@ -216,7 +216,7 @@ public class ReadThroughSingleCacheMockTest {
 
 		replayAll();
 
-		final String result = (String) cut.cacheGetSingle(pjp);
+		final String result = (String) cut.cacheSingle(pjp);
 
 		verifyAll();
 		assertNull(result);

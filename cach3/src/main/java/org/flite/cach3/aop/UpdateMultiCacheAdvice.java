@@ -38,7 +38,13 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 	public void updateMulti() {}
 
 	@AfterReturning(pointcut="updateMulti()", returning="retVal")
-	public Object cacheUpdateSingle(final JoinPoint jp, final Object retVal) throws Throwable {
+	public Object cacheUpdateMulti(final JoinPoint jp, final Object retVal) throws Throwable {
+        // If we've disabled the caching programmatically (or via properties file) just flow through.
+        if (isCacheDisabled()) {
+            LOG.debug("Caching is disabled.");
+            return retVal;
+        }
+
         // For Update*Cache, an AfterReturning aspect is fine. We will only apply our caching
         // after the underlying method completes successfully, and we will have the same
         // access to the method params.
