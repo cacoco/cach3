@@ -6,7 +6,7 @@ import org.flite.cach3.annotations.*;
 import org.testng.annotations.*;
 
 /**
-Copyright (c) 2008, 2009  Nelson Carpentier
+Copyright (c) 2011 Flite, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
