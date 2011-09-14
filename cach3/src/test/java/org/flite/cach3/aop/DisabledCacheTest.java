@@ -3,6 +3,7 @@ package org.flite.cach3.aop;
 import org.apache.commons.lang.*;
 import org.aspectj.lang.*;
 import org.easymock.*;
+import org.flite.cach3.config.*;
 import org.testng.annotations.*;
 
 import static org.easymock.EasyMock.*;
@@ -31,59 +32,61 @@ THE SOFTWARE.
 public class DisabledCacheTest extends EasyMockSupport {
     @Test
     public void testDisabled() throws Throwable {
+        final Cach3State state = new Cach3State();
+        state.setCacheDisabled(true);
         int length = 5;
 
         // Invalidates
         final InvalidateAssignCacheAdvice a1 = new InvalidateAssignCacheAdvice();
-        a1.setCacheDisabled(true);
+        a1.setState(state);
         final ProceedingJoinPoint pjp1 = createMock(ProceedingJoinPoint.class);
         final String r1 = RandomStringUtils.randomAlphanumeric(length++);
         expect(pjp1.proceed()).andReturn(r1);
 
         final InvalidateMultiCacheAdvice a2 = new InvalidateMultiCacheAdvice();
-        a2.setCacheDisabled(true);
+        a2.setState(state);
         final ProceedingJoinPoint pjp2 = createMock(ProceedingJoinPoint.class);
         final String r2 = RandomStringUtils.randomAlphanumeric(length++);
         expect(pjp2.proceed()).andReturn(r2);
 
         final InvalidateSingleCacheAdvice a3 = new InvalidateSingleCacheAdvice();
-        a3.setCacheDisabled(true);
+        a3.setState(state);
         final ProceedingJoinPoint pjp3 = createMock(ProceedingJoinPoint.class);
         final String r3 = RandomStringUtils.randomAlphanumeric(length++);
         expect(pjp3.proceed()).andReturn(r3);
 
         // ReadThroughs
         final ReadThroughAssignCacheAdvice a4 = new ReadThroughAssignCacheAdvice();
-        a4.setCacheDisabled(true);
+        a4.setState(state);
         final ProceedingJoinPoint pjp4 = createMock(ProceedingJoinPoint.class);
         final String r4 = RandomStringUtils.randomAlphanumeric(length++);
         expect(pjp4.proceed()).andReturn(r4);
 
         final ReadThroughMultiCacheAdvice a5 = new ReadThroughMultiCacheAdvice();
-        a5.setCacheDisabled(true);
+        a5.setState(state);
         final ProceedingJoinPoint pjp5 = createMock(ProceedingJoinPoint.class);
         final String r5 = RandomStringUtils.randomAlphanumeric(length++);
         expect(pjp5.proceed()).andReturn(r5);
 
         final ReadThroughSingleCacheAdvice a6 = new ReadThroughSingleCacheAdvice();
-        a6.setCacheDisabled(true);
+        a6.setState(state);
         final ProceedingJoinPoint pjp6 = createMock(ProceedingJoinPoint.class);
         final String r6 = RandomStringUtils.randomAlphanumeric(length++);
         expect(pjp6.proceed()).andReturn(r6);
 
         // Updates
         final UpdateAssignCacheAdvice a7 = new UpdateAssignCacheAdvice();
-        a7.setCacheDisabled(true);
+        a7.setState(state);
         final JoinPoint pjp7 = createMock(JoinPoint.class);
         final String r7 = RandomStringUtils.randomAlphanumeric(length++);
 
         final UpdateMultiCacheAdvice a8 = new UpdateMultiCacheAdvice();
-        a8.setCacheDisabled(true);
+        a8.setState(state);
         final JoinPoint pjp8 = createMock(JoinPoint.class);
         final String r8 = RandomStringUtils.randomAlphanumeric(length++);
 
         final UpdateSingleCacheAdvice a9 = new UpdateSingleCacheAdvice();
-        a9.setCacheDisabled(true);
+        a9.setState(state);
         final JoinPoint pjp9 = createMock(JoinPoint.class);
         final String r9 = RandomStringUtils.randomAlphanumeric(length++);
 

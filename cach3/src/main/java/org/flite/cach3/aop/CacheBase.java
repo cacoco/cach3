@@ -5,6 +5,7 @@ import org.aspectj.lang.*;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.config.*;
 import org.flite.cach3.exceptions.*;
 
 import java.lang.reflect.*;
@@ -38,15 +39,14 @@ public class CacheBase {
 
 	protected MemcachedClientIF cache;
 	CacheKeyMethodStore methodStore;
+    private Cach3State state;
 
-    private boolean cacheDisabled = false;
-
-    /*default*/ boolean isCacheDisabled() {
-        return cacheDisabled;
+    public void setState(Cach3State state) {
+        this.state = state;
     }
 
-    /*default*/ void setCacheDisabled(boolean cacheDisabled) {
-        this.cacheDisabled = cacheDisabled;
+    protected boolean isCacheDisabled() {
+        return state == null ? false : state.isCacheDisabled();
     }
 
     public void setCache(MemcachedClientIF cache) {
