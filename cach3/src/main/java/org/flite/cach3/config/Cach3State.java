@@ -1,5 +1,9 @@
 package org.flite.cach3.config;
 
+import org.flite.cach3.api.*;
+
+import java.util.*;
+
 /**
  * Copyright (c) 2011 Flite, Inc
  * <p/>
@@ -26,6 +30,16 @@ public class Cach3State {
 
     private boolean cacheDisabled = false;
 
+    private List<InvalidateAssignCacheListener> iaListeners = new ArrayList<InvalidateAssignCacheListener>();
+    private List<InvalidateSingleCacheListener> isListeners = new ArrayList<InvalidateSingleCacheListener>();
+    private List<InvalidateMultiCacheListener> imListeners = new ArrayList<InvalidateMultiCacheListener>();
+    private List<ReadThroughAssignCacheListener> rtaListeners = new ArrayList<ReadThroughAssignCacheListener>();
+    private List<ReadThroughSingleCacheListener> rtsListeners = new ArrayList<ReadThroughSingleCacheListener>();
+    private List<ReadThroughMultiCacheListener> rtmListeners = new ArrayList<ReadThroughMultiCacheListener>();
+    private List<UpdateAssignCacheListener> uaListeners = new ArrayList<UpdateAssignCacheListener>();
+    private List<UpdateSingleCacheListener> usListeners = new ArrayList<UpdateSingleCacheListener>();
+    private List<UpdateMultiCacheListener> umListeners = new ArrayList<UpdateMultiCacheListener>();
+
     public boolean isCacheDisabled() {
         return cacheDisabled;
     }
@@ -33,4 +47,86 @@ public class Cach3State {
     public void setCacheDisabled(boolean cacheDisabled) {
         this.cacheDisabled = cacheDisabled;
     }
+
+    // InvalidateAssign
+    public void registerIAListener(final InvalidateAssignCacheListener listener) {
+        iaListeners.add(listener);
+    }
+
+    public List<InvalidateAssignCacheListener> getIAListeners() {
+        return iaListeners;
+    }
+
+    // InvalidateSingle
+    public void registerISListener(final InvalidateSingleCacheListener listener) {
+        isListeners.add(listener);
+    }
+
+    public List<InvalidateSingleCacheListener> getISListeners() {
+        return isListeners;
+    }
+
+    // InvalidateMulti
+    public void registerIMListener(final InvalidateMultiCacheListener listener) {
+        imListeners.add(listener);
+    }
+
+    public List<InvalidateMultiCacheListener> getIMListeners() {
+        return imListeners;
+    }
+
+    // ReadThroughAssign
+    public void registerRTAListener(final ReadThroughAssignCacheListener listener) {
+        rtaListeners.add(listener);
+    }
+
+    public List<ReadThroughAssignCacheListener> getRTAListeners() {
+        return rtaListeners;
+    }
+
+    // ReadThroughSingle
+    public void registerRTSListener(final ReadThroughSingleCacheListener listener) {
+        rtsListeners.add(listener);
+    }
+
+    public List<ReadThroughSingleCacheListener> getRTSListeners() {
+        return rtsListeners;
+    }
+
+    // ReadThroughMulti
+    public void registerRTMListener(final ReadThroughMultiCacheListener listener) {
+        rtmListeners.add(listener);
+    }
+
+    public List<ReadThroughMultiCacheListener> getRTMListeners() {
+        return rtmListeners;
+    }
+
+    // UpdateAssign
+    public void registerUAListener(final UpdateAssignCacheListener listener) {
+        uaListeners.add(listener);
+    }
+
+    public List<UpdateAssignCacheListener> getUAListeners() {
+        return uaListeners;
+    }
+
+    // UpdateSingle
+    public void registerUSListener(final UpdateSingleCacheListener listener) {
+        usListeners.add(listener);
+    }
+
+    public List<UpdateSingleCacheListener> getUSListeners() {
+        return usListeners;
+    }
+
+    // UpdateMulti
+    public void registerUMListener(final UpdateMultiCacheListener listener) {
+        umListeners.add(listener);
+    }
+
+    public List<UpdateMultiCacheListener> getUMListeners() {
+        return umListeners;
+    }
+
 }
