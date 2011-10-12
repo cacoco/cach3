@@ -1,6 +1,7 @@
 package org.flite.cach3.config;
 
 import org.apache.commons.lang.math.*;
+import org.flite.cach3.annotations.UpdateAssignCache;
 import org.flite.cach3.api.*;
 import org.testng.annotations.*;
 
@@ -37,6 +38,14 @@ public class ConfigurationHelperTest {
 
     @Test
     public void testSetListeners() {
+
+        try {
+            ConfigurationHelper.addCacheListeners(null, null);
+            fail("Expected Exception");
+        } catch (InvalidParameterException ex) { }
+
+        final Cach3State state = new Cach3State();
+
         final Map<Class, Integer> classes = new HashMap<Class, Integer>();
         classes.put(InvalidateAssignCacheListener.class, 1 + RandomUtils.nextInt(10));
         classes.put(InvalidateSingleCacheListener.class, 1 + RandomUtils.nextInt(10));
@@ -52,23 +61,29 @@ public class ConfigurationHelperTest {
 
         final List<CacheListener> listeners = new ArrayList<CacheListener>();
 
-        for (Map.Entry entry : classes.entrySet()) {
-            
+        for (Map.Entry<Class, Integer> entry : classes.entrySet()) {
+            final Class clazz = entry.getKey();
+            for (int ix = 0; ix < ((Integer)entry.getValue()).intValue(); ix++) {
+                final CacheListener listener = (CacheListener) Proxy.newProxyInstance(CacheListener.class.getClassLoader(),
+                        new Class[] {clazz},
+                        new MyInvocationHandler());
+                listeners.add(listener);
+            }
         }
+        Collections.shuffle(listeners);
 
+        ConfigurationHelper.addCacheListeners(state, listeners.toArray(new CacheListener[] {}));
 
+        assertEquals(classes.get(InvalidateAssignCacheListener.class).intValue(), state.getIAListeners().size());
+        assertEquals(classes.get(InvalidateSingleCacheListener.class).intValue(), state.getISListeners().size());
+        assertEquals(classes.get(InvalidateMultiCacheListener.class).intValue(), state.getIMListeners().size());
+        assertEquals(classes.get(ReadThroughAssignCacheListener.class).intValue(), state.getRTAListeners().size());
+        assertEquals(classes.get(ReadThroughSingleCacheListener.class).intValue(), state.getRTSListeners().size());
+        assertEquals(classes.get(ReadThroughMultiCacheListener.class).intValue(), state.getRTMListeners().size());
+        assertEquals(classes.get(UpdateAssignCacheListener.class).intValue(), state.getUAListeners().size());
+        assertEquals(classes.get(UpdateSingleCacheListener.class).intValue(), state.getUSListeners().size());
+        assertEquals(classes.get(UpdateMultiCacheListener.class).intValue(), state.getUMListeners().size());
 
-        final CacheListener l1 = (CacheListener) Proxy.newProxyInstance(CacheListener.class.getClassLoader(),
-                new Class[] {CacheListener.class},
-                new MyInvocationHandler());
-
-        final CacheListener l2 = (CacheListener) Proxy.newProxyInstance(CacheListener.class.getClassLoader(),
-                new Class[] {CacheListener.class},
-                new MyInvocationHandler());
-
-        assertFalse(l1 == l2);
-        assertFalse(l1.hashCode() == l2.hashCode());
-        assertFalse(l1.equals(l2));
     }
 
     private static class MyInvocationHandler implements InvocationHandler {
