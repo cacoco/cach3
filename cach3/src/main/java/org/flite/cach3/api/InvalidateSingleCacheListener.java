@@ -22,4 +22,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface InvalidateSingleCacheListener extends CacheListener {
+    void triggeredInvalidateSingleCache(String namespace, Object keyObject);
 }

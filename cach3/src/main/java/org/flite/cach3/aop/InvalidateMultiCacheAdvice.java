@@ -4,6 +4,7 @@ import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.api.*;
 import org.flite.cach3.exceptions.*;
 
 import java.lang.reflect.*;
@@ -82,6 +83,18 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
                 for (final String key : cacheKeys) {
                     if (key != null && key.trim().length() > 0) {
                         cache.delete(key);
+                    }
+                }
+            }
+
+            // Notify the observers that a cache interaction happened.
+            final List<InvalidateMultiCacheListener> listeners = getPertinentListeners(InvalidateMultiCacheListener.class,annotationData.getNamespace());
+            if (listeners != null && !listeners.isEmpty()) {
+                for (final InvalidateMultiCacheListener listener : listeners) {
+                    try {
+                        // TODO: listener.triggeredInvalidateMultiCache(annotationData.getNamespace(), ??);
+                    } catch (Exception ex) {
+                        LOG.warn("Problem when triggering a listener.", ex);
                     }
                 }
             }

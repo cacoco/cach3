@@ -4,9 +4,11 @@ import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.api.*;
 
 import java.lang.reflect.*;
 import java.security.*;
+import java.util.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -61,6 +63,18 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
                 throw new InvalidParameterException("Unable to find a cache key");
             }
             cache.delete(cacheKey);
+
+            // Notify the observers that a cache interaction happened.
+            final List<InvalidateAssignCacheListener> listeners = getPertinentListeners(InvalidateAssignCacheListener.class,annotationData.getNamespace());
+            if (listeners != null && !listeners.isEmpty()) {
+                for (final InvalidateAssignCacheListener listener : listeners) {
+                    try {
+                        listener.triggeredInvalidateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey());
+                    } catch (Exception ex) {
+                        LOG.warn("Problem when triggering a listener.", ex);
+                    }
+                }
+            }
         } catch (Throwable ex) {
             LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
         }

@@ -22,4 +22,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface UpdateAssignCacheListener extends CacheListener {
+    void triggeredUpdateAssignCache(String namespace, String assignKey, Object submission);
 }

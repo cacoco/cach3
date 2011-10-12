@@ -1,7 +1,6 @@
 package org.flite.cach3.config;
 
 import org.apache.commons.lang.math.*;
-import org.flite.cach3.annotations.UpdateAssignCache;
 import org.flite.cach3.api.*;
 import org.testng.annotations.*;
 
@@ -12,13 +11,26 @@ import java.util.*;
 import static org.testng.AssertJUnit.*;
 
 /**
- * Copyright (c) 2011 Flite, Inc
- * <p/>
- * All rights reserved.
- * THIS PROGRAM IS CONFIDENTIAL AND AN UNPUBLISHED WORK AND TRADE
- * SECRET OF THE COPYRIGHT HOLDER, AND DISTRIBUTED ONLY UNDER RESTRICTION.
- */
+Copyright (c) 2011 Flite, Inc
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ */
 public class ConfigurationHelperTest {
 
     @Test
@@ -40,7 +52,7 @@ public class ConfigurationHelperTest {
     public void testSetListeners() {
 
         try {
-            ConfigurationHelper.addCacheListeners(null, null);
+            ConfigurationHelper.addCacheListeners(null, new CacheListener[] {});
             fail("Expected Exception");
         } catch (InvalidParameterException ex) { }
 
@@ -70,20 +82,20 @@ public class ConfigurationHelperTest {
                 listeners.add(listener);
             }
         }
+        listeners.add(null);
         Collections.shuffle(listeners);
 
         ConfigurationHelper.addCacheListeners(state, listeners.toArray(new CacheListener[] {}));
 
-        assertEquals(classes.get(InvalidateAssignCacheListener.class).intValue(), state.getIAListeners().size());
-        assertEquals(classes.get(InvalidateSingleCacheListener.class).intValue(), state.getISListeners().size());
-        assertEquals(classes.get(InvalidateMultiCacheListener.class).intValue(), state.getIMListeners().size());
-        assertEquals(classes.get(ReadThroughAssignCacheListener.class).intValue(), state.getRTAListeners().size());
-        assertEquals(classes.get(ReadThroughSingleCacheListener.class).intValue(), state.getRTSListeners().size());
-        assertEquals(classes.get(ReadThroughMultiCacheListener.class).intValue(), state.getRTMListeners().size());
-        assertEquals(classes.get(UpdateAssignCacheListener.class).intValue(), state.getUAListeners().size());
-        assertEquals(classes.get(UpdateSingleCacheListener.class).intValue(), state.getUSListeners().size());
-        assertEquals(classes.get(UpdateMultiCacheListener.class).intValue(), state.getUMListeners().size());
-
+        assertEquals(classes.get(InvalidateAssignCacheListener.class).intValue(), state.getListeners(InvalidateAssignCacheListener.class).size());
+        assertEquals(classes.get(InvalidateSingleCacheListener.class).intValue(), state.getListeners(InvalidateSingleCacheListener.class).size());
+        assertEquals(classes.get(InvalidateMultiCacheListener.class).intValue(), state.getListeners(InvalidateMultiCacheListener.class).size());
+        assertEquals(classes.get(ReadThroughAssignCacheListener.class).intValue(), state.getListeners(ReadThroughAssignCacheListener.class).size());
+        assertEquals(classes.get(ReadThroughSingleCacheListener.class).intValue(), state.getListeners(ReadThroughSingleCacheListener.class).size());
+        assertEquals(classes.get(ReadThroughMultiCacheListener.class).intValue(), state.getListeners(ReadThroughMultiCacheListener.class).size());
+        assertEquals(classes.get(UpdateAssignCacheListener.class).intValue(), state.getListeners(UpdateAssignCacheListener.class).size());
+        assertEquals(classes.get(UpdateSingleCacheListener.class).intValue(), state.getListeners(UpdateSingleCacheListener.class).size());
+        assertEquals(classes.get(UpdateMultiCacheListener.class).intValue(), state.getListeners(UpdateMultiCacheListener.class).size());
     }
 
     private static class MyInvocationHandler implements InvocationHandler {

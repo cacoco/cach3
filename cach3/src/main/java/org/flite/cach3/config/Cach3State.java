@@ -2,6 +2,7 @@ package org.flite.cach3.config;
 
 import org.flite.cach3.api.*;
 
+import java.security.*;
 import java.util.*;
 
 /**
@@ -30,15 +31,18 @@ public class Cach3State {
 
     private boolean cacheDisabled = false;
 
-    private List<InvalidateAssignCacheListener> iaListeners = new ArrayList<InvalidateAssignCacheListener>();
-    private List<InvalidateSingleCacheListener> isListeners = new ArrayList<InvalidateSingleCacheListener>();
-    private List<InvalidateMultiCacheListener> imListeners = new ArrayList<InvalidateMultiCacheListener>();
-    private List<ReadThroughAssignCacheListener> rtaListeners = new ArrayList<ReadThroughAssignCacheListener>();
-    private List<ReadThroughSingleCacheListener> rtsListeners = new ArrayList<ReadThroughSingleCacheListener>();
-    private List<ReadThroughMultiCacheListener> rtmListeners = new ArrayList<ReadThroughMultiCacheListener>();
-    private List<UpdateAssignCacheListener> uaListeners = new ArrayList<UpdateAssignCacheListener>();
-    private List<UpdateSingleCacheListener> usListeners = new ArrayList<UpdateSingleCacheListener>();
-    private List<UpdateMultiCacheListener> umListeners = new ArrayList<UpdateMultiCacheListener>();
+    private Map<Class<? extends CacheListener>, List<? extends CacheListener>> listeners = new HashMap<Class<? extends CacheListener>, List<? extends CacheListener>>();
+    {
+        listeners.put(InvalidateAssignCacheListener.class, new ArrayList<InvalidateAssignCacheListener>());
+        listeners.put(InvalidateSingleCacheListener.class, new ArrayList<InvalidateSingleCacheListener>());
+        listeners.put(InvalidateMultiCacheListener.class, new ArrayList<InvalidateMultiCacheListener>());
+        listeners.put(ReadThroughAssignCacheListener.class, new ArrayList<ReadThroughAssignCacheListener>());
+        listeners.put(ReadThroughSingleCacheListener.class, new ArrayList<ReadThroughSingleCacheListener>());
+        listeners.put(ReadThroughMultiCacheListener.class, new ArrayList<ReadThroughMultiCacheListener>());
+        listeners.put(UpdateAssignCacheListener.class, new ArrayList<UpdateAssignCacheListener>());
+        listeners.put(UpdateSingleCacheListener.class, new ArrayList<UpdateSingleCacheListener>());
+        listeners.put(UpdateMultiCacheListener.class, new ArrayList<UpdateMultiCacheListener>());
+    }
 
     public boolean isCacheDisabled() {
         return cacheDisabled;
@@ -48,85 +52,62 @@ public class Cach3State {
         this.cacheDisabled = cacheDisabled;
     }
 
-    // InvalidateAssign
-    public void registerIAListener(final InvalidateAssignCacheListener listener) {
-        iaListeners.add(listener);
+    public void addListener(final CacheListener listener) {
+        if (listener == null) { return; }
+
+        if (listener instanceof InvalidateAssignCacheListener) {
+            final List<InvalidateAssignCacheListener> list = (List<InvalidateAssignCacheListener>)listeners.get(InvalidateAssignCacheListener.class);
+            list.add((InvalidateAssignCacheListener) listener);
+        }
+
+        if (listener instanceof InvalidateSingleCacheListener) {
+            final List<InvalidateSingleCacheListener> list = (List<InvalidateSingleCacheListener>)listeners.get(InvalidateSingleCacheListener.class);
+            list.add((InvalidateSingleCacheListener) listener);
+        }
+
+        if (listener instanceof InvalidateMultiCacheListener) {
+            final List<InvalidateMultiCacheListener> list = (List<InvalidateMultiCacheListener>)listeners.get(InvalidateMultiCacheListener.class);
+            list.add((InvalidateMultiCacheListener) listener);
+        }
+
+        if (listener instanceof UpdateAssignCacheListener) {
+            final List<UpdateAssignCacheListener> list = (List<UpdateAssignCacheListener>)listeners.get(UpdateAssignCacheListener.class);
+            list.add((UpdateAssignCacheListener) listener);
+        }
+
+        if (listener instanceof UpdateSingleCacheListener) {
+            final List<UpdateSingleCacheListener> list = (List<UpdateSingleCacheListener>)listeners.get(UpdateSingleCacheListener.class);
+            list.add((UpdateSingleCacheListener) listener);
+        }
+
+        if (listener instanceof UpdateMultiCacheListener) {
+            final List<UpdateMultiCacheListener> list = (List<UpdateMultiCacheListener>)listeners.get(UpdateMultiCacheListener.class);
+            list.add((UpdateMultiCacheListener) listener);
+        }
+
+        if (listener instanceof ReadThroughAssignCacheListener) {
+            final List<ReadThroughAssignCacheListener> list = (List<ReadThroughAssignCacheListener>)listeners.get(ReadThroughAssignCacheListener.class);
+            list.add((ReadThroughAssignCacheListener) listener);
+        }
+
+        if (listener instanceof ReadThroughSingleCacheListener) {
+            final List<ReadThroughSingleCacheListener> list = (List<ReadThroughSingleCacheListener>)listeners.get(ReadThroughSingleCacheListener.class);
+            list.add((ReadThroughSingleCacheListener) listener);
+        }
+
+        if (listener instanceof ReadThroughMultiCacheListener) {
+            final List<ReadThroughMultiCacheListener> list = (List<ReadThroughMultiCacheListener>)listeners.get(ReadThroughMultiCacheListener.class);
+            list.add((ReadThroughMultiCacheListener) listener);
+        }
     }
 
-    public List<InvalidateAssignCacheListener> getIAListeners() {
-        return iaListeners;
-    }
+    public <L extends CacheListener> List<L> getListeners(final Class<L> type) {
+        if (type == null) { throw new InvalidParameterException("Type must be defined."); }
 
-    // InvalidateSingle
-    public void registerISListener(final InvalidateSingleCacheListener listener) {
-        isListeners.add(listener);
-    }
+        final List<L> listenerList = (List<L>) listeners.get(type);
+        if (listenerList == null) { throw new InvalidParameterException(String.format("No listeners found of type [%s]",type.getName())); }
 
-    public List<InvalidateSingleCacheListener> getISListeners() {
-        return isListeners;
-    }
-
-    // InvalidateMulti
-    public void registerIMListener(final InvalidateMultiCacheListener listener) {
-        imListeners.add(listener);
-    }
-
-    public List<InvalidateMultiCacheListener> getIMListeners() {
-        return imListeners;
-    }
-
-    // ReadThroughAssign
-    public void registerRTAListener(final ReadThroughAssignCacheListener listener) {
-        rtaListeners.add(listener);
-    }
-
-    public List<ReadThroughAssignCacheListener> getRTAListeners() {
-        return rtaListeners;
-    }
-
-    // ReadThroughSingle
-    public void registerRTSListener(final ReadThroughSingleCacheListener listener) {
-        rtsListeners.add(listener);
-    }
-
-    public List<ReadThroughSingleCacheListener> getRTSListeners() {
-        return rtsListeners;
-    }
-
-    // ReadThroughMulti
-    public void registerRTMListener(final ReadThroughMultiCacheListener listener) {
-        rtmListeners.add(listener);
-    }
-
-    public List<ReadThroughMultiCacheListener> getRTMListeners() {
-        return rtmListeners;
-    }
-
-    // UpdateAssign
-    public void registerUAListener(final UpdateAssignCacheListener listener) {
-        uaListeners.add(listener);
-    }
-
-    public List<UpdateAssignCacheListener> getUAListeners() {
-        return uaListeners;
-    }
-
-    // UpdateSingle
-    public void registerUSListener(final UpdateSingleCacheListener listener) {
-        usListeners.add(listener);
-    }
-
-    public List<UpdateSingleCacheListener> getUSListeners() {
-        return usListeners;
-    }
-
-    // UpdateMulti
-    public void registerUMListener(final UpdateMultiCacheListener listener) {
-        umListeners.add(listener);
-    }
-
-    public List<UpdateMultiCacheListener> getUMListeners() {
-        return umListeners;
+        return listenerList;
     }
 
 }

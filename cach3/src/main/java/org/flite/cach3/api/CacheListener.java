@@ -1,5 +1,7 @@
 package org.flite.cach3.api;
 
+import java.util.*;
+
 /**
 Copyright (c) 2011 Flite, Inc
 
@@ -22,4 +24,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface CacheListener {
+
+    /**
+     * This method provides a short-circuit way to rule out cache interactions
+     * that the Observers/Listeners are not interested in.
+     *
+     * To be informed of all interactions, just return a null, or empty set
+     * of namespaces.
+     *
+     * @return null or emptyset to be informed of all cache interactions;
+     * otherwise the subset of namespaces that you are interested in
+     */
+    Set<String> getNamespacesOfInterest();
 }

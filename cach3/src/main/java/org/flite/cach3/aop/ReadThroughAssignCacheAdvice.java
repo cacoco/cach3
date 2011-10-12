@@ -7,8 +7,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.flite.cach3.annotations.ReadThroughAssignCache;
+import org.flite.cach3.api.*;
 
 import java.lang.reflect.Method;
+import java.util.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -75,6 +77,18 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
         try {
             final Object submission = (result == null) ? new PertinentNegativeNull() : result;
             cache.set(cacheKey, annotationData.getExpiration(), submission);
+
+            // Notify the observers that a cache interaction happened.
+            final List<ReadThroughAssignCacheListener> listeners = getPertinentListeners(ReadThroughAssignCacheListener.class,annotationData.getNamespace());
+            if (listeners != null && !listeners.isEmpty()) {
+                for (final ReadThroughAssignCacheListener listener : listeners) {
+                    try {
+                        // TODO: listener.triggeredReadThroughAssignCache(annotationData.getNamespace(), ??);
+                    } catch (Exception ex) {
+                        LOG.warn("Problem when triggering a listener.", ex);
+                    }
+                }
+            }
         } catch (Throwable ex) {
             LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
         }

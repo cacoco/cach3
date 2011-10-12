@@ -7,9 +7,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.flite.cach3.annotations.InvalidateSingleCache;
+import org.flite.cach3.api.*;
 
 import java.lang.reflect.Method;
 import java.security.InvalidParameterException;
+import java.util.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -84,6 +86,18 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
                 throw new InvalidParameterException("Unable to find a cache key");
             }
             cache.delete(cacheKey);
+
+            // Notify the observers that a cache interaction happened.
+            final List<InvalidateSingleCacheListener> listeners = getPertinentListeners(InvalidateSingleCacheListener.class,annotationData.getNamespace());
+            if (listeners != null && !listeners.isEmpty()) {
+                for (final InvalidateSingleCacheListener listener : listeners) {
+                    try {
+                        // TODO: listener.triggeredInvalidateSingleCache(annotationData.getNamespace(), ??);
+                    } catch (Exception ex) {
+                        LOG.warn("Problem when triggering a listener.", ex);
+                    }
+                }
+            }
         } catch (Throwable ex) {
             LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
         }

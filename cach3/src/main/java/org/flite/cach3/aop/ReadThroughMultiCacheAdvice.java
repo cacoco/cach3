@@ -4,6 +4,7 @@ import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.api.*;
 import org.flite.cach3.exceptions.*;
 
 import java.lang.reflect.*;
@@ -105,6 +106,18 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 						resultObject);
 				coord.getKey2Result().put(cacheKey, resultObject);
 			}
+
+            // Notify the observers that a cache interaction happened.
+            final List<ReadThroughMultiCacheListener> listeners = getPertinentListeners(ReadThroughMultiCacheListener.class,coord.getAnnotationData().getNamespace());
+            if (listeners != null && !listeners.isEmpty()) {
+                for (final ReadThroughMultiCacheListener listener : listeners) {
+                    try {
+                        // TODO: listener.triggeredReadThroughMultiCache(annotationData.getNamespace(), ??);
+                    } catch (Exception ex) {
+                        LOG.warn("Problem when triggering a listener.", ex);
+                    }
+                }
+            }
 
 			return coord.generateResultList();
 		} catch (Throwable ex) {

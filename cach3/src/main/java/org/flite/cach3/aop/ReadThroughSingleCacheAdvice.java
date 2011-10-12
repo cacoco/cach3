@@ -73,6 +73,18 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
 		try {
 			final Object submission = (result == null) ? new PertinentNegativeNull() : result;
 			cache.set(cacheKey, annotation.expiration(), submission);
+
+//            // Notify the observers that a cache interaction happened.
+//            final List<ReadThroughSingleCacheListener> listeners = getPertinentListeners(ReadThroughSingleCacheListener.class,annotationData.getNamespace());
+//            if (listeners != null && !listeners.isEmpty()) {
+//                for (final ReadThroughSingleCacheListener listener : listeners) {
+//                    try {
+//                        // TODO: listener.triggeredReadThroughSingleCache(annotationData.getNamespace(), ??);
+//                    } catch (Exception ex) {
+//                        LOG.warn("Problem when triggering a listener.", ex);
+//                    }
+//                }
+//            }
 		} catch (Throwable ex) {
 			LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
 		}

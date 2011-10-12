@@ -6,13 +6,26 @@ import org.flite.cach3.api.*;
 import java.security.*;
 
 /**
- * Copyright (c) 2011 Flite, Inc
- * <p/>
- * All rights reserved.
- * THIS PROGRAM IS CONFIDENTIAL AND AN UNPUBLISHED WORK AND TRADE
- * SECRET OF THE COPYRIGHT HOLDER, AND DISTRIBUTED ONLY UNDER RESTRICTION.
- */
+Copyright (c) 2011 Flite, Inc
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ */
 public class ConfigurationHelper {
     private static final Log LOG = LogFactory.getLog(ConfigurationHelper.class);
 
@@ -26,28 +39,10 @@ public class ConfigurationHelper {
         if (listeners == null || listeners.length == 0) { return; }
 
         for (final CacheListener listener : listeners) {
-            if (listener == null) { continue; }
-
-            if (listener instanceof InvalidateAssignCacheListener) {
-                state.registerIAListener((InvalidateAssignCacheListener)listener);
-            } else if (listener instanceof InvalidateSingleCacheListener) {
-                state.registerISListener((InvalidateSingleCacheListener)listener);
-            } else if (listener instanceof InvalidateMultiCacheListener) {
-                state.registerIMListener((InvalidateMultiCacheListener)listener);
-            } else if (listener instanceof ReadThroughAssignCacheListener) {
-                state.registerRTAListener((ReadThroughAssignCacheListener)listener);
-            } else if (listener instanceof ReadThroughSingleCacheListener) {
-                state.registerRTSListener((ReadThroughSingleCacheListener)listener);
-            } else if (listener instanceof ReadThroughMultiCacheListener) {
-                state.registerRTMListener((ReadThroughMultiCacheListener)listener);
-            } else if (listener instanceof UpdateAssignCacheListener) {
-                state.registerUAListener((UpdateAssignCacheListener)listener);
-            } else if (listener instanceof UpdateSingleCacheListener) {
-                state.registerUSListener((UpdateSingleCacheListener)listener);
-            } else if (listener instanceof UpdateMultiCacheListener) {
-                state.registerUMListener((UpdateMultiCacheListener)listener);
+            if (listener == null) {
+                LOG.info("Skipping null CacheListener");
             } else {
-                LOG.info(String.format("Unrecognized CacheListener type: [%s]", listener.getClass().getName()));
+                state.addListener(listener);
             }
         }
     }

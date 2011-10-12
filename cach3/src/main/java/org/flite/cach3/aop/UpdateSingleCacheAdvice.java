@@ -4,8 +4,10 @@ import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.api.*;
 
 import java.lang.reflect.*;
+import java.util.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -60,6 +62,18 @@ public class UpdateSingleCacheAdvice extends CacheBase {
                     : getIndexObject(annotationData.getDataIndex(), jp, methodToCache);
             final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
 			cache.set(cacheKey, annotationData.getExpiration(), submission);
+
+            // Notify the observers that a cache interaction happened.
+            final List<UpdateSingleCacheListener> listeners = getPertinentListeners(UpdateSingleCacheListener.class,annotationData.getNamespace());
+            if (listeners != null && !listeners.isEmpty()) {
+                for (final UpdateSingleCacheListener listener : listeners) {
+                    try {
+                        // TODO: listener.triggeredUpdateSingleCache(annotationData.getNamespace(), ??);
+                    } catch (Exception ex) {
+                        LOG.warn("Problem when triggering a listener.", ex);
+                    }
+                }
+            }
 		} catch (Exception ex) {
 			LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
 		}

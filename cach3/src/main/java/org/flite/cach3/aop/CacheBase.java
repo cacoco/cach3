@@ -5,6 +5,7 @@ import org.aspectj.lang.*;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.api.*;
 import org.flite.cach3.config.*;
 import org.flite.cach3.exceptions.*;
 
@@ -245,6 +246,26 @@ public class CacheBase {
             final Method keyMethod = getKeyMethod(object);
             final String objectId = generateObjectId(keyMethod, object);
             results.add(buildCacheKey(objectId, annotationData));
+        }
+
+        return results;
+    }
+
+    protected <L extends CacheListener> List<L> getPertinentListeners(final Class<L> clazz,
+                                                                      final String namespace) throws Exception {
+        if (clazz == null) { throw new InvalidParameterException("Clazz type must be defined."); }
+        if (namespace == null || namespace.length() == 0) { throw new InvalidParameterException("Namespace must be defined."); }
+
+        final List<L> results = new ArrayList<L>();
+        final List<L> baseList = state.getListeners(clazz);
+        if (baseList != null && !baseList.isEmpty()) {
+            for (final L base : baseList) {
+                if (base.getNamespacesOfInterest() == null
+                        || base.getNamespacesOfInterest().isEmpty()
+                        || base.getNamespacesOfInterest().contains(namespace)) {
+                    results.add(base);
+                }
+            }
         }
 
         return results;

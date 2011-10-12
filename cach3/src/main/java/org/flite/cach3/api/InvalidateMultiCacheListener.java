@@ -1,5 +1,7 @@
 package org.flite.cach3.api;
 
+import java.util.*;
+
 /**
 Copyright (c) 2011 Flite, Inc
 
@@ -22,4 +24,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface InvalidateMultiCacheListener extends CacheListener {
+    void triggeredInvalidateMultiCache(String namespace, List<Object> keyObjects);
 }

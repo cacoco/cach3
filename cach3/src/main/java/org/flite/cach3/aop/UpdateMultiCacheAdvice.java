@@ -4,6 +4,7 @@ import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.api.*;
 import org.flite.cach3.exceptions.*;
 
 import java.lang.reflect.*;
@@ -60,6 +61,18 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 			final List<Object> keyObjects = getKeyObjects(annotationData.getKeyIndex(), retVal, jp, methodToCache);
 			final List<String> cacheKeys = getCacheKeys(keyObjects, annotationData);
 			updateCache(cacheKeys, dataList, methodToCache, annotationData);
+
+            // Notify the observers that a cache interaction happened.
+            final List<UpdateMultiCacheListener> listeners = getPertinentListeners(UpdateMultiCacheListener.class,annotationData.getNamespace());
+            if (listeners != null && !listeners.isEmpty()) {
+                for (final UpdateMultiCacheListener listener : listeners) {
+                    try {
+                        // TODO: listener.triggeredUpdateMultiCache(annotationData.getNamespace(), ??);
+                    } catch (Exception ex) {
+                        LOG.warn("Problem when triggering a listener.", ex);
+                    }
+                }
+            }
 		} catch (Exception ex) {
 			LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
 		}
