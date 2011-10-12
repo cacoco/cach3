@@ -34,16 +34,17 @@ public class ConfigurationHelper {
         state.setCacheDisabled(disabled);
     }
 
-    public static void addCacheListeners(final Cach3State state, final CacheListener... listeners) {
+    public static boolean addCacheListeners(final Cach3State state, final CacheListener... listeners) {
         if (state == null) { throw new InvalidParameterException("Cach3State must be defined."); }
-        if (listeners == null || listeners.length == 0) { return; }
-
-        for (final CacheListener listener : listeners) {
-            if (listener == null) {
-                LOG.info("Skipping null CacheListener");
-            } else {
-                state.addListener(listener);
+        if (listeners != null && listeners.length > 0) {
+            for (final CacheListener listener : listeners) {
+                if (listener == null) {
+                    LOG.info("Skipping null CacheListener");
+                } else {
+                    state.addListener(listener);
+                }
             }
         }
+        return true;
     }
 }

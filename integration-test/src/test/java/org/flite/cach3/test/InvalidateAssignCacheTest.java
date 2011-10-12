@@ -1,15 +1,15 @@
 package org.flite.cach3.test;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotSame;
-import static org.testng.AssertJUnit.assertFalse;
-import org.flite.cach3.test.svc.TestSvc;
+import org.flite.cach3.test.dao.*;
+import org.flite.cach3.test.listeners.*;
+import org.flite.cach3.test.svc.*;
+import org.springframework.context.*;
+import org.springframework.context.support.*;
+import org.testng.annotations.*;
 
-import java.util.List;
+import java.util.*;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -43,6 +43,8 @@ public class InvalidateAssignCacheTest {
     @Test
     public void test() {
         final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubInvalidateAssignCacheListenerImpl listener =
+                (StubInvalidateAssignCacheListenerImpl) context.getBean("stubIA");
 
         final List<String> result1 = test.getAssignStrings();
         final List<String> result2 = test.getAssignStrings();
@@ -52,7 +54,14 @@ public class InvalidateAssignCacheTest {
             assertEquals(result1.get(ix), result2.get(ix));
         }
 
+        final int previous = listener.getTriggers().size();
         test.invalidateAssignStrings();
+
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() > previous);
+        final String expected = StubInvalidateAssignCacheListenerImpl.formatTriggers(TestDAOImpl.ASSIGN_NAMESPACE, TestDAOImpl.ASSIGN_KEY);
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+
         final List<String> result3 = test.getAssignStrings();
 
         // This was wrong before. The 3rd array is supposed to come

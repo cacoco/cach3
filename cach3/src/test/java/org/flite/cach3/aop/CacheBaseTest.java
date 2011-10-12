@@ -1,15 +1,17 @@
 package org.flite.cach3.aop;
 
 import org.apache.commons.lang.*;
-import static org.testng.AssertJUnit.*;
-
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.api.*;
+import org.flite.cach3.config.*;
 import org.flite.cach3.exceptions.*;
 import org.testng.annotations.*;
 
-import java.security.*;
 import java.lang.reflect.*;
+import java.security.*;
 import java.util.*;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -156,6 +158,70 @@ public class CacheBaseTest {
 		}
 	}
 
+    @Test
+    public void testGetPertinentListeners() throws Exception {
+        final Cach3State state = new Cach3State();
+        cut.setState(state);
+
+        final MockInvalidateAssignCacheListener bubba = new MockInvalidateAssignCacheListener();
+        bubba.setInterests(new HashSet<String>());
+        bubba.getInterests().add("buford");
+        bubba.getInterests().add("blue");
+        bubba.getInterests().add("shrimp");
+        state.addListener(bubba);
+
+        final MockInvalidateAssignCacheListener forest = new MockInvalidateAssignCacheListener();
+        forest.setInterests(new HashSet<String>());
+        forest.getInterests().add("gump");
+        forest.getInterests().add("shrimp");
+        state.addListener(forest);
+
+        final MockInvalidateAssignCacheListener nosey1 = new MockInvalidateAssignCacheListener();
+        nosey1.setInterests(new HashSet<String>());
+        state.addListener(nosey1);
+
+        final MockInvalidateAssignCacheListener nosey2 = new MockInvalidateAssignCacheListener();
+        state.addListener(nosey2);
+
+        // Check for valid parameters
+        try {
+            cut.getPertinentListeners(null, "bubba");
+            fail("Expected Exception.");
+        } catch (InvalidParameterException ex) { }
+
+        try {
+            cut.getPertinentListeners(CacheListener.class, null);
+            fail("Expected Exception.");
+        } catch (InvalidParameterException ex) { }
+
+        try {
+            cut.getPertinentListeners(CacheListener.class, "");
+            fail("Expected Exception.");
+        } catch (InvalidParameterException ex) { }
+
+        // Now check actual execution.
+        final List<InvalidateAssignCacheListener> r1 = cut.getPertinentListeners(InvalidateAssignCacheListener.class, "yankee");
+        assertFalse(r1.contains(bubba));
+        assertFalse(r1.contains(forest));
+        assertTrue(r1.contains(nosey1));
+        assertTrue(r1.contains(nosey2));
+
+        final List<InvalidateAssignCacheListener> r2 = cut.getPertinentListeners(InvalidateAssignCacheListener.class, "buford");
+        assertTrue(r2.contains(bubba));
+        assertFalse(r2.contains(forest));
+        assertTrue(r2.contains(nosey1));
+        assertTrue(r2.contains(nosey2));
+
+        final List<InvalidateAssignCacheListener> r3 = cut.getPertinentListeners(InvalidateAssignCacheListener.class, "shrimp");
+        assertTrue(r3.contains(bubba));
+        assertTrue(r3.contains(forest));
+        assertTrue(r3.contains(nosey1));
+        assertTrue(r3.contains(nosey2));
+
+        final List<UpdateMultiCacheListener> r4 = cut.getPertinentListeners(UpdateMultiCacheListener.class, "shrimp");
+        assertTrue(r4.isEmpty());
+    }
+
 	private static class ReturnTypeCheck {
 		@ReadThroughMultiCache(keyIndex = 0, namespace = "bubba", expiration = 10)
 		public List checkA() {return null;}
@@ -208,4 +274,30 @@ public class CacheBaseTest {
 		private KeyObject06(String result) { this.result = result;}
 		public String toString() { return result; }
 	}
+
+    // TODO: Maybe promote this for usage throughout the unit tests?
+    private static class MockInvalidateAssignCacheListener implements InvalidateAssignCacheListener {
+        private Set<String> interests = null;
+        private List<String> triggers = new ArrayList<String>();
+
+        public List<String> getTriggers() {
+            return triggers;
+        }
+
+        public Set<String> getInterests() {
+            return interests;
+        }
+
+        public void setInterests(Set<String> interests) {
+            this.interests = interests;
+        }
+
+        public void triggeredInvalidateAssignCache(String namespace, String assignedKey) {
+            triggers.add(String.format("%s [-] %s", namespace, assignedKey));
+        }
+
+        public Set<String> getNamespacesOfInterest() {
+            return interests;
+        }
+    }
 }

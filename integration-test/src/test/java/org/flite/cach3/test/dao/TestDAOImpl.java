@@ -28,8 +28,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
-@Repository("testDao")
 public class TestDAOImpl implements TestDAO {
+
+    public static final String ASSIGN_NAMESPACE = "Echo";
+    public static final String ASSIGN_KEY = "SomePhatKey";
 
 	@ReadThroughSingleCache(namespace = "Alpha", keyIndex = 0, expiration = 30)
 	public String getDateString(final String key) {
@@ -126,7 +128,7 @@ public class TestDAOImpl implements TestDAO {
         return keys;
     }
 
-    @ReadThroughAssignCache(assignedKey = "SomePhatKey", namespace = "Echo", expiration = 3000)
+    @ReadThroughAssignCache(assignedKey = ASSIGN_KEY, namespace = ASSIGN_NAMESPACE, expiration = 3000)
     public List<String> getAssignStrings() {
         try {
             Thread.sleep(500);
@@ -140,9 +142,9 @@ public class TestDAOImpl implements TestDAO {
         return results;
     }
 
-    @InvalidateAssignCache(assignedKey = "SomePhatKey", namespace = "Echo")
+    @InvalidateAssignCache(assignedKey = ASSIGN_KEY, namespace = ASSIGN_NAMESPACE)
     public void invalidateAssignStrings() { }
 
-    @UpdateAssignCache(assignedKey = "SomePhatKey", namespace = "Echo", expiration = 3000, dataIndex = 1)
+    @UpdateAssignCache(assignedKey = ASSIGN_KEY, namespace = ASSIGN_NAMESPACE, expiration = 3000, dataIndex = 1)
     public void updateAssignStrings(int bubpkus, final List<String> newData) { }
 }

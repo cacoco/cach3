@@ -26,4 +26,10 @@
 		<property name="dao" ref="testDao" />
 	</bean>
 
+  <bean id="stubIA" class="org.flite.cach3.test.listeners.StubInvalidateAssignCacheListenerImpl" />
+
+  <bean class="org.flite.cach3.config.ConfigurationHelper" factory-method="addCacheListeners">
+    <constructor-arg index="0" ref="cach3-state"/>
+    <constructor-arg index="1" ref="stubIA" />
+  </bean>
 </beans>
