@@ -83,7 +83,7 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final ReadThroughAssignCacheListener listener : listeners) {
                     try {
-                        // TODO: listener.triggeredReadThroughAssignCache(annotationData.getNamespace(), ??);
+                        listener.triggeredReadThroughAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), result);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }
