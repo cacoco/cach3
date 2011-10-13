@@ -41,12 +41,12 @@ public class StubInvalidateSingleCacheListenerImpl implements InvalidateSingleCa
         this.interests = interests;
     }
 
-    public void triggeredInvalidateSingleCache(String namespace, Object keyObject) {
-        this.triggers.add(formatTriggers(namespace, keyObject));
-    }
-
     public Set<String> getNamespacesOfInterest() {
         return interests;
+    }
+
+    public void triggeredInvalidateSingleCache(final String namespace, final Object keyObject) {
+        this.triggers.add(formatTriggers(namespace, keyObject));
     }
 
     public static String formatTriggers(final String namespace, final Object keyObject) {

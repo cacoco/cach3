@@ -52,6 +52,7 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
         // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
         // but do not let it surface up past the AOP injection itself.
         String cacheKey = null;
+        Object keyObject = null;
         final AnnotationData annotationData;
         try {
             final Method methodToCache = getMethodToCache(pjp);
@@ -61,7 +62,7 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
                             InvalidateSingleCache.class,
                             methodToCache.getName());
             if (annotationData.getKeyIndex() > -1) {
-                final Object keyObject = getIndexObject(annotationData.getKeyIndex(), pjp, methodToCache);
+                keyObject = getIndexObject(annotationData.getKeyIndex(), pjp, methodToCache);
                 final Method keyMethod = getKeyMethod(keyObject);
                 final String objectId = generateObjectId(keyMethod, keyObject);
                 cacheKey = buildCacheKey(objectId, annotationData);
@@ -78,6 +79,7 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
         try {
             // If we have a -1 key index, then build the cacheKey now.
             if (annotationData.getKeyIndex() == -1) {
+                keyObject = result;
                 final Method keyMethod = getKeyMethod(result);
                 final String objectId = generateObjectId(keyMethod, result);
                 cacheKey = buildCacheKey(objectId, annotationData);
@@ -92,7 +94,7 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final InvalidateSingleCacheListener listener : listeners) {
                     try {
-                        // TODO: listener.triggeredInvalidateSingleCache(annotationData.getNamespace(), ??);
+                        listener.triggeredInvalidateSingleCache(annotationData.getNamespace(), keyObject);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }

@@ -58,7 +58,7 @@ public class InvalidateAssignCacheTest {
         test.invalidateAssignStrings();
 
         // Testing that the listener got invoked as required.
-        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() > previous);
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
         final String expected = StubInvalidateAssignCacheListenerImpl.formatTriggers(TestDAOImpl.ASSIGN_NAMESPACE, TestDAOImpl.ASSIGN_KEY);
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 

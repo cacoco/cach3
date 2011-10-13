@@ -1,17 +1,16 @@
 package org.flite.cach3.test;
 
-import static org.testng.AssertJUnit.*;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import org.apache.commons.lang.math.RandomUtils;
-import org.flite.cach3.test.svc.TestSvc;
+import org.apache.commons.lang.math.*;
+import org.flite.cach3.test.dao.*;
+import org.flite.cach3.test.listeners.*;
+import org.flite.cach3.test.svc.*;
+import org.springframework.context.*;
+import org.springframework.context.support.*;
+import org.testng.annotations.*;
 
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.ArrayList;
+import java.util.*;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -45,6 +44,8 @@ public class InvalidateMultiCacheTest {
     @Test
     public void test() {
         final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubInvalidateMultiCacheListenerImpl listener =
+                (StubInvalidateMultiCacheListenerImpl) context.getBean("stubIM");
 
         final List<Long> allIds = new ArrayList<Long>();
         final List<Long> noChangeIds = new ArrayList<Long>();
@@ -64,7 +65,14 @@ public class InvalidateMultiCacheTest {
         assertEquals(firstMap, createMap(allIds, test.getRandomStrings(allIds)));
         assertEquals(firstMap, createMap(allIds, test.getRandomStrings(allIds)));
 
+        final int previous = listener.getTriggers().size();
         test.updateRandomStrings(firstChangeIds);
+
+        // Make sure the listener is getting triggered.
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+        final String expected = StubInvalidateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.MULTI_NAMESPACE, firstChangeIds);
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
         final Map<Long, String> secondMap = createMap(allIds, test.getRandomStrings(allIds));
         for (Map.Entry<Long, String> entry : secondMap.entrySet()) {

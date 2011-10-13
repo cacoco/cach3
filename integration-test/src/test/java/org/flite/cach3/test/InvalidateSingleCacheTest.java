@@ -1,11 +1,13 @@
 package org.flite.cach3.test;
 
+import org.flite.cach3.test.dao.*;
+import org.flite.cach3.test.listeners.*;
+import org.flite.cach3.test.svc.*;
+import org.springframework.context.*;
+import org.springframework.context.support.*;
+import org.testng.annotations.*;
+
 import static org.testng.AssertJUnit.*;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import org.flite.cach3.test.svc.TestSvc;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -42,6 +44,8 @@ public class InvalidateSingleCacheTest {
         final Long key2 = System.currentTimeMillis() + 10000;
 
         final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubInvalidateSingleCacheListenerImpl listener =
+                (StubInvalidateSingleCacheListenerImpl) context.getBean("stubIS");
 
         final String f1 = test.getRandomString(key1);
         final String f2 = test.getRandomString(key2);
@@ -52,7 +56,15 @@ public class InvalidateSingleCacheTest {
         assertEquals(f1, test.getRandomString(key1));
         assertEquals(f2, test.getRandomString(key2));
 
+        final int previous = listener.getTriggers().size();
         test.updateRandomString(key1);
+
+        // Make sure the listener is getting triggered.
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+        final String expected = StubInvalidateSingleCacheListenerImpl.formatTriggers(TestDAOImpl.SINGLE_NAMESPACE, key1);
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+
         test.updateRandomString(key2);
 
         final String s1 = test.getRandomString(key1);

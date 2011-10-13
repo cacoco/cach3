@@ -49,6 +49,7 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
         // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
         // but do not let it surface up past the AOP injection itself.
         List<String> cacheKeys = null;
+        List<Object> keyObjects = null;
         final AnnotationData annotationData;
         final String methodDescription;
         try {
@@ -61,7 +62,7 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
                             methodToCache.getName());
             if (annotationData.getKeyIndex() > -1) {
                 final Object keyObject = getIndexObject(annotationData.getKeyIndex(), pjp, methodToCache);
-                final List<Object> keyObjects = convertToKeyObjects(keyObject, annotationData.getKeyIndex(), methodDescription);
+                keyObjects = convertToKeyObjects(keyObject, annotationData.getKeyIndex(), methodDescription);
                 cacheKeys = getCacheKeys(keyObjects, annotationData);
             }
         } catch (Throwable ex) {
@@ -76,7 +77,7 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
         try {
             // If we have a -1 key index, then build the cacheKeys now.
             if (annotationData.getKeyIndex() == -1) {
-                final List<Object> keyObjects = convertToKeyObjects(result, annotationData.getKeyIndex(), methodDescription);
+                keyObjects = convertToKeyObjects(result, annotationData.getKeyIndex(), methodDescription);
                 cacheKeys = getCacheKeys(keyObjects, annotationData);
             }
             if (cacheKeys != null && cacheKeys.size() > 0) {
@@ -92,7 +93,7 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final InvalidateMultiCacheListener listener : listeners) {
                     try {
-                        // TODO: listener.triggeredInvalidateMultiCache(annotationData.getNamespace(), ??);
+                        listener.triggeredInvalidateMultiCache(annotationData.getNamespace(), keyObjects);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }

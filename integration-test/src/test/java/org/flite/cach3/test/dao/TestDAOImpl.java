@@ -1,9 +1,8 @@
 package org.flite.cach3.test.dao;
 
+import org.apache.commons.lang.*;
+import org.apache.commons.lang.math.*;
 import org.flite.cach3.annotations.*;
-import org.springframework.stereotype.*;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.math.RandomUtils;
 
 import java.util.*;
 
@@ -30,6 +29,8 @@ THE SOFTWARE.
  */
 public class TestDAOImpl implements TestDAO {
 
+    public static final String SINGLE_NAMESPACE = "Charlie";
+    public static final String MULTI_NAMESPACE = "Delta";
     public static final String ASSIGN_NAMESPACE = "Echo";
     public static final String ASSIGN_KEY = "SomePhatKey";
 
@@ -87,7 +88,7 @@ public class TestDAOImpl implements TestDAO {
                                         final String nuthin,
                                         final List<String> overrideData) {}
 
-    @ReadThroughSingleCache(namespace = "Charlie", keyIndex = 0, expiration = 1000)
+    @ReadThroughSingleCache(namespace = SINGLE_NAMESPACE, keyIndex = 0, expiration = 1000)
     public String getRandomString(final Long key) {
         try {
             Thread.sleep(500);
@@ -95,17 +96,17 @@ public class TestDAOImpl implements TestDAO {
         return RandomStringUtils.randomAlphanumeric(25 + RandomUtils.nextInt(30));
     }
 
-    @InvalidateSingleCache(namespace = "Charlie", keyIndex = 0)
+    @InvalidateSingleCache(namespace = SINGLE_NAMESPACE, keyIndex = 0)
     public void updateRandomString(final Long key) {
         // Nothing really to do here.
     }
 
-    @InvalidateSingleCache(namespace = "Charlie", keyIndex = -1)
+    @InvalidateSingleCache(namespace = SINGLE_NAMESPACE, keyIndex = -1)
     public Long updateRandomStringAgain(final Long key) {
         return key;
     }
 
-    @ReadThroughMultiCache(namespace = "Delta", keyIndex = 0, expiration = 1000)
+    @ReadThroughMultiCache(namespace = MULTI_NAMESPACE, keyIndex = 0, expiration = 1000)
     public List<String> getRandomStrings(final List<Long> keys) {
         try {
             Thread.sleep(500);
@@ -118,12 +119,12 @@ public class TestDAOImpl implements TestDAO {
         return results;
     }
 
-    @InvalidateMultiCache(namespace = "Delta", keyIndex = 0)
+    @InvalidateMultiCache(namespace = MULTI_NAMESPACE, keyIndex = 0)
     public void updateRandomStrings(final List<Long> keys) {
         // Nothing to do.
     }
 
-    @InvalidateMultiCache(namespace = "Delta", keyIndex = 0)
+    @InvalidateMultiCache(namespace = MULTI_NAMESPACE, keyIndex = 0)
     public List<Long> updateRandomStringsAgain(final List<Long> keys) {
         return keys;
     }

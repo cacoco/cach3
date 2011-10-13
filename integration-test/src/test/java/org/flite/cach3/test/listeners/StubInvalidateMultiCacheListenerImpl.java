@@ -25,7 +25,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
-public class StubInvalidateAssignCacheListenerImpl implements InvalidateAssignCacheListener {
+public class StubInvalidateMultiCacheListenerImpl implements InvalidateMultiCacheListener {
     private Set<String> interests = null;
     private List<String> triggers = new ArrayList<String>();
 
@@ -45,11 +45,12 @@ public class StubInvalidateAssignCacheListenerImpl implements InvalidateAssignCa
         return interests;
     }
 
-    public void triggeredInvalidateAssignCache(final String namespace, final String assignedKey) {
-        triggers.add(formatTriggers(namespace, assignedKey));
+    public void triggeredInvalidateMultiCache(final String namespace, final List<Object> keyObjects) {
+        this.triggers.add(formatTriggers(namespace, keyObjects));
     }
 
-    public static String formatTriggers(final String namespace, final String assignedKey) {
-        return String.format("%s [-] %s", namespace, assignedKey);
+    public static String formatTriggers(final String namespace, final List<? extends Object> keyObjects) {
+        return String.format("%s [-] %s", namespace, keyObjects.toString());
     }
+
 }

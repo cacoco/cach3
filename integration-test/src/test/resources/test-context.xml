@@ -27,9 +27,17 @@
 	</bean>
 
   <bean id="stubIA" class="org.flite.cach3.test.listeners.StubInvalidateAssignCacheListenerImpl" />
+  <bean id="stubIS" class="org.flite.cach3.test.listeners.StubInvalidateSingleCacheListenerImpl" />
+  <bean id="stubIM" class="org.flite.cach3.test.listeners.StubInvalidateMultiCacheListenerImpl" />
 
   <bean class="org.flite.cach3.config.ConfigurationHelper" factory-method="addCacheListeners">
     <constructor-arg index="0" ref="cach3-state"/>
-    <constructor-arg index="1" ref="stubIA" />
+    <constructor-arg index="1">
+      <list>
+        <ref bean="stubIA" />
+        <ref bean="stubIS" />
+        <ref bean="stubIM" />
+      </list>
+    </constructor-arg>
   </bean>
 </beans>

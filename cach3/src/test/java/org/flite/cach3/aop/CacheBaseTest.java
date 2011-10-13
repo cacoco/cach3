@@ -3,6 +3,7 @@ package org.flite.cach3.aop;
 import org.apache.commons.lang.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
+import org.flite.cach3.api.stubs.*;
 import org.flite.cach3.config.*;
 import org.flite.cach3.exceptions.*;
 import org.testng.annotations.*;
@@ -163,24 +164,24 @@ public class CacheBaseTest {
         final Cach3State state = new Cach3State();
         cut.setState(state);
 
-        final MockInvalidateAssignCacheListener bubba = new MockInvalidateAssignCacheListener();
+        final TestInvalidateAssignCacheListener bubba = new TestInvalidateAssignCacheListener();
         bubba.setInterests(new HashSet<String>());
         bubba.getInterests().add("buford");
         bubba.getInterests().add("blue");
         bubba.getInterests().add("shrimp");
         state.addListener(bubba);
 
-        final MockInvalidateAssignCacheListener forest = new MockInvalidateAssignCacheListener();
+        final TestInvalidateAssignCacheListener forest = new TestInvalidateAssignCacheListener();
         forest.setInterests(new HashSet<String>());
         forest.getInterests().add("gump");
         forest.getInterests().add("shrimp");
         state.addListener(forest);
 
-        final MockInvalidateAssignCacheListener nosey1 = new MockInvalidateAssignCacheListener();
+        final TestInvalidateAssignCacheListener nosey1 = new TestInvalidateAssignCacheListener();
         nosey1.setInterests(new HashSet<String>());
         state.addListener(nosey1);
 
-        final MockInvalidateAssignCacheListener nosey2 = new MockInvalidateAssignCacheListener();
+        final TestInvalidateAssignCacheListener nosey2 = new TestInvalidateAssignCacheListener();
         state.addListener(nosey2);
 
         // Check for valid parameters
@@ -275,29 +276,4 @@ public class CacheBaseTest {
 		public String toString() { return result; }
 	}
 
-    // TODO: Maybe promote this for usage throughout the unit tests?
-    private static class MockInvalidateAssignCacheListener implements InvalidateAssignCacheListener {
-        private Set<String> interests = null;
-        private List<String> triggers = new ArrayList<String>();
-
-        public List<String> getTriggers() {
-            return triggers;
-        }
-
-        public Set<String> getInterests() {
-            return interests;
-        }
-
-        public void setInterests(Set<String> interests) {
-            this.interests = interests;
-        }
-
-        public void triggeredInvalidateAssignCache(String namespace, String assignedKey) {
-            triggers.add(String.format("%s [-] %s", namespace, assignedKey));
-        }
-
-        public Set<String> getNamespacesOfInterest() {
-            return interests;
-        }
-    }
 }
