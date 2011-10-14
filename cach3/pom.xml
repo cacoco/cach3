@@ -6,9 +6,12 @@
     <artifactId>cach3-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
+
   <artifactId>cach3</artifactId>
   <packaging>jar</packaging>
   <name>cach3</name>
+  <url>https://github.com/flite/cach3</url>
+
   <build>
     <plugins>
       <plugin>
@@ -19,9 +22,25 @@
           </descriptorRefs>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/test/listeners/*</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-  
+
   <reporting>
     <plugins>
       <plugin>

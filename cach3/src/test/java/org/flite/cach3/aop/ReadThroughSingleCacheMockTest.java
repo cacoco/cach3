@@ -3,14 +3,14 @@ package org.flite.cach3.aop;
 import net.spy.memcached.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.reflect.*;
-import static org.easymock.EasyMock.*;
-import static org.testng.AssertJUnit.*;
-
 import org.flite.cach3.annotations.*;
 import org.testng.annotations.*;
 
 import java.lang.reflect.*;
 import java.security.*;
+
+import static org.easymock.EasyMock.*;
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -107,20 +107,6 @@ public class ReadThroughSingleCacheMockTest {
 		assertEquals(answer, cut.getIndexObject(1, pjp, method));
 
 		verifyAll();
-	}
-
-	@Test
-	public void testGetObjectId() throws Exception {
-		final Method methodToCache = AOPTargetClass2.class.getDeclaredMethod("cacheThis", AOPKeyClass.class);
-		expect(pjp.getArgs()).andReturn(new Object[] {new AOPKeyClass()});
-
-		replayAll();
-
-		final String result = cut.getObjectId(0, pjp, methodToCache);
-
-		verifyAll();
-
-		assertEquals(AOPKeyClass.result, result);
 	}
 
 	@Test

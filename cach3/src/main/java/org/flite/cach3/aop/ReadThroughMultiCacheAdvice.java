@@ -79,6 +79,8 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 			// Create the new list of arguments with a subset of the key objects that aren't in the cache.
 			args = coord.modifyArgumentList(args);
 		} catch (Throwable ex) {
+            // If there's an exception somewhere in the caching code, then just bail out
+            // and call through to the target method with the original parameters.
 			LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
 			return pjp.proceed();
 		}

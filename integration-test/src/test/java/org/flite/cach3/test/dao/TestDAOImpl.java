@@ -29,12 +29,13 @@ THE SOFTWARE.
  */
 public class TestDAOImpl implements TestDAO {
 
+    public static final String DATE_NAMESPACE = "Alpha";
     public static final String SINGLE_NAMESPACE = "Charlie";
     public static final String MULTI_NAMESPACE = "Delta";
     public static final String ASSIGN_NAMESPACE = "Echo";
     public static final String ASSIGN_KEY = "SomePhatKey";
 
-	@ReadThroughSingleCache(namespace = "Alpha", keyIndex = 0, expiration = 30)
+	@ReadThroughSingleCache(namespace = DATE_NAMESPACE, keyIndex = 0, expiration = 30)
 	public String getDateString(final String key) {
 		final Date now = new Date();
 		try {
@@ -43,7 +44,7 @@ public class TestDAOImpl implements TestDAO {
 		return now.toString() + ":" + now.getTime();
 	}
 
-    @UpdateSingleCache(namespace = "Alpha", keyIndex = 1, dataIndex = 2, expiration = 30)
+    @UpdateSingleCache(namespace = DATE_NAMESPACE, keyIndex = 1, dataIndex = 2, expiration = 30)
     public void overrideDateString(final int trash, final String key, final String overrideData) {}
 
     @ReadThroughMultiCache(namespace = "Bravo", keyIndex = 0, expiration = 300)

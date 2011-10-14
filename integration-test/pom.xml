@@ -9,17 +9,27 @@
   <artifactId>integration-test</artifactId>
   <packaging>jar</packaging>
   <name>integration-test</name>
-  <url>http://code.google.com/p/simple-spring-memcached/</url>
+  <url>https://github.com/flite/cach3</url>
+
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>cach3</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.4</version>
-        </dependency>
-    </dependencies>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.4</version>
+    </dependency>
+
+    <!--test-->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>cach3</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+      <type>test-jar</type>
+    </dependency>
+  </dependencies>
 </project>

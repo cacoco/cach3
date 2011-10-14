@@ -1,12 +1,13 @@
 package org.flite.cach3.test;
 
+import org.flite.cach3.test.dao.*;
+import org.flite.cach3.test.listeners.*;
 import org.flite.cach3.test.svc.*;
 import org.springframework.context.*;
 import org.springframework.context.support.*;
-import static org.testng.AssertJUnit.*;
 import org.testng.annotations.*;
 
-import java.util.*;
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -41,9 +42,19 @@ public class ReadThroughSingleCacheTest {
 	@Test
 	public void test() {
 		final TestSvc test = (TestSvc) context.getBean("testSvc");
-		final String currentKey = "TestKey-" + new Date().getTime();
-		System.out.println("Key -> " + currentKey);
+        final StubReadThroughSingleCacheListenerImpl listener =
+                (StubReadThroughSingleCacheListenerImpl) context.getBean("stubRTS");
+
+        final String currentKey = "TestKey-" + System.currentTimeMillis();
+
+        final int previous = listener.getTriggers().size();
 		final String s1 = test.getDateString(currentKey);
+
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+        final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.DATE_NAMESPACE, currentKey, s1);
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+
 		for (int ix = 0; ix < 10; ix++) {
 			assertEquals(String.format("Cache didn't seem to bring back [%s] as expectd.", s1), s1, test.getDateString(currentKey));
 		}

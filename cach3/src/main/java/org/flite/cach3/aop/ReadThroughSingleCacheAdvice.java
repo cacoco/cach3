@@ -4,8 +4,10 @@ import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.api.*;
 
 import java.lang.reflect.*;
+import java.util.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -47,14 +49,17 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
 		// but do not let it surface up past the AOP injection itself.
 		final String cacheKey;
 		final ReadThroughSingleCache annotation;
+        final AnnotationData annotationData;
+        final Object keyObject;
 		try {
 			final Method methodToCache = getMethodToCache(pjp);
 			annotation = methodToCache.getAnnotation(ReadThroughSingleCache.class);
-            final AnnotationData annotationData =
+            annotationData =
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             ReadThroughSingleCache.class,
                             methodToCache.getName());
-            final String objectId = getObjectId(annotation.keyIndex(), pjp, methodToCache);
+            keyObject = getIndexObject(annotation.keyIndex(), pjp, methodToCache);
+            final String objectId = getObjectId(keyObject);
 			cacheKey = buildCacheKey(objectId, annotationData);
 			final Object result = cache.get(cacheKey);
 			if (result != null) {
@@ -74,27 +79,24 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
 			final Object submission = (result == null) ? new PertinentNegativeNull() : result;
 			cache.set(cacheKey, annotation.expiration(), submission);
 
-//            // Notify the observers that a cache interaction happened.
-//            final List<ReadThroughSingleCacheListener> listeners = getPertinentListeners(ReadThroughSingleCacheListener.class,annotationData.getNamespace());
-//            if (listeners != null && !listeners.isEmpty()) {
-//                for (final ReadThroughSingleCacheListener listener : listeners) {
-//                    try {
-//                        // TODO: listener.triggeredReadThroughSingleCache(annotationData.getNamespace(), ??);
-//                    } catch (Exception ex) {
-//                        LOG.warn("Problem when triggering a listener.", ex);
-//                    }
-//                }
-//            }
+            // Notify the observers that a cache interaction happened.
+            final List<ReadThroughSingleCacheListener> listeners = getPertinentListeners(ReadThroughSingleCacheListener.class,annotationData.getNamespace());
+            if (listeners != null && !listeners.isEmpty()) {
+                for (final ReadThroughSingleCacheListener listener : listeners) {
+                    try {
+                        listener.triggeredReadThroughSingleCache(annotationData.getNamespace(), keyObject, result);
+                    } catch (Exception ex) {
+                        LOG.warn("Problem when triggering a listener.", ex);
+                    }
+                }
+            }
 		} catch (Throwable ex) {
 			LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
 		}
 		return result;
 	}
 
-	protected String getObjectId(final int keyIndex,
-	                             final JoinPoint jp,
-	                             final Method methodToCache) throws Exception {
-		final Object keyObject = getIndexObject(keyIndex, jp, methodToCache);
+	protected String getObjectId(final Object keyObject) throws Exception {
 		final Method keyMethod = getKeyMethod(keyObject);
 		return generateObjectId(keyMethod, keyObject);
 	}
