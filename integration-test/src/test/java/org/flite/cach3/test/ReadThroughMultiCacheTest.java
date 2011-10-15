@@ -137,7 +137,7 @@ public class ReadThroughMultiCacheTest {
 
 		final List<String> keys = new ArrayList<String>();
 		final Map<String, String> answerMap = new HashMap<String, String>();
-		final Long now = new Date().getTime();
+		final Long now = System.currentTimeMillis();
 		final String alphabet = "abcdefghijklmnopqrstuvwxyz";
 		for (int ix = 0; ix < 5; ix++) {
 			final String key = alphabet.charAt(ix) + now.toString();

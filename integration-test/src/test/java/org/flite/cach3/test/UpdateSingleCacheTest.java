@@ -1,5 +1,9 @@
 package org.flite.cach3.test;
 
+import org.flite.cach3.test.dao.TestDAOImpl;
+import org.flite.cach3.test.listeners.StubReadThroughSingleCacheListenerImpl;
+import org.flite.cach3.test.listeners.StubUpdateAssignCacheListenerImpl;
+import org.flite.cach3.test.listeners.StubUpdateSingleCacheListenerImpl;
 import org.springframework.context.*;
 import org.springframework.context.support.*;
 import org.testng.annotations.*;
@@ -56,6 +60,8 @@ public class UpdateSingleCacheTest {
 		final Map<Long, String> expectedResults = new HashMap<Long, String>();
 
 		final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubUpdateSingleCacheListenerImpl listener =
+                (StubUpdateSingleCacheListenerImpl) context.getBean("stubUS");
 
         // This should hit the DAO, filling every value with the same first part,
         // followed by an "X", followed by the key.
@@ -73,7 +79,14 @@ public class UpdateSingleCacheTest {
         // Go thru each key in the 'subset', and replace the cache
         // value with a single value, followed by a "U", followed by the key.
         for (final Long key : subset) {
+            final int previous = listener.getTriggers().size();
             final String value = test.updateTimestampValue(key);
+
+            // Testing that the listener got invoked as required.
+            assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+            final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE, key, value);
+            assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+
 			assertFalse(originalResults.get(key).equals(value));
 			expectedResults.put(key, value);
 		}

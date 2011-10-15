@@ -36,16 +36,16 @@ public class UpdateSingleCacheAdviceTest {
         cut.updateSingle();
     }
 
-    @Test
-    public void testGetObjectId() throws Exception {
-        final String key = "Key-" + System.currentTimeMillis();
-        final KeyObject obj = new KeyObject();
-        obj.setKey(key);
-
-        final String result = cut.getObjectId(-1, obj, null, null);
-
-        assertEquals(key, result);
-    }
+//    @Test
+//    public void testGetObjectId() throws Exception {
+//        final String key = "Key-" + System.currentTimeMillis();
+//        final KeyObject obj = new KeyObject();
+//        obj.setKey(key);
+//
+//        final String result = cut.getObjectId(-1, obj, null, null);
+//
+//        assertEquals(key, result);
+//    }
 
     private static class AnnotationValidator {
 		@UpdateSingleCache(keyIndex = -1, namespace = "bubba")

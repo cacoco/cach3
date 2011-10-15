@@ -54,7 +54,7 @@ public class TestDAOImpl implements TestDAO {
 		try {
 			Thread.sleep(1500);
 		} catch (InterruptedException ex) {}
-		final Long now = new Date().getTime();
+		final Long now = System.currentTimeMillis();
 		for (final Long key : keys) {
 			results.add(now.toString() + "-X-" + key.toString());
 		}
@@ -66,7 +66,7 @@ public class TestDAOImpl implements TestDAO {
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException ex) {}
-		final Long now = new Date().getTime();
+		final Long now = System.currentTimeMillis();
 		final String result = now.toString() + "-U-" + key.toString();
 		return result;
 	}
@@ -76,7 +76,7 @@ public class TestDAOImpl implements TestDAO {
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException ex) {}
-		final Long now = new Date().getTime();
+		final Long now = System.currentTimeMillis();
 		final List<String> results = new ArrayList<String>();
 		for (final Long key : keys) {
 			results.add(now.toString() + "-M-" + key.toString());

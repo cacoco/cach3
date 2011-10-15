@@ -55,7 +55,10 @@ public class UpdateSingleCacheAdvice extends CacheBase {
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             UpdateSingleCache.class,
                             methodToCache.getName());
-            final String objectId = getObjectId(annotationData.getKeyIndex(), retVal, jp, methodToCache);
+            final Object keyObject = annotationData.getKeyIndex() == -1
+                                        ? validateReturnValueAsKeyObject(retVal, methodToCache)
+                                        : getIndexObject(annotationData.getKeyIndex(), jp, methodToCache);
+            final String objectId = getObjectId(keyObject);
 			final String cacheKey = buildCacheKey(objectId, annotationData);
             final Object dataObject = annotationData.getDataIndex() == -1
                     ? retVal
@@ -68,7 +71,7 @@ public class UpdateSingleCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final UpdateSingleCacheListener listener : listeners) {
                     try {
-                        // TODO: listener.triggeredUpdateSingleCache(annotationData.getNamespace(), ??);
+                        listener.triggeredUpdateSingleCache(annotationData.getNamespace(), keyObject, submission);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }
@@ -80,13 +83,7 @@ public class UpdateSingleCacheAdvice extends CacheBase {
 		return retVal;
 	}
 
-	protected String getObjectId(final int keyIndex,
-     	                         final Object returnValue,
-	                             final JoinPoint jp,
-	                             final Method methodToCache) throws Exception {
-		final Object keyObject = keyIndex == -1
-									? validateReturnValueAsKeyObject(returnValue, methodToCache)
-									: getIndexObject(keyIndex, jp, methodToCache);
+	protected String getObjectId(final Object keyObject) throws Exception {
 		final Method keyMethod = getKeyMethod(keyObject);
 		return generateObjectId(keyMethod, keyObject);
 	}
