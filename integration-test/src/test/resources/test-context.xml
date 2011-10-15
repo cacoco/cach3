@@ -32,6 +32,7 @@
   <bean id="stubRTA" class="org.flite.cach3.test.listeners.StubReadThroughAssignCacheListenerImpl" />
   <bean id="stubRTS" class="org.flite.cach3.test.listeners.StubReadThroughSingleCacheListenerImpl" />
   <bean id="stubRTM" class="org.flite.cach3.test.listeners.StubReadThroughMultiCacheListenerImpl" />
+  <bean id="stubUA" class="org.flite.cach3.test.listeners.StubUpdateAssignCacheListenerImpl" />
 
   <bean class="org.flite.cach3.config.ConfigurationHelper" factory-method="addCacheListeners">
     <constructor-arg index="0" ref="cach3-state"/>
@@ -43,6 +44,7 @@
         <ref bean="stubRTA" />
         <ref bean="stubRTS" />
         <ref bean="stubRTM" />
+        <ref bean="stubUA" />
       </list>
     </constructor-arg>
   </bean>

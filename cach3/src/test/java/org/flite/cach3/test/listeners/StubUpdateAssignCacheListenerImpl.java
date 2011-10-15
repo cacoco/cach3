@@ -1,8 +1,10 @@
-package org.flite.cach3.api.stubs;
+package org.flite.cach3.test.listeners;
 
-import org.flite.cach3.api.*;
+import org.flite.cach3.api.UpdateAssignCacheListener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -25,7 +27,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
-public class TestInvalidateAssignCacheListener implements InvalidateAssignCacheListener {
+public class StubUpdateAssignCacheListenerImpl implements UpdateAssignCacheListener {
     private Set<String> interests = null;
     private List<String> triggers = new ArrayList<String>();
 
@@ -41,11 +43,16 @@ public class TestInvalidateAssignCacheListener implements InvalidateAssignCacheL
         this.interests = interests;
     }
 
-    public void triggeredInvalidateAssignCache(String namespace, String assignedKey) {
-        triggers.add(String.format("%s [-] %s", namespace, assignedKey));
-    }
-
     public Set<String> getNamespacesOfInterest() {
         return interests;
     }
+
+    public void triggeredUpdateAssignCache(final String namespace, final String assignKey, final Object submission) {
+        triggers.add(formatTriggers(namespace, assignKey, submission));
+    }
+
+    public static String formatTriggers(final String namespace, final String assignedKey, final Object submission) {
+        return String.format("%s [-] %s [-] %s", namespace, assignedKey, submission);
+    }
+
 }

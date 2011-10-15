@@ -3,9 +3,9 @@ package org.flite.cach3.aop;
 import org.apache.commons.lang.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
-import org.flite.cach3.api.stubs.*;
 import org.flite.cach3.config.*;
 import org.flite.cach3.exceptions.*;
+import org.flite.cach3.test.listeners.StubInvalidateAssignCacheListenerImpl;
 import org.testng.annotations.*;
 
 import java.lang.reflect.*;
@@ -164,24 +164,24 @@ public class CacheBaseTest {
         final Cach3State state = new Cach3State();
         cut.setState(state);
 
-        final TestInvalidateAssignCacheListener bubba = new TestInvalidateAssignCacheListener();
+        final StubInvalidateAssignCacheListenerImpl bubba = new StubInvalidateAssignCacheListenerImpl();
         bubba.setInterests(new HashSet<String>());
         bubba.getInterests().add("buford");
         bubba.getInterests().add("blue");
         bubba.getInterests().add("shrimp");
         state.addListener(bubba);
 
-        final TestInvalidateAssignCacheListener forest = new TestInvalidateAssignCacheListener();
+        final StubInvalidateAssignCacheListenerImpl forest = new StubInvalidateAssignCacheListenerImpl();
         forest.setInterests(new HashSet<String>());
         forest.getInterests().add("gump");
         forest.getInterests().add("shrimp");
         state.addListener(forest);
 
-        final TestInvalidateAssignCacheListener nosey1 = new TestInvalidateAssignCacheListener();
+        final StubInvalidateAssignCacheListenerImpl nosey1 = new StubInvalidateAssignCacheListenerImpl();
         nosey1.setInterests(new HashSet<String>());
         state.addListener(nosey1);
 
-        final TestInvalidateAssignCacheListener nosey2 = new TestInvalidateAssignCacheListener();
+        final StubInvalidateAssignCacheListenerImpl nosey2 = new StubInvalidateAssignCacheListenerImpl();
         state.addListener(nosey2);
 
         // Check for valid parameters

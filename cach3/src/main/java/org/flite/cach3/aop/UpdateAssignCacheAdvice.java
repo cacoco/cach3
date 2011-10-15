@@ -65,7 +65,7 @@ public class UpdateAssignCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final UpdateAssignCacheListener listener : listeners) {
                     try {
-                        // TODO: listener.triggeredUpdateAssignCache(annotationData.getNamespace(), ??);
+                        listener.triggeredUpdateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), dataObject);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }

@@ -1,5 +1,8 @@
 package org.flite.cach3.test;
 
+import org.flite.cach3.test.dao.TestDAOImpl;
+import org.flite.cach3.test.listeners.StubReadThroughAssignCacheListenerImpl;
+import org.flite.cach3.test.listeners.StubUpdateAssignCacheListenerImpl;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.testng.annotations.BeforeClass;
@@ -42,6 +45,8 @@ public class UpdateAssignCacheTest {
     @Test
     public void test() {
         final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubUpdateAssignCacheListenerImpl listener =
+                (StubUpdateAssignCacheListenerImpl) context.getBean("stubUA");
 
         final List<String> result1 = test.getAssignStrings();
 
@@ -52,7 +57,14 @@ public class UpdateAssignCacheTest {
             }
         }
 
+        final int previous = listener.getTriggers().size();
         test.updateAssignStrings(altData);
+
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+        final String expected = StubUpdateAssignCacheListenerImpl.formatTriggers(TestDAOImpl.ASSIGN_NAMESPACE, TestDAOImpl.ASSIGN_KEY, altData);
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+
         final List<String> result2 = test.getAssignStrings();
 
         assertNotSame(result1.size(), result2.size());
