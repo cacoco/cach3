@@ -30,6 +30,7 @@ THE SOFTWARE.
 public class TestDAOImpl implements TestDAO {
 
     public static final String DATE_NAMESPACE = "Alpha";
+    public static final String TIME_NAMESPACE = "Bravo";
     public static final String SINGLE_NAMESPACE = "Charlie";
     public static final String MULTI_NAMESPACE = "Delta";
     public static final String ASSIGN_NAMESPACE = "Echo";
@@ -47,7 +48,7 @@ public class TestDAOImpl implements TestDAO {
     @UpdateSingleCache(namespace = DATE_NAMESPACE, keyIndex = 1, dataIndex = 2, expiration = 30)
     public void overrideDateString(final int trash, final String key, final String overrideData) {}
 
-    @ReadThroughMultiCache(namespace = "Bravo", keyIndex = 0, expiration = 300)
+    @ReadThroughMultiCache(namespace = TIME_NAMESPACE, keyIndex = 0, expiration = 300)
 	public List<String> getTimestampValues(final List<Long> keys) {
 		final List<String> results = new ArrayList<String>();
 		try {
@@ -60,7 +61,7 @@ public class TestDAOImpl implements TestDAO {
 		return results;
 	}
 
-	@UpdateSingleCache(namespace = "Bravo", keyIndex = 0, expiration = 300, dataIndex = -1)
+	@UpdateSingleCache(namespace = TIME_NAMESPACE, keyIndex = 0, expiration = 300, dataIndex = -1)
 	public String updateTimestampValue(final Long key) {
 		try {
 			Thread.sleep(100);
@@ -70,7 +71,7 @@ public class TestDAOImpl implements TestDAO {
 		return result;
 	}
 
-	@UpdateMultiCache(namespace = "Bravo", keyIndex = 0, expiration = 300, dataIndex = -1)
+	@UpdateMultiCache(namespace = TIME_NAMESPACE, keyIndex = 0, expiration = 300, dataIndex = -1)
 	public List<String> updateTimestamValues(final List<Long> keys) {
 		try {
 			Thread.sleep(100);
@@ -83,7 +84,7 @@ public class TestDAOImpl implements TestDAO {
 		return results;
 	}
 
-    @UpdateMultiCache(namespace = "Bravo", keyIndex = 1, dataIndex = 3, expiration = 300)
+    @UpdateMultiCache(namespace = TIME_NAMESPACE, keyIndex = 1, dataIndex = 3, expiration = 300)
     public void overrideTimestampValues(final int trash,
                                         final List<Long> keys,
                                         final String nuthin,

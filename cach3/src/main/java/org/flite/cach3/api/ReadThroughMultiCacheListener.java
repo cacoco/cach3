@@ -24,5 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface ReadThroughMultiCacheListener extends CacheListener {
+    // The objects sent in here are only the subset that were read from the
+    // underlying method and then sent to the cache.
     void triggeredReadThroughMultiCache(String namespace, List<Object> keyObjects, List<Object> submissions);
 }

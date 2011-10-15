@@ -1,13 +1,15 @@
 package org.flite.cach3.test;
 
-import org.flite.cach3.test.svc.*;
 import net.spy.memcached.*;
+import org.flite.cach3.test.listeners.*;
+import org.flite.cach3.test.svc.*;
 import org.springframework.context.*;
 import org.springframework.context.support.*;
-import static org.testng.AssertJUnit.*;
 import org.testng.annotations.*;
 
 import java.util.*;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -56,6 +58,8 @@ public class ReadThroughMultiCacheTest {
 		Collections.shuffle(jumbleset);
 
 		final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubReadThroughMultiCacheListenerImpl listener =
+                (StubReadThroughMultiCacheListenerImpl) context.getBean("stubRTM");
 
 		// Get all the results for the subset ids.
 		// Ensure the ids line up with the results, and have the same timestamp.
@@ -78,7 +82,16 @@ public class ReadThroughMultiCacheTest {
 		// Now call the full list.
 		// Ensure id's line up, and that results from ids that got passed in the subset
 		// have the older time stamp.
+        final int previous = listener.getTriggers().size();
 		final List<String> supersetResult = test.getTimestampValues(superset);
+
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+//      TODO: This needs even better verification. The problem is that we're dealing with two
+//              subset lists, that may be in different orders.
+//        final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.DATE_NAMESPACE, currentKey, s1);
+//        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+
 		assertEquals(superset.size(), supersetResult.size());
 		String supersetTime = null;
 		for (int ix = 0; ix < superset.size(); ix++) {
