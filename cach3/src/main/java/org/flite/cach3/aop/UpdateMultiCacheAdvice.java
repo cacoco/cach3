@@ -67,7 +67,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final UpdateMultiCacheListener listener : listeners) {
                     try {
-                        // TODO: listener.triggeredUpdateMultiCache(annotationData.getNamespace(), ??);
+                        listener.triggeredUpdateMultiCache(annotationData.getNamespace(), keyObjects, dataList);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }
