@@ -1,6 +1,9 @@
 package org.flite.cach3.config;
 
+import org.apache.commons.logging.*;
 import org.flite.cach3.api.*;
+import org.springframework.beans.factory.*;
+import org.springframework.context.*;
 
 import java.security.*;
 import java.util.*;
@@ -27,9 +30,11 @@ import java.util.*;
  * THE SOFTWARE.
  */
 
-public class Cach3State {
+public class Cach3State implements ApplicationContextAware, InitializingBean {
+    private static final Log LOG = LogFactory.getLog(Cach3State.class);
 
     private boolean cacheDisabled = false;
+    private ApplicationContext context;
 
     private Map<Class<? extends CacheListener>, List<? extends CacheListener>> listeners = new HashMap<Class<? extends CacheListener>, List<? extends CacheListener>>();
     {
@@ -42,6 +47,27 @@ public class Cach3State {
         listeners.put(UpdateAssignCacheListener.class, new ArrayList<UpdateAssignCacheListener>());
         listeners.put(UpdateSingleCacheListener.class, new ArrayList<UpdateSingleCacheListener>());
         listeners.put(UpdateMultiCacheListener.class, new ArrayList<UpdateMultiCacheListener>());
+    }
+
+    public void setApplicationContext(final ApplicationContext applicationContext) {
+        this.context = applicationContext;
+    }
+
+    public void afterPropertiesSet() throws Exception {
+        final Map<String, CacheListener> beans = context.getBeansOfType(CacheListener.class);
+        if (beans == null || beans.isEmpty()) {
+            LOG.info(String.format("No beans of type [%s] found.", CacheListener.class.getName()));
+            return;
+        }
+
+        for (final Map.Entry<String, CacheListener> entry : beans.entrySet()) {
+            final String beanName = entry.getKey();
+            final CacheListener listener = entry.getValue();
+            if (listener != null) {
+                addListener(listener);
+                LOG.debug(String.format("Added bean: [%s] - {%s}", beanName, listener.getClass().getName()));
+            }
+        }
     }
 
     public boolean isCacheDisabled() {
