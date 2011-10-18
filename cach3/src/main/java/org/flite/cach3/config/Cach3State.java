@@ -2,6 +2,7 @@ package org.flite.cach3.config;
 
 import org.apache.commons.logging.*;
 import org.flite.cach3.api.*;
+import org.flite.cach3.api.MemcachedClientProvider;
 import org.springframework.beans.factory.*;
 import org.springframework.context.*;
 
@@ -29,12 +30,13 @@ import java.util.*;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 public class Cach3State implements ApplicationContextAware, InitializingBean {
     private static final Log LOG = LogFactory.getLog(Cach3State.class);
 
-    private boolean cacheDisabled = false;
     private ApplicationContext context;
+
+    private boolean cacheDisabled = false;
+    private MemcachedClientProvider provider;
 
     private Map<Class<? extends CacheListener>, List<? extends CacheListener>> listeners = new HashMap<Class<? extends CacheListener>, List<? extends CacheListener>>();
     {
@@ -53,7 +55,23 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
         this.context = applicationContext;
     }
 
+    /*default*/ void setProvider(MemcachedClientProvider provider) { // for testing
+        this.provider = provider;
+    }
+
     public void afterPropertiesSet() throws Exception {
+        // Get one, and only one, provider.
+        final Map<String, MemcachedClientProvider> providers = context.getBeansOfType(MemcachedClientProvider.class);
+        if (providers == null || providers.isEmpty() || providers.size() > 1) {
+            throw new IllegalStateException("There must be exactly one MemcachedClientProvider defined.");
+        }
+
+        final String providerName = providers.keySet().iterator().next();
+        provider = providers.get(providerName);
+        if (provider == null) { throw new IllegalStateException("No provider found."); } // Not likely to happen!
+        if (provider.getMemcachedClient() == null) { throw new IllegalStateException("Provider doesn't seem to be providing."); }
+
+        // Get the listeners
         final Map<String, CacheListener> beans = context.getBeansOfType(CacheListener.class);
         if (beans == null || beans.isEmpty()) {
             LOG.info(String.format("No beans of type [%s] found.", CacheListener.class.getName()));
@@ -68,10 +86,12 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
                 LOG.debug(String.format("Added bean: [%s] - {%s}", beanName, listener.getClass().getName()));
             }
         }
+
+
     }
 
     public boolean isCacheDisabled() {
-        return cacheDisabled;
+        return cacheDisabled || provider == null;
     }
 
     public void setCacheDisabled(boolean cacheDisabled) {

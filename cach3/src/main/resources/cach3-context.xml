@@ -14,11 +14,11 @@
 
   <!--<aop:aspectj-autoproxy />-->
 
-	<bean id="memcachedClientFactory" class="org.flite.cach3.config.MemcachedClientFactory" >
-		<property name="bean" ref="memcachedConnectionBean" />
-	</bean>
+	<!--<bean id="memcachedClientFactory" class="org.flite.cach3.config.MemcachedClientFactory" >-->
+		<!--<property name="bean" ref="memcachedConnectionBean" />-->
+	<!--</bean>-->
 
-	<bean id="memcachedClient" factory-bean="memcachedClientFactory" factory-method="createMemcachedClient" />
+	<!--<bean id="memcachedClient" factory-bean="memcachedClientFactory" factory-method="createMemcachedClient" />-->
 
 	<bean id="methodStore" class="org.flite.cach3.aop.CacheKeyMethodStoreImpl" />
 

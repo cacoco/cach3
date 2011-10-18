@@ -2,6 +2,7 @@ package org.flite.cach3.config;
 
 import org.apache.commons.lang.math.*;
 import org.flite.cach3.api.*;
+import org.flite.cach3.api.impl.DefaultMemcachedCacheProviderImpl;
 import org.testng.annotations.*;
 
 import java.lang.reflect.*;
@@ -41,6 +42,8 @@ public class ConfigurationHelperTest {
         } catch (InvalidParameterException ex) { }
 
         final Cach3State state = new Cach3State();
+        state.setProvider(new DefaultMemcachedCacheProviderImpl());
+
         for (int ix = 0; ix < 3; ix++) {
             final boolean result = RandomUtils.nextBoolean();
             ConfigurationHelper.setCacheDisabled(state, result);
