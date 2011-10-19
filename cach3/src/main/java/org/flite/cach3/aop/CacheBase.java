@@ -38,7 +38,7 @@ public class CacheBase {
 
 	static final String SEPARATOR = ":";
 
-	protected MemcachedClientIF cache;
+//	protected MemcachedClientIF cache;
 	CacheKeyMethodStore methodStore;
     private Cach3State state;
 
@@ -50,10 +50,10 @@ public class CacheBase {
         return state == null ? false : state.isCacheDisabled();
     }
 
-    public void setCache(MemcachedClientIF cache) {
-		this.cache = cache;
-	}
-
+//    public void setCache(MemcachedClientIF cache) {
+//		this.cache = cache;
+//	}
+//
 	public void setMethodStore(CacheKeyMethodStore methodStore) {
 		this.methodStore = methodStore;
 	}
@@ -269,5 +269,9 @@ public class CacheBase {
         }
 
         return results;
+    }
+
+    protected MemcachedClientIF getMemcachedClient() {
+        return state.getMemcachedClient();
     }
 }

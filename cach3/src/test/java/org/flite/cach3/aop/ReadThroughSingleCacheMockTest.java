@@ -4,6 +4,8 @@ import net.spy.memcached.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.reflect.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.api.*;
+import org.flite.cach3.config.*;
 import org.testng.annotations.*;
 
 import java.lang.reflect.*;
@@ -36,6 +38,7 @@ THE SOFTWARE.
 public class ReadThroughSingleCacheMockTest {
 
 	private ReadThroughSingleCacheAdvice cut;
+    private Cach3State state;
 	private ProceedingJoinPoint pjp;
 	private MemcachedClientIF cache;
 	private MethodSignature sig;
@@ -48,8 +51,15 @@ public class ReadThroughSingleCacheMockTest {
 		cache = createMock(MemcachedClientIF.class);
 		sig = createMock(MethodSignature.class);
 
-		cut.setCache(cache);
+        state = new Cach3State();
+        cut.setState(state);
 		cut.setMethodStore(new CacheKeyMethodStoreImpl());
+
+        state.setProvider(new MemcachedClientProvider() {
+            public MemcachedClientIF getMemcachedClient() {
+                return cache;
+            }
+        });
 	}
 
 	@BeforeMethod

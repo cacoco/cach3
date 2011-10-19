@@ -1,8 +1,8 @@
 package org.flite.cach3.config;
 
+import net.spy.memcached.*;
 import org.apache.commons.lang.math.*;
 import org.flite.cach3.api.*;
-import org.flite.cach3.api.impl.DefaultMemcachedCacheProviderImpl;
 import org.testng.annotations.*;
 
 import java.lang.reflect.*;
@@ -35,14 +35,18 @@ THE SOFTWARE.
 public class ConfigurationHelperTest {
 
     @Test
-    public void testSetDisabled() {
+    public void testSetDisabled() throws Exception {
         try {
             ConfigurationHelper.setCacheDisabled(null, true);
             fail("Expected Exception.");
         } catch (InvalidParameterException ex) { }
 
         final Cach3State state = new Cach3State();
-        state.setProvider(new DefaultMemcachedCacheProviderImpl());
+        state.setProvider(new MemcachedClientProvider() {
+            public MemcachedClientIF getMemcachedClient() {
+                return null;
+            }
+        });
 
         for (int ix = 0; ix < 3; ix++) {
             final boolean result = RandomUtils.nextBoolean();

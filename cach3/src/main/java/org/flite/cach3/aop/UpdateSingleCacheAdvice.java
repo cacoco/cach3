@@ -1,5 +1,6 @@
 package org.flite.cach3.aop;
 
+import net.spy.memcached.*;
 import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
@@ -45,6 +46,7 @@ public class UpdateSingleCacheAdvice extends CacheBase {
             return retVal;
         }
 
+        final MemcachedClientIF cache = getMemcachedClient();
         // For Update*Cache, an AfterReturning aspect is fine. We will only apply our caching
         // after the underlying method completes successfully, and we will have the same
         // access to the method params.
@@ -87,15 +89,15 @@ public class UpdateSingleCacheAdvice extends CacheBase {
 		final Method keyMethod = getKeyMethod(keyObject);
 		return generateObjectId(keyMethod, keyObject);
 	}
-
-	protected void validateAnnotation(final UpdateSingleCache annotation,
-	                                  final Method method) {
-
-		final Class annotationClass = UpdateSingleCache.class;
-		validateAnnotationExists(annotation, annotationClass);
-		validateAnnotationIndex(annotation.keyIndex(), true, annotationClass, method);
-		validateAnnotationNamespace(annotation.namespace(), annotationClass, method);
-		validateAnnotationExpiration(annotation.expiration(), annotationClass, method);
-	}
-
+//  TODO: Not needed?
+//	protected void validateAnnotation(final UpdateSingleCache annotation,
+//	                                  final Method method) {
+//
+//		final Class annotationClass = UpdateSingleCache.class;
+//		validateAnnotationExists(annotation, annotationClass);
+//		validateAnnotationIndex(annotation.keyIndex(), true, annotationClass, method);
+//		validateAnnotationNamespace(annotation.namespace(), annotationClass, method);
+//		validateAnnotationExpiration(annotation.expiration(), annotationClass, method);
+//	}
+//
 }

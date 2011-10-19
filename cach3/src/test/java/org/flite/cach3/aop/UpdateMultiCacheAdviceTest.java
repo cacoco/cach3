@@ -1,16 +1,18 @@
 package org.flite.cach3.aop;
 
-import net.spy.memcached.MemcachedClientIF;
+import net.spy.memcached.*;
 import org.apache.commons.lang.*;
-import static org.testng.AssertJUnit.*;
-
+import org.easymock.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.api.*;
+import org.flite.cach3.config.*;
 import org.flite.cach3.exceptions.*;
 import org.testng.annotations.*;
-import org.easymock.EasyMock;
 
 import java.lang.reflect.*;
 import java.util.*;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -36,12 +38,16 @@ THE SOFTWARE.
 public class UpdateMultiCacheAdviceTest {
 
 	private UpdateMultiCacheAdvice cut;
+    private Cach3State state;
 
 	@BeforeClass
 	public void beforeClass() {
 		cut = new UpdateMultiCacheAdvice();
 		cut.setMethodStore(new CacheKeyMethodStoreImpl());
         cut.updateMulti();
+
+        state = new Cach3State();
+        cut.setState(state);
     }
 
 	@Test
@@ -87,20 +93,25 @@ public class UpdateMultiCacheAdviceTest {
         final UpdateMultiCache annotation = method.getAnnotation(UpdateMultiCache.class);
         final AnnotationData data = AnnotationDataBuilder.buildAnnotationData(annotation, UpdateMultiCache.class, "cacheMe01");
 
+        final MemcachedClientIF cache = EasyMock.createMock(MemcachedClientIF.class);
+        state.setProvider(new MemcachedClientProvider() {
+            public MemcachedClientIF getMemcachedClient() {
+                return cache;
+            }
+        });
+
         final List<String> keys = new ArrayList<String>();
         final List<Object> objs = new ArrayList<Object>();
         keys.add("Key1-" + System.currentTimeMillis());
         keys.add("Key2-" + System.currentTimeMillis());
 
         try {
-            cut.updateCache(keys, objs, method, data);
+            cut.updateCache(keys, objs, method, data, cache);
             fail("Expected Exception.");
         } catch (InvalidAnnotationException ex) {
             assertTrue(ex.getMessage().contains("do not match in size"));
         }
 
-        final MemcachedClientIF cache = EasyMock.createMock(MemcachedClientIF.class);
-        cut.setCache(cache);
 
         for (final String key : keys) {
             final String value = "ValueFor-" + key;
@@ -113,7 +124,7 @@ public class UpdateMultiCacheAdviceTest {
 
         EasyMock.replay(cache);
 
-        cut.updateCache(keys, objs, method, data);
+        cut.updateCache(keys, objs, method, data, cache);
 
         EasyMock.verify(cache);
 

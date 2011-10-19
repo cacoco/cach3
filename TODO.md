@@ -1,6 +1,5 @@
 In Progress
 ===========
-* Cache Activity Observers [to address multi-datacenter and/or multi-object updates]
 * Pluggable/Overrideable MemcachedClient Factory
 
 To Do / For Consideration
@@ -19,3 +18,4 @@ These are the items that should be considered for future inclusion in the projec
 Finished
 ========
 * Cache Disabling
+* Cache Activity Observers [to address multi-datacenter and/or multi-object updates]

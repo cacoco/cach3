@@ -1,5 +1,6 @@
 package org.flite.cach3.config;
 
+import net.spy.memcached.*;
 import org.apache.commons.logging.*;
 import org.flite.cach3.api.*;
 import org.flite.cach3.api.MemcachedClientProvider;
@@ -55,7 +56,8 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
         this.context = applicationContext;
     }
 
-    /*default*/ void setProvider(MemcachedClientProvider provider) { // for testing
+    @Deprecated // for testing only
+    public void setProvider(MemcachedClientProvider provider) {
         this.provider = provider;
     }
 
@@ -86,8 +88,6 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
                 LOG.debug(String.format("Added bean: [%s] - {%s}", beanName, listener.getClass().getName()));
             }
         }
-
-
     }
 
     public boolean isCacheDisabled() {
@@ -156,4 +156,7 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
         return listenerList;
     }
 
+    public MemcachedClientIF getMemcachedClient() {
+        return provider == null ? null : provider.getMemcachedClient();
+    }
 }

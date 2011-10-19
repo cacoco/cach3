@@ -1,5 +1,6 @@
 package org.flite.cach3.aop;
 
+import net.spy.memcached.*;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.annotation.Around;
@@ -48,6 +49,7 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
             return pjp.proceed();
         }
 
+        final MemcachedClientIF cache = getMemcachedClient();
         // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
         // but do not let it surface up past the AOP injection itself.
         final String cacheKey;

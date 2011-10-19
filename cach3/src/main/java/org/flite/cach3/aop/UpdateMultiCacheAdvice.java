@@ -1,5 +1,6 @@
 package org.flite.cach3.aop;
 
+import net.spy.memcached.*;
 import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
@@ -46,6 +47,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
             return retVal;
         }
 
+        final MemcachedClientIF cache = getMemcachedClient();
         // For Update*Cache, an AfterReturning aspect is fine. We will only apply our caching
         // after the underlying method completes successfully, and we will have the same
         // access to the method params.
@@ -60,7 +62,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
                     : (List<Object>) getIndexObject(annotationData.getDataIndex(), jp, methodToCache);
 			final List<Object> keyObjects = getKeyObjects(annotationData.getKeyIndex(), retVal, jp, methodToCache);
 			final List<String> cacheKeys = getCacheKeys(keyObjects, annotationData);
-			updateCache(cacheKeys, dataList, methodToCache, annotationData);
+			updateCache(cacheKeys, dataList, methodToCache, annotationData, cache);
 
             // Notify the observers that a cache interaction happened.
             final List<UpdateMultiCacheListener> listeners = getPertinentListeners(UpdateMultiCacheListener.class,annotationData.getNamespace());
@@ -82,7 +84,8 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 	protected void updateCache(final List<String> cacheKeys,
 	                           final List<Object> returnList,
 	                           final Method methodToCache,
-	                           final AnnotationData annotationData) {
+	                           final AnnotationData annotationData,
+                               final MemcachedClientIF cache) {
 		if (returnList.size() != cacheKeys.size()) {
 			throw new InvalidAnnotationException(String.format(
 					"The key generation objects, and the resulting objects do not match in size for [%s].",
