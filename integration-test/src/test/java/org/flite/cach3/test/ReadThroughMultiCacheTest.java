@@ -1,6 +1,8 @@
 package org.flite.cach3.test;
 
 import net.spy.memcached.*;
+import org.flite.cach3.config.*;
+import org.flite.cach3.test.dao.*;
 import org.flite.cach3.test.listeners.*;
 import org.flite.cach3.test.svc.*;
 import org.springframework.context.*;
@@ -45,13 +47,18 @@ public class ReadThroughMultiCacheTest {
 		final Long rawNow = System.currentTimeMillis();
 		final Long now = (rawNow / 1000) * 10000;
 		final List<Long> subset = new ArrayList<Long>();
+        final List<Long> complement = new ArrayList<Long>();
 		final List<Long> superset = new ArrayList<Long>();
 		final List<Long> jumbleset = new ArrayList<Long>();
+        final List<String> complementResult = new ArrayList<String>(complement.size());
 
 		for (Long ix = 1 + now; ix < 35 + now; ix++) {
 			if (ix % 3 == 0) {
 				subset.add(ix);
-			}
+			} else {
+                complement.add(ix);
+                complementResult.add(null);
+            }
 			superset.add(ix);
 			jumbleset.add(ix);
 		}
@@ -85,13 +92,6 @@ public class ReadThroughMultiCacheTest {
         final int previous = listener.getTriggers().size();
 		final List<String> supersetResult = test.getTimestampValues(superset);
 
-        // Testing that the listener got invoked as required.
-        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-//      TODO: This needs even better verification. The problem is that we're dealing with two
-//              subset lists, that may be in different orders.
-//        final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.DATE_NAMESPACE, currentKey, s1);
-//        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
-
 		assertEquals(superset.size(), supersetResult.size());
 		String supersetTime = null;
 		for (int ix = 0; ix < superset.size(); ix++) {
@@ -108,7 +108,22 @@ public class ReadThroughMultiCacheTest {
 				assertEquals(supersetTime, parts[0]);
 			}
 			assertEquals(key.toString(), parts[1]);
+
+            if (!inSubset) {
+                int index = complement.indexOf(key);
+                complementResult.set(index, value);
+            }
 		}
+
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+//      TODO: This needs even better verification. The problem is that we're dealing with two
+//              subset lists, that may be in different orders.
+        final String expected = StubReadThroughMultiCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE,
+                (List<Object>) (List) complement, // Using Erasure to satisfy the compiler. YUCK!
+                (List<Object>) (List) complementResult);
+        System.out.println("Expected = " + expected);
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
 		// Now call for the results again, but with a randomized
 		// set of keys.  This is to ensure the proper values line up with
@@ -133,7 +148,7 @@ public class ReadThroughMultiCacheTest {
 
 	@Test
 	public void testMemcached() {
-		final MemcachedClientIF cache = (MemcachedClientIF) context.getBean("memcachedClient");
+		final MemcachedClientIF cache = ((Cach3State) context.getBean("cach3-state")).getMemcachedClient();
 
 		final List<String> keys = new ArrayList<String>();
 		final Map<String, String> answerMap = new HashMap<String, String>();

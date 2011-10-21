@@ -13,10 +13,10 @@
 
 	<import resource="cach3-context.xml" />
 
-	<bean id="memcachedConnectionBean" class="org.flite.cach3.config.MemcachedConnectionBean">
-		<property name="consistentHashing" value="true" />
-		<property name="nodeList" value="127.0.0.1:11211" />
-	</bean>
+  <bean class="org.flite.cach3.api.impl.DefaultMemcachedCacheProviderImpl">
+    <constructor-arg index="0" value="true" />
+    <constructor-arg index="1" value="127.0.0.1:11211" />
+  </bean>
 
   <aop:aspectj-autoproxy />
 

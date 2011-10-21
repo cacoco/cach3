@@ -1,10 +1,9 @@
 package org.flite.cach3.test.listeners;
 
-import org.flite.cach3.api.UpdateMultiCacheListener;
+import org.flite.cach3.api.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.security.*;
+import java.util.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -52,6 +51,30 @@ public class StubUpdateMultiCacheListenerImpl implements UpdateMultiCacheListene
     }
 
     public static String formatTriggers(final String namespace, final List<Object> keyObjects, final List<Object> submissions) {
-        return String.format("%s [-] %s [-] %s", namespace, keyObjects, submissions);
+        if (keyObjects == null && submissions == null) {
+            return String.format("%s [-] null [-] null", namespace, keyObjects, submissions);
+        }
+        if (keyObjects == null
+                || submissions == null
+                || keyObjects.size() != submissions.size()) { throw new IllegalStateException("keys and submissions don't match."); }
+
+        final Map<Object, Object> map = new HashMap<Object, Object>();
+        for (int ix = 0; ix < keyObjects.size(); ix++) {
+            if (map.put(keyObjects.get(ix), submissions.get(ix)) != null) {
+                throw new InvalidParameterException("There seems to be duplicate keys. This may not be an actual problem, but this formatter is not equipped to handle that case.");
+            }
+        }
+
+        final List<Comparable> sorted = new ArrayList<Comparable>((List<Comparable>)(List)keyObjects);
+        Collections.sort(sorted);
+
+        final StringBuilder sb = new StringBuilder(namespace).append(" ");
+        for (int ix = 0; ix < sorted.size(); ix++) {
+            final Object key = sorted.get(ix);
+            final Object value = map.get(key);
+            sb.append(key).append("=").append(value).append(";");
+        }
+
+        return sb.toString();
     }
 }

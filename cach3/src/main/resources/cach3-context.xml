@@ -25,47 +25,38 @@
   <bean id="cach3-state" class="org.flite.cach3.config.Cach3State" />
 
 	<bean id="cach3-readThroughSingleCache" class="org.flite.cach3.aop.ReadThroughSingleCacheAdvice">
-		<property name="cache" ref="memcachedClient" />
 		<property name="methodStore" ref="methodStore" />
     <property name="state" ref="cach3-state" />
 	</bean>
 	<bean id="cach3-readThroughMultiCache" class="org.flite.cach3.aop.ReadThroughMultiCacheAdvice">
-		<property name="cache" ref="memcachedClient" />
 		<property name="methodStore" ref="methodStore" />
     <property name="state" ref="cach3-state" />
 	</bean>
   <bean id="cach3-readThroughAssignCache" class="org.flite.cach3.aop.ReadThroughAssignCacheAdvice">
-    <property name="cache" ref="memcachedClient" />
     <property name="methodStore" ref="methodStore" />
     <property name="state" ref="cach3-state" />
   </bean>
 	<bean id="cach3-updateSingleCache" class="org.flite.cach3.aop.UpdateSingleCacheAdvice">
-		<property name="cache" ref="memcachedClient" />
 		<property name="methodStore" ref="methodStore" />
     <property name="state" ref="cach3-state" />
 	</bean>
 	<bean id="cach3-updateMultiCache" class="org.flite.cach3.aop.UpdateMultiCacheAdvice">
-		<property name="cache" ref="memcachedClient" />
 		<property name="methodStore" ref="methodStore" />
     <property name="state" ref="cach3-state" />
 	</bean>
   <bean id="cach3-updateAssignCache" class="org.flite.cach3.aop.UpdateAssignCacheAdvice">
-    <property name="cache" ref="memcachedClient" />
     <property name="methodStore" ref="methodStore" />
     <property name="state" ref="cach3-state" />
   </bean>
   <bean id="cach3-invalidateSingleCache" class="org.flite.cach3.aop.InvalidateSingleCacheAdvice">
-    <property name="cache" ref="memcachedClient" />
     <property name="methodStore" ref="methodStore" />
     <property name="state" ref="cach3-state" />
   </bean>
   <bean id="cach3-invalidateMultiCache" class="org.flite.cach3.aop.InvalidateMultiCacheAdvice">
-    <property name="cache" ref="memcachedClient" />
     <property name="methodStore" ref="methodStore" />
     <property name="state" ref="cach3-state" />
   </bean>
   <bean id="cach3-invalidateAssignCache" class="org.flite.cach3.aop.InvalidateAssignCacheAdvice">
-    <property name="cache" ref="memcachedClient" />
     <property name="methodStore" ref="methodStore" />
     <property name="state" ref="cach3-state" />
   </bean>

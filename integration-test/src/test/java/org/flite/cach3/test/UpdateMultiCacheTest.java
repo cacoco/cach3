@@ -1,16 +1,15 @@
 package org.flite.cach3.test;
 
-import org.flite.cach3.test.dao.TestDAOImpl;
-import org.flite.cach3.test.listeners.StubReadThroughSingleCacheListenerImpl;
-import org.flite.cach3.test.listeners.StubUpdateMultiCacheListenerImpl;
-import org.flite.cach3.test.listeners.StubUpdateSingleCacheListenerImpl;
+import org.flite.cach3.test.dao.*;
+import org.flite.cach3.test.listeners.*;
 import org.flite.cach3.test.svc.*;
 import org.springframework.context.*;
 import org.springframework.context.support.*;
-import static org.testng.AssertJUnit.*;
 import org.testng.annotations.*;
 
 import java.util.*;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -78,11 +77,10 @@ public class UpdateMultiCacheTest {
 
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-//          TODO: This needs better validation. Also stupid java can't cast List<Long> as List<Object>
-//        final String expected = StubUpdateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE,
-//                (List<Object>) (List) subset, // Using Erasure to satisfy the compile. YUCK!
-//                (List<Object>) (List) subsetUpdateResult);
-//        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+        final String expected = StubUpdateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE,
+                (List<Object>) (List) subset, // Using Erasure to satisfy the compiler. YUCK!
+                (List<Object>) (List) subsetUpdateResult);
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
 		for (int ix = 0; ix < subset.size(); ix++) {
 			final Long key = subset.get(ix);

@@ -52,6 +52,6 @@ public class StubReadThroughMultiCacheListenerImpl implements ReadThroughMultiCa
     }
 
     public static String formatTriggers(final String namespace, final List<Object> keyObjects, final List<Object> submissions) {
-        return String.format("%s [-] %s [-] %s", namespace, keyObjects, submissions);
+        return StubUpdateMultiCacheListenerImpl.formatTriggers(namespace, keyObjects, submissions);
     }
 }
