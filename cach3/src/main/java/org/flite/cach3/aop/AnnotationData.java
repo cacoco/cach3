@@ -28,6 +28,7 @@ class AnnotationData {
     private int expiration = 0;
     private String className = "";
     private String assignedKey = "";
+    private String keyPrefix = null;
 
     public String getNamespace() {
         return namespace;
@@ -75,5 +76,13 @@ class AnnotationData {
 
     public void setAssignedKey(String assignedKey) {
         this.assignedKey = assignedKey;
+    }
+
+    public String getKeyPrefix() {
+        return keyPrefix;
+    }
+
+    public void setKeyPrefix(String keyPrefix) {
+        this.keyPrefix = keyPrefix;
     }
 }
