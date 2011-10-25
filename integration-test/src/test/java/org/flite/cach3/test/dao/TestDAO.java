@@ -56,4 +56,16 @@ public interface TestDAO {
 
     public void updateAssignStrings(int bubpkus, final List<String> newData);
 
+    public String getDwarf(final Long id);
+
+    public List<String> getDwarves(final List<Long> ids);
+
+    public void invalidateDwarf(final Long id);
+
+    public void invalidateDwarves(final List<Long> id);
+
+    public String updateDwarf(final Long id);
+
+    public List<String> updateDwarves(final List<Long> ids);
+
 }

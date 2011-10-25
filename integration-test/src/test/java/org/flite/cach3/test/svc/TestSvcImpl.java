@@ -96,4 +96,27 @@ public class TestSvcImpl implements TestSvc {
         this.dao.updateAssignStrings(25, newData);
     }
 
+    public String getDwarf(Long id) {
+        return this.dao.getDwarf(id);
+    }
+
+    public List<String> getDwarves(List<Long> ids) {
+        return this.dao.getDwarves(ids);
+    }
+
+    public void invalidateDwarf(Long id) {
+        this.dao.invalidateDwarf(id);
+    }
+
+    public void invalidateDwarves(List<Long> ids) {
+        this.dao.invalidateDwarves(ids);
+    }
+
+    public String updateDwarf(Long id) {
+        return this.dao.updateDwarf(id);
+    }
+
+    public List<String> updateDwarves(List<Long> ids) {
+        return this.dao.updateDwarves(ids);
+    }
 }
