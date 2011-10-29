@@ -1,5 +1,8 @@
 package org.flite.cach3.test;
 
+import org.flite.cach3.test.dao.TestDAOImpl;
+import org.flite.cach3.test.listeners.StubInvalidateMultiCacheListenerImpl;
+import org.flite.cach3.test.listeners.StubInvalidateSingleCacheListenerImpl;
 import org.flite.cach3.test.svc.*;
 import org.springframework.context.*;
 import org.springframework.context.support.*;
@@ -59,6 +62,8 @@ public class KeyPrefixCacheTest {
         }
 
         final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubInvalidateSingleCacheListenerImpl listener =
+                (StubInvalidateSingleCacheListenerImpl) context.getBean("stubIS");
 
         // Test the ReadThrough's
         final String sResult1 = test.getDwarf(singleId);
@@ -68,12 +73,20 @@ public class KeyPrefixCacheTest {
         assertEquals(sResult1, mResult1.get(singleLoc));
 
         // Testing the invalidations.
+        final int previous = listener.getTriggers().size();
         test.invalidateDwarf(singleId);
+        // Make sure the listener is getting triggered.
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+        final String expected = StubInvalidateSingleCacheListenerImpl.formatTriggers(TestDAOImpl.PREFIX_NAMESPACE, TestDAOImpl.PREFIX_STRING, singleId);
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+
         final List<String> mResult2 = test.getDwarves(allIds);
         final int pos1 = positions.get(singleId);
         assertFalse(sResult1.equals(mResult2.get(pos1)));
 
         test.invalidateDwarves(multiIds);
+
         final List<String> mResult3 = test.getDwarves(allIds);
         for (final Long id : multiIds) {
             final int pos = positions.get(id);

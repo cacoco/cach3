@@ -96,7 +96,7 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final InvalidateSingleCacheListener listener : listeners) {
                     try {
-                        listener.triggeredInvalidateSingleCache(annotationData.getNamespace(), keyObject);
+                        listener.triggeredInvalidateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), keyObject);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }

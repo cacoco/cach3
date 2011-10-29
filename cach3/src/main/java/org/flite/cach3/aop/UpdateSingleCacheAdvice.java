@@ -73,7 +73,7 @@ public class UpdateSingleCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final UpdateSingleCacheListener listener : listeners) {
                     try {
-                        listener.triggeredUpdateSingleCache(annotationData.getNamespace(), keyObject, submission);
+                        listener.triggeredUpdateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), keyObject, submission);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }

@@ -46,13 +46,13 @@ public class StubUpdateMultiCacheListenerImpl implements UpdateMultiCacheListene
         return interests;
     }
 
-    public void triggeredUpdateMultiCache(final String namespace, final List<Object> keyObjects, final List<Object> submissions) {
-        triggers.add(formatTriggers(namespace, keyObjects, submissions));
+    public void triggeredUpdateMultiCache(final String namespace, final String prefix, final List<Object> keyObjects, final List<Object> submissions) {
+        triggers.add(formatTriggers(namespace, prefix, keyObjects, submissions));
     }
 
-    public static String formatTriggers(final String namespace, final List<Object> keyObjects, final List<Object> submissions) {
+    public static String formatTriggers(final String namespace, final String prefix, final List<Object> keyObjects, final List<Object> submissions) {
         if (keyObjects == null && submissions == null) {
-            return String.format("%s [-] null [-] null", namespace, keyObjects, submissions);
+            return String.format("%s [-] %s [-] null [-] null", namespace, prefix, keyObjects, submissions);
         }
         if (keyObjects == null
                 || submissions == null
@@ -68,7 +68,7 @@ public class StubUpdateMultiCacheListenerImpl implements UpdateMultiCacheListene
         final List<Comparable> sorted = new ArrayList<Comparable>((List<Comparable>)(List)keyObjects);
         Collections.sort(sorted);
 
-        final StringBuilder sb = new StringBuilder(namespace).append(" ");
+        final StringBuilder sb = new StringBuilder(namespace).append(" ").append(prefix).append("");
         for (int ix = 0; ix < sorted.size(); ix++) {
             final Object key = sorted.get(ix);
             final Object value = map.get(key);

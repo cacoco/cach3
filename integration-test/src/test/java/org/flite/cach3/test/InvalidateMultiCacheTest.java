@@ -71,7 +71,7 @@ public class InvalidateMultiCacheTest {
         // Make sure the listener is getting triggered.
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-        final String expected = StubInvalidateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.MULTI_NAMESPACE, firstChangeIds);
+        final String expected = StubInvalidateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.MULTI_NAMESPACE, null, firstChangeIds);
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
         final Map<Long, String> secondMap = createMap(allIds, test.getRandomStrings(allIds));

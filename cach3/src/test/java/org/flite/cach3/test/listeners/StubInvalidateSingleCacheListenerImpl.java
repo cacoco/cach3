@@ -45,11 +45,11 @@ public class StubInvalidateSingleCacheListenerImpl implements InvalidateSingleCa
         return interests;
     }
 
-    public void triggeredInvalidateSingleCache(final String namespace, final Object keyObject) {
-        this.triggers.add(formatTriggers(namespace, keyObject));
+    public void triggeredInvalidateSingleCache(final String namespace, final String prefix, final Object keyObject) {
+        this.triggers.add(formatTriggers(namespace, prefix, keyObject));
     }
 
-    public static String formatTriggers(final String namespace, final Object keyObject) {
-        return String.format("%s [-] %s", namespace, keyObject.toString());
+    public static String formatTriggers(final String namespace, final String prefix, final Object keyObject) {
+        return String.format("%s [-] %s [-] %s", namespace, prefix, keyObject.toString());
     }
 }

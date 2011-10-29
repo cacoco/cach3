@@ -84,7 +84,7 @@ public class UpdateSingleCacheTest {
 
             // Testing that the listener got invoked as required.
             assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-            final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE, key, value);
+            final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE, null, key, value);
             assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
 			assertFalse(originalResults.get(key).equals(value));

@@ -86,7 +86,7 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final ReadThroughSingleCacheListener listener : listeners) {
                     try {
-                        listener.triggeredReadThroughSingleCache(annotationData.getNamespace(), keyObject, result);
+                        listener.triggeredReadThroughSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), keyObject, result);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }

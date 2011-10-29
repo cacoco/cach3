@@ -46,12 +46,13 @@ public class StubReadThroughMultiCacheListenerImpl implements ReadThroughMultiCa
     }
 
     public void triggeredReadThroughMultiCache(final String namespace,
+                                               final String prefix,
                                                final List<Object> keyObjects,
                                                final List<Object> submissions) {
-        this.triggers.add(formatTriggers(namespace, keyObjects, submissions));
+        this.triggers.add(formatTriggers(namespace, prefix, keyObjects, submissions));
     }
 
-    public static String formatTriggers(final String namespace, final List<Object> keyObjects, final List<Object> submissions) {
-        return StubUpdateMultiCacheListenerImpl.formatTriggers(namespace, keyObjects, submissions);
+    public static String formatTriggers(final String namespace, final String prefix, final List<Object> keyObjects, final List<Object> submissions) {
+        return StubUpdateMultiCacheListenerImpl.formatTriggers(namespace, prefix, keyObjects, submissions);
     }
 }

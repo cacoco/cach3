@@ -62,7 +62,7 @@ public class InvalidateSingleCacheTest {
         // Make sure the listener is getting triggered.
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-        final String expected = StubInvalidateSingleCacheListenerImpl.formatTriggers(TestDAOImpl.SINGLE_NAMESPACE, key1);
+        final String expected = StubInvalidateSingleCacheListenerImpl.formatTriggers(TestDAOImpl.SINGLE_NAMESPACE, null, key1);
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
         test.updateRandomString(key2);

@@ -78,6 +78,7 @@ public class UpdateMultiCacheTest {
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
         final String expected = StubUpdateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE,
+                null,
                 (List<Object>) (List) subset, // Using Erasure to satisfy the compiler. YUCK!
                 (List<Object>) (List) subsetUpdateResult);
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
