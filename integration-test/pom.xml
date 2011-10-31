@@ -4,12 +4,19 @@
   <parent>
     <groupId>org.flite</groupId>
     <artifactId>cach3-parent</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
   </parent>
   <artifactId>integration-test</artifactId>
   <packaging>jar</packaging>
   <name>integration-test</name>
   <url>https://github.com/flite/cach3</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <spring.jar.version>3.0.5.RELEASE</spring.jar.version>
+    <aspectj.jar.version>1.6.11</aspectj.jar.version>
+  </properties>
 
 	<dependencies>
 		<dependency>
@@ -24,6 +31,36 @@
     </dependency>
 
     <!--test-->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>${spring.jar.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>${spring.jar.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+      <version>${aspectj.jar.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>${aspectj.jar.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>5.8</version>
+      <scope>test</scope>
+	    <classifier>jdk15</classifier>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>cach3</artifactId>

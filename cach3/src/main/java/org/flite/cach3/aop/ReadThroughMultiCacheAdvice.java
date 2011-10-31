@@ -116,7 +116,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final ReadThroughMultiCacheListener listener : listeners) {
                     try {
-                        listener.triggeredReadThroughMultiCache(coord.getAnnotationData().getNamespace(), coord.getMissObjects(), results);
+                        listener.triggeredReadThroughMultiCache(coord.getAnnotationData().getNamespace(), coord.getAnnotationData().getKeyPrefix(), coord.getMissObjects(), results);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }

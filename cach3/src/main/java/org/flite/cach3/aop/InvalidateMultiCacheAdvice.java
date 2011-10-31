@@ -95,7 +95,7 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final InvalidateMultiCacheListener listener : listeners) {
                     try {
-                        listener.triggeredInvalidateMultiCache(annotationData.getNamespace(), keyObjects);
+                        listener.triggeredInvalidateMultiCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), keyObjects);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }

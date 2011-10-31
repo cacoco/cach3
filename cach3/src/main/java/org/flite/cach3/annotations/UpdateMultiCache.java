@@ -68,4 +68,12 @@ public @interface UpdateMultiCache {
 	 * @return
 	 */
 	int expiration() default 0;
+
+    /**
+     * An optional String prefix that will be pre-pended to the id returned by the object
+     * addressed by the keyIndex. If supplied, must not contain whitespace characters.
+     * @return the defined prefix
+     */
+    String keyPrefix() default AnnotationConstants.DEFAULT_STRING;
+
 }

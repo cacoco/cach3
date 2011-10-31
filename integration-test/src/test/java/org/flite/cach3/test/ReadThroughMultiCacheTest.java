@@ -120,6 +120,7 @@ public class ReadThroughMultiCacheTest {
 //      TODO: This needs even better verification. The problem is that we're dealing with two
 //              subset lists, that may be in different orders.
         final String expected = StubReadThroughMultiCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE,
+                null,
                 (List<Object>) (List) complement, // Using Erasure to satisfy the compiler. YUCK!
                 (List<Object>) (List) complementResult);
         System.out.println("Expected = " + expected);

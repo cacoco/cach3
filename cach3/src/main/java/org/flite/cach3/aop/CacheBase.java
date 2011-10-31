@@ -50,10 +50,6 @@ public class CacheBase {
         return state == null ? false : state.isCacheDisabled();
     }
 
-//    public void setCache(MemcachedClientIF cache) {
-//		this.cache = cache;
-//	}
-//
 	public void setMethodStore(CacheKeyMethodStore methodStore) {
 		this.methodStore = methodStore;
 	}
@@ -80,7 +76,17 @@ public class CacheBase {
         if (objectId == null || objectId.length() < 1) {
             throw new InvalidParameterException("Ids for objects in the cache must be at least 1 character long.");
         }
-        return data.getNamespace() + SEPARATOR + objectId;
+        final StringBuilder result = new StringBuilder(data.getNamespace())
+                .append(SEPARATOR);
+        if (data.getKeyPrefix() != null) {
+            result.append(data.getKeyPrefix());
+        }
+        result.append(objectId);
+        if (result.length() > 255) {
+            throw new InvalidParameterException("Ids for objects in the cache must not exceed 255 characters: [" + result.toString() + "]");
+        }
+
+        return result.toString();
     }
 
     protected Object getIndexObject(final int index,

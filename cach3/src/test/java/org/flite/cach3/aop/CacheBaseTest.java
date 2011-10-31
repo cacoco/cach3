@@ -103,6 +103,17 @@ public class CacheBaseTest {
 
 		final String objectId = RandomStringUtils.randomAlphanumeric(20);
         final AnnotationData annotationData = new AnnotationData();
+        annotationData.setNamespace(RandomStringUtils.randomAlphanumeric(235));
+
+        try {
+            cut.buildCacheKey(objectId, annotationData);
+            fail("Expected exception.");
+        } catch (InvalidParameterException ex) {
+            assertTrue(ex.getMessage().indexOf("255") != -1);
+            assertTrue(ex.getMessage().indexOf(objectId) != -1);
+            System.out.println(ex.getMessage());
+        }
+
         final String namespace = RandomStringUtils.randomAlphanumeric(12);
         annotationData.setNamespace(namespace);
 

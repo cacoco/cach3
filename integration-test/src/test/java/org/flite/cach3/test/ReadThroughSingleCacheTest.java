@@ -52,7 +52,7 @@ public class ReadThroughSingleCacheTest {
 
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-        final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.DATE_NAMESPACE, currentKey, s1);
+        final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.DATE_NAMESPACE, null, currentKey, s1);
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
 		for (int ix = 0; ix < 10; ix++) {

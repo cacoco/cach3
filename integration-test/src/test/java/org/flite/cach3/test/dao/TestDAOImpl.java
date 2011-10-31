@@ -35,6 +35,8 @@ public class TestDAOImpl implements TestDAO {
     public static final String MULTI_NAMESPACE = "Delta";
     public static final String ASSIGN_NAMESPACE = "Echo";
     public static final String ASSIGN_KEY = "SomePhatKey";
+    public static final String PREFIX_NAMESPACE = "Foxtrot";
+    public static final String PREFIX_STRING = "p-p-p-prefix-";
 
 	@ReadThroughSingleCache(namespace = DATE_NAMESPACE, keyIndex = 0, expiration = 30)
 	public String getDateString(final String key) {
@@ -150,4 +152,53 @@ public class TestDAOImpl implements TestDAO {
 
     @UpdateAssignCache(assignedKey = ASSIGN_KEY, namespace = ASSIGN_NAMESPACE, expiration = 3000, dataIndex = 1)
     public void updateAssignStrings(int bubpkus, final List<String> newData) { }
+
+    @ReadThroughSingleCache(namespace = PREFIX_NAMESPACE, keyPrefix = PREFIX_STRING, keyIndex = 0, expiration = 3000)
+    public String getDwarf(final Long id) {
+        final List<Long> ids = new ArrayList<Long>();
+        ids.add(id);
+        return disneyBasedStrings(ids).get(0);
+    }
+
+    @ReadThroughMultiCache(namespace = PREFIX_NAMESPACE, keyPrefix = PREFIX_STRING, keyIndex = 0, expiration = 3000)
+    public List<String> getDwarves(final List<Long> ids) {
+        return disneyBasedStrings(ids);
+    }
+
+    @InvalidateSingleCache(namespace = PREFIX_NAMESPACE, keyPrefix = PREFIX_STRING, keyIndex = 0)
+    public void invalidateDwarf(final Long id) { }
+
+    @InvalidateMultiCache(namespace = PREFIX_NAMESPACE, keyPrefix = PREFIX_STRING, keyIndex = 0)
+    public void invalidateDwarves(final List<Long> ids) { }
+
+    @UpdateSingleCache(namespace = PREFIX_NAMESPACE, keyPrefix = PREFIX_STRING, keyIndex = 0, expiration = 3000, dataIndex = -1)
+    public String updateDwarf(final Long id) {
+        return "Snow Whte - " + id;
+    }
+
+    @UpdateMultiCache(namespace = PREFIX_NAMESPACE, keyPrefix = PREFIX_STRING, keyIndex = 0, expiration = 3000, dataIndex = -1)
+    public List<String> updateDwarves(final List<Long> ids) {
+        final List<String> results = new ArrayList<String>();
+        for (final Long id : ids) {
+            results.add(updateDwarf(id));
+        }
+        return results;
+    }
+
+    private static String[] dwarves = {"Sneezy", "Sleepy", "Dopey", "Doc", "Happy", "Bashful", "Grumpy"};
+    private static List<String> disneyBasedStrings(final List<Long> ids) {
+        final long current = System.currentTimeMillis();
+        final String dwarf1 = dwarves[(int)(current % dwarves.length)];
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ex) {}
+
+        final List<String> results = new ArrayList<String>(ids.size());
+        for (final Long id : ids) {
+            final String dwarf2 = dwarves[(int)(id % dwarves.length)];
+            results.add(dwarf1 + " - " + dwarf2 + " - " + current + " - " + id);
+        }
+        return results;
+    }
+
 }

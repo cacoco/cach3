@@ -2,10 +2,9 @@ package org.flite.cach3.aop;
 
 import org.flite.cach3.annotations.*;
 
-import java.security.InvalidParameterException;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.annotation.Annotation;
+import java.lang.annotation.*;
+import java.lang.reflect.*;
+import java.security.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -66,6 +65,14 @@ class AnnotationDataBuilder {
                     ));
                 }
                 data.setKeyIndex(keyIndex);
+
+                final Method keyPrefixMethod = clazz.getDeclaredMethod("keyPrefix", null);
+                final String keyPrefix = (String) keyPrefixMethod.invoke(annotation, null);
+                if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
+                        && keyPrefix != null
+                        && keyPrefix.length() > 0) {
+                    data.setKeyPrefix(keyPrefix);
+                }
             }
 
             if (expectedAnnotationClass == UpdateSingleCache.class
