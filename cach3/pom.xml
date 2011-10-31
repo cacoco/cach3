@@ -9,7 +9,7 @@
 
   <groupId>org.flite</groupId>
   <artifactId>cach3</artifactId>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.2</version>
   <packaging>jar</packaging>
   <name>cach3</name>
   <url>https://github.com/flite/cach3</url>
