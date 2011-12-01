@@ -68,5 +68,7 @@ public interface TestSvc {
 
     public List<String> updateDwarves(final List<Long> ids);
 
+    public String getCompoundString(final Long first, final String toReturn, final Long second);
+
 }
 

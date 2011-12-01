@@ -68,4 +68,10 @@ public interface TestDAO {
 
     public List<String> updateDwarves(final List<Long> ids);
 
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  Methods using the velocity templating option.                * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+    public String getCompoundString(final Long first, final String toReturn, final Long second);
+
 }

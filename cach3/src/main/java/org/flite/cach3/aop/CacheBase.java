@@ -1,6 +1,7 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
+import org.apache.commons.lang.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.*;
@@ -72,23 +73,27 @@ public class CacheBase {
 		return objectId;
 	}
 
-    protected String buildCacheKey(final String objectId, final AnnotationData data) {
+    protected static final char[] WS = new char[] {' ', '\n', '\t'};
+    protected static String buildCacheKey(final String objectId, final AnnotationData data) {
         if (objectId == null || objectId.length() < 1) {
             throw new InvalidParameterException("Ids for objects in the cache must be at least 1 character long.");
         }
-        final StringBuilder result = new StringBuilder(data.getNamespace())
-                .append(SEPARATOR);
-        if (data.getKeyPrefix() != null) {
+        final StringBuilder result = new StringBuilder(data.getNamespace()).append(SEPARATOR);
+        if (StringUtils.isNotBlank(data.getKeyPrefix())) {
             result.append(data.getKeyPrefix());
         }
         result.append(objectId);
         if (result.length() > 255) {
             throw new InvalidParameterException("Ids for objects in the cache must not exceed 255 characters: [" + result.toString() + "]");
         }
-
-        return result.toString();
+        final String resultString = result.toString();
+        if (StringUtils.containsAny(resultString, WS)) {
+            throw new InvalidParameterException("Ids for objects in the cache must not have whitespace: [" + result.toString() + "]");
+        }
+        return resultString;
     }
 
+    @Deprecated
     protected Object getIndexObject(final int index,
 	                             final JoinPoint jp,
 	                             final Method methodToCache) throws Exception {
@@ -109,6 +114,30 @@ public class CacheBase {
 			throw new InvalidParameterException(String.format(
 					"The argument passed into [%s] at index %s is null.",
 					methodToCache.toString(),
+					index));
+		}
+		return indexObject;
+	}
+
+    protected static Object getIndexObject(final int index,
+                                           final Object[] args,
+                                           final String methodString) throws Exception {
+        if (index < 0) {
+            throw new InvalidParameterException(String.format(
+					"An index of %s is invalid",
+					index));
+        }
+		if (args.length <= index) {
+			throw new InvalidParameterException(String.format(
+					"An index of %s is too big for the number of arguments in [%s]",
+					index,
+					methodString));
+		}
+		final Object indexObject = args[index];
+		if (indexObject == null) {
+			throw new InvalidParameterException(String.format(
+					"The argument passed into [%s] at index %s is null.",
+					methodString,
 					index));
 		}
 		return indexObject;
