@@ -1,5 +1,6 @@
 package org.flite.cach3.aop;
 
+import org.apache.commons.lang.*;
 import org.flite.cach3.annotations.*;
 
 import java.lang.annotation.*;
@@ -55,17 +56,8 @@ class AnnotationDataBuilder {
             if (expectedAnnotationClass != ReadThroughAssignCache.class
                     && expectedAnnotationClass != InvalidateAssignCache.class
                     && expectedAnnotationClass != UpdateAssignCache.class) {
-                final Method keyIndexMethod = clazz.getDeclaredMethod("keyIndex", null);
-                final int keyIndex = (Integer) keyIndexMethod.invoke(annotation, null);
-                if (keyIndex < -1) {
-                    throw new InvalidParameterException(String.format(
-                            "KeyIndex for annotation [%s] must be -1 or greater on [%s]",
-                            expectedAnnotationClass.getName(),
-                            targetMethodName
-                    ));
-                }
-                data.setKeyIndex(keyIndex);
 
+                // Non-*AssignCache annotations MAY have a keyPrefix() defined.
                 final Method keyPrefixMethod = clazz.getDeclaredMethod("keyPrefix", null);
                 final String keyPrefix = (String) keyPrefixMethod.invoke(annotation, null);
                 if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
@@ -73,6 +65,54 @@ class AnnotationDataBuilder {
                         && keyPrefix.length() > 0) {
                     data.setKeyPrefix(keyPrefix);
                 }
+
+                // Get the keyIndex() and keyTemplate() values.
+                final Method keyIndexMethod = clazz.getDeclaredMethod("keyIndex", null);
+                final int keyIndex = (Integer) keyIndexMethod.invoke(annotation, null);
+                final boolean keyIndexDefined = keyIndex >= -1;
+
+                final Method keyTemplateMethod = clazz.getDeclaredMethod("keyTemplate", null);
+                final String keyTemplate = (String) keyTemplateMethod.invoke(annotation, null);
+                final boolean keyTemplateDefined = !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)
+                        && StringUtils.isNotBlank(keyTemplate);
+
+                if (expectedAnnotationClass == InvalidateSingleCache.class
+                        || expectedAnnotationClass == UpdateSingleCache.class
+                        || expectedAnnotationClass == ReadThroughSingleCache.class) {
+                    // For *SingleCache, one and only one of keyIndex or keyTemplate must be defined.
+                    if (keyIndexDefined == keyTemplateDefined) {
+                        throw new InvalidParameterException(String.format(
+                                "Exactly one of [keyIndex,keyTemplate] must be defined for annotation [%s] on [%s]",
+                                expectedAnnotationClass.getName(),
+                                targetMethodName
+                        ));
+                    }
+                } else {
+                    // For *MultiCache, keyIndex MUST be defined to give the process its dimensionality
+                    if (!keyIndexDefined) {
+                        throw new InvalidParameterException(String.format(
+                                "KkeyIndex must be defined for annotation [%s] on [%s]",
+                                expectedAnnotationClass.getName(),
+                                targetMethodName
+                        ));
+                    }
+                }
+
+                // For ReadThrough[Single,Multi]Cache index can't be less than 0
+                if ((expectedAnnotationClass == ReadThroughSingleCache.class && !keyTemplateDefined)
+                        || expectedAnnotationClass == ReadThroughMultiCache.class) {
+                    if (keyIndex < 0) {
+                        throw new InvalidParameterException(String.format(
+                                "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                                expectedAnnotationClass.getName(),
+                                targetMethodName
+                        ));
+                    }
+                }
+
+                if (keyIndexDefined) { data.setKeyIndex(keyIndex); }
+                if (keyTemplateDefined) { data.setKeyTemplate(keyTemplate); }
+
             }
 
             if (expectedAnnotationClass == UpdateSingleCache.class

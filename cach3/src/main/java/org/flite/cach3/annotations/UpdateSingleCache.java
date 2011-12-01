@@ -40,9 +40,22 @@ public @interface UpdateSingleCache {
 	 * argument provides the id by which the object will be cached. This is a
 	 * 0-based array index. This annotation also takes a special value of -1 to signify
 	 * that the object being returned is the object responsible for providing the cache key.
+     * This is mutually exclusive with keyTemplate(), i.e. one and only one of
+     * keyIndex() and keyTemplate() must be defined.
 	 * @return the index into the arguments array for the item that will provide the id
 	 */
-	int keyIndex() default Integer.MIN_VALUE;
+	int keyIndex() default AnnotationConstants.DEFAULT_KEY_INDEX;
+
+    /**
+     * This is a value for the user to provide a Velocity template
+     * to create the cache id.
+     * For the Velocity template Context, there will be two defined variables:
+     *  1 - args: An array of the objects passed into the method as parameters
+     *  2 - index: the integer pointer of where in the list of multi-values that we are creating an id for.
+     * This is mutually exclusive with keyIndex(), i.e. one and only one of
+     * keyIndex() and keyTemplate() must be defined.
+     */
+    String keyTemplate() default AnnotationConstants.DEFAULT_STRING;
 
     /**
      * Since keys and the actual data to be cached may be different, we also need to know which

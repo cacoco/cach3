@@ -1,12 +1,11 @@
 package org.flite.cach3.annotations;
 
-import static org.testng.AssertJUnit.*;
-
-import org.flite.cach3.annotations.*;
 import org.testng.annotations.*;
 
 import java.lang.annotation.*;
 import java.lang.reflect.*;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -30,6 +29,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public class AnnotationsTest {
+
+//    @Test
+//    public void testVelocity() {
+//        final String result = "This Is A Big Fat Result.";
+//        final Object[] args = new Object[] {null, "key 2", Long.valueOf(1337)};
+//        final VelocityContext context = new VelocityContext();
+//        context.put("result", result);
+//        context.put("args", args);
+//        context.put("StringUtils", StringUtils.class);
+//
+//        final StringWriter writer = new StringWriter(250);
+//
+//        Velocity.evaluate(context, writer, "bubba knows", "$result&$StringUtils.defaultString($args[0])&$args[2]");
+//
+//        System.out.println(writer.toString());
+//    }
 
 	@Test
 	public void testIndividual() throws Exception {

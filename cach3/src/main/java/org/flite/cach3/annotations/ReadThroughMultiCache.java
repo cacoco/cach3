@@ -41,7 +41,18 @@ public @interface ReadThroughMultiCache {
 	 * 0-based array index. The identified argument must be a List.
 	 * @return the index into the arguments array for the item that will provide the id
 	 */
-	int keyIndex() default 0;
+	int keyIndex() default AnnotationConstants.DEFAULT_KEY_INDEX;
+
+    /**
+     * This is an <em>optional</em> value for the user to provide a Velocity template
+     * to create the cache id(s). In any of the *MultiCache annotations, keyIndex() is still
+     * required, so that the underlying logic has an indication of the dimensionality
+     * of the multi-values.
+     * For the Velocity template Context, there will be two defined variables:
+     *  1 - args: An array of the objects passed into the method as parameters
+     *  2 - index: the integer pointer of where in the list of multi-values that we are creating an id for.
+     */
+    String keyTemplate() default AnnotationConstants.DEFAULT_STRING;
 
 	/**
 	 *  The exp value is passed along to memcached exactly as given, and will be

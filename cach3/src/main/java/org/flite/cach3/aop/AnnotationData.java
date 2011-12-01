@@ -1,5 +1,7 @@
 package org.flite.cach3.aop;
 
+import org.flite.cach3.annotations.*;
+
 /**
 Copyright (c) 2011 Flite, Inc
 
@@ -23,12 +25,13 @@ THE SOFTWARE.
  */
 class AnnotationData {
     private String namespace = "";
-    private int keyIndex = Integer.MIN_VALUE;
+    private int keyIndex = AnnotationConstants.DEFAULT_KEY_INDEX;
     private int dataIndex = Integer.MIN_VALUE;
     private int expiration = 0;
     private String className = "";
     private String assignedKey = "";
     private String keyPrefix = null;
+    private String keyTemplate = null;
 
     public String getNamespace() {
         return namespace;
@@ -84,5 +87,13 @@ class AnnotationData {
 
     public void setKeyPrefix(String keyPrefix) {
         this.keyPrefix = keyPrefix;
+    }
+
+    public String getKeyTemplate() {
+        return keyTemplate;
+    }
+
+    public void setKeyTemplate(String keyTemplate) {
+        this.keyTemplate = keyTemplate;
     }
 }

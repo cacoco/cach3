@@ -23,4 +23,5 @@ THE SOFTWARE.
  */
 public interface AnnotationConstants {
 	public static final String DEFAULT_STRING = "[unassigned]";
+    public static final int DEFAULT_KEY_INDEX = Integer.MIN_VALUE;
 }
