@@ -2,13 +2,13 @@ package org.flite.cach3.aop;
 
 import org.apache.commons.lang.*;
 import org.apache.commons.lang.math.*;
-import static org.testng.AssertJUnit.*;
-
 import org.flite.cach3.annotations.*;
 import org.testng.annotations.*;
 
 import java.security.*;
 import java.util.*;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -66,7 +66,7 @@ public class ReadThroughMultiCacheTest {
 		final List<Object> exceptionObjects = new ArrayList<Object>(idObjects);
 		exceptionObjects.add(null);
 		try {
-			cut.convertIdObjectsToKeyMap(exceptionObjects, data);
+			cut.convertIdObjectsToKeyMap(exceptionObjects, data, null);
 			fail("Expected Exception");
 		} catch (InvalidParameterException ex) { }
 
@@ -77,7 +77,7 @@ public class ReadThroughMultiCacheTest {
 		}
 		assertTrue(idObjects.size() > length);
 
-		final ReadThroughMultiCacheAdvice.MapHolder holder = cut.convertIdObjectsToKeyMap(idObjects, data);
+		final ReadThroughMultiCacheAdvice.MapHolder holder = cut.convertIdObjectsToKeyMap(idObjects, data, null);
 
 		assertEquals(length, holder.getKey2Obj().size());
 		assertEquals(length, holder.getObj2Key().size());

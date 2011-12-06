@@ -74,4 +74,6 @@ public interface TestDAO {
 
     public String getCompoundString(final Long first, final String toReturn, final Long second);
 
+    public List<String> getCompoundStrings(final List<Long> first, final String toReturn, final Long second);
+
 }

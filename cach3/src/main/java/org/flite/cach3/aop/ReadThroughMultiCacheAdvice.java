@@ -1,13 +1,17 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
+import org.apache.commons.lang.*;
 import org.apache.commons.logging.*;
+import org.apache.velocity.*;
+import org.apache.velocity.app.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
 import org.flite.cach3.exceptions.*;
 
+import java.io.*;
 import java.lang.reflect.*;
 import java.security.*;
 import java.util.*;
@@ -68,7 +72,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 			coord.setKeyObjects(getKeyObjectList(coord.getAnnotationData().getKeyIndex(), pjp, coord.getMethod()));
 
 			// Create key->object and object->key mappings.
-			coord.setHolder(convertIdObjectsToKeyMap(coord.getKeyObjects(), coord.getAnnotationData()));
+			coord.setHolder(convertIdObjectsToKeyMap(coord.getKeyObjects(), coord.getAnnotationData(), args));
 
 			// Get the full list of cache keys and ask the cache for the corresponding values.
 			coord.setInitialKey2Result(cache.getBulk(coord.getKey2Obj().keySet()));
@@ -101,14 +105,17 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 				throw new RuntimeException("Did not receive a correlated amount of data from the target method.");
 			}
 
+            final String[] cacheBaseIds = new String[results.size()];
 			for (int ix = 0; ix < results.size(); ix++) {
 				final Object keyObject = coord.getMissObjects().get(ix);
 				final Object resultObject = results.get(ix) == null ? new PertinentNegativeNull() : results.get(ix);
 				final String cacheKey = coord.obj2Key.get(keyObject);
+                final String cacheBase = coord.obj2Base.get(keyObject);
 				cache.set(cacheKey,
 						coord.getAnnotationData().getExpiration(),
 						resultObject);
 				coord.getKey2Result().put(cacheKey, resultObject);
+                cacheBaseIds[ix] = cacheBase;
 			}
 
             // Notify the observers that a cache interaction happened.
@@ -116,7 +123,11 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final ReadThroughMultiCacheListener listener : listeners) {
                     try {
-                        listener.triggeredReadThroughMultiCache(coord.getAnnotationData().getNamespace(), coord.getAnnotationData().getKeyPrefix(), coord.getMissObjects(), results);
+                        listener.triggeredReadThroughMultiCache(coord.getAnnotationData().getNamespace(),
+                                coord.getAnnotationData().getKeyPrefix(),
+                                Arrays.asList(cacheBaseIds),
+                                results,
+                                args);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }
@@ -131,31 +142,38 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 		}
 	}
 
-//	protected void validateAnnotation(final ReadThroughMultiCache annotation,
-//	                                  final Method method) {
-//		final Class annotationClass = ReadThroughMultiCache.class;
-//		validateAnnotationExists(annotation, annotationClass);
-//		validateAnnotationIndex(annotation.dataIndex(), false, annotationClass, method);
-//		validateAnnotationNamespace(annotation.namespace(), annotationClass, method);
-//		validateAnnotationExpiration(annotation.expiration(), annotationClass, method);
-//	}
-//
 	protected MapHolder convertIdObjectsToKeyMap(final List<Object> idObjects,
-	                                              final AnnotationData data)
-			throws Exception {
+	                                              final AnnotationData data,
+                                                  final Object[] args) throws Exception {
 		final MapHolder holder = new MapHolder();
-		for (final Object obj : idObjects) {
-			if (obj == null) {
-				throw new InvalidParameterException("One of the passed in key objects is null");
-			}
+        for (int ix = 0; ix < idObjects.size(); ix++) {
+            final Object obj = idObjects.get(ix);
+			if (obj == null) { throw new InvalidParameterException("One of the passed in key objects is null"); }
 
-			final Method method = getKeyMethod(obj);
-			final String cacheKey = buildCacheKey(generateObjectId(method, obj), data);
+            final String template = data.getKeyTemplate();
+            final String base;
+            if (StringUtils.isBlank(template)) {
+                final Method method = getKeyMethod(obj);
+                base = generateObjectId(method, obj);
+            } else {
+                final VelocityContext context = new VelocityContext();
+                context.put("StringUtils", StringUtils.class);
+                context.put("args", args);
+                context.put("index", ix);
+                context.put("indexObject", obj);
+
+                final StringWriter writer = new StringWriter(250);
+                Velocity.evaluate(context, writer, "", template);
+                base = writer.toString();
+            }
+            final String key = buildCacheKey(base,data);
+
 			if (holder.getObj2Key().get(obj) == null) {
-				holder.getObj2Key().put(obj, cacheKey);
+				holder.getObj2Key().put(obj, key);
+                holder.getObj2Base().put(obj, base);
 			}
-			if (holder.getKey2Obj().get(cacheKey) == null) {
-				holder.getKey2Obj().put(cacheKey, obj);
+			if (holder.getKey2Obj().get(key) == null) {
+				holder.getKey2Obj().put(key, obj);
 			}
 		}
 
@@ -165,7 +183,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 	protected List<Object> getKeyObjectList(final int keyIndex,
 	                                            final JoinPoint jp,
 	                                            final Method method) throws Exception {
-		final Object keyObjects = getIndexObject(keyIndex, jp, method);
+        final Object keyObjects = getIndexObject(keyIndex, jp.getArgs(), method.toString());
 		if (verifyTypeIsList(keyObjects.getClass())) { return (List<Object>) keyObjects;}
 		throw new InvalidAnnotationException(String.format(
 				"The parameter object found at dataIndex [%s] is not a [%s]. " +
@@ -179,15 +197,20 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 	static class MapHolder {
 		final Map<String, Object> key2Obj = new HashMap<String, Object>();
 		final Map<Object, String> obj2Key = new HashMap<Object, String>();
+        final Map<Object, String> obj2Base = new HashMap<Object, String>();
 
 		public Map<String, Object> getKey2Obj() {
 			return key2Obj;
 		}
 
-		public Map<Object, String> getObj2Key() {
+        public Map<Object, String> getObj2Key() {
 			return obj2Key;
 		}
-	}
+
+        public Map<Object, String> getObj2Base() {
+            return obj2Base;
+        }
+    }
 
 	static class MultiCacheCoordinator {
 		private Method method;
@@ -196,6 +219,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
         private List<Object> keyObjects = new ArrayList<Object>();
 		private Map<String, Object> key2Obj = new HashMap<String, Object>();
 		private Map<Object, String> obj2Key = new HashMap<Object, String>();
+        private Map<Object, String> obj2Base = new HashMap<Object, String>();
 		private Map<String, Object> key2Result = new HashMap<String, Object>();
 		private List<Object> missObjects = new ArrayList<Object>();
 
@@ -206,14 +230,6 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 		public void setMethod(Method method) {
 			this.method = method;
 		}
-
-//		public ReadThroughMultiCache getAnnotation() {
-//			return annotation;
-//		}
-//
-//		public void setAnnotation(ReadThroughMultiCache annotation) {
-//			this.annotation = annotation;
-//		}
 
         public AnnotationData getAnnotationData() {
             return annotationData;
@@ -234,6 +250,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 		public void setHolder(MapHolder holder) {
 			key2Obj.putAll(holder.getKey2Obj());
 			obj2Key.putAll(holder.getObj2Key());
+            obj2Base.putAll(holder.getObj2Base());
 		}
 
 		public Map<String, Object> getKey2Obj() {

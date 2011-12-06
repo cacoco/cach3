@@ -1,6 +1,8 @@
 package org.flite.cach3.test;
 
 import net.spy.memcached.*;
+import org.apache.commons.lang.*;
+import org.apache.commons.lang.math.*;
 import org.flite.cach3.config.*;
 import org.flite.cach3.test.dao.*;
 import org.flite.cach3.test.listeners.*;
@@ -117,14 +119,6 @@ public class ReadThroughMultiCacheTest {
 
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-//      TODO: This needs even better verification. The problem is that we're dealing with two
-//              subset lists, that may be in different orders.
-        final String expected = StubReadThroughMultiCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE,
-                null,
-                (List<Object>) (List) complement, // Using Erasure to satisfy the compiler. YUCK!
-                (List<Object>) (List) complementResult);
-        System.out.println("Expected = " + expected);
-        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
 		// Now call for the results again, but with a randomized
 		// set of keys.  This is to ensure the proper values line up with
@@ -166,6 +160,65 @@ public class ReadThroughMultiCacheTest {
 		final Map<String, Object> memcachedSez = cache.getBulk(keys);
 
 		assertTrue(memcachedSez.equals(answerMap));
-
 	}
+
+    @Test
+    public void testVelocity() {
+        final Long constant = RandomUtils.nextLong();
+
+        final List<Long> firsts = new ArrayList<Long>();
+        final List<Long> thrus = new ArrayList<Long>();
+        final Long f1 = System.currentTimeMillis();
+        firsts.add(f1);
+
+        final Long base = f1 + RandomUtils.nextInt(1000) + 500;
+        for (int ix = 0; ix < 4; ix++) {
+            firsts.add(base+ix);
+            thrus.add(base+ix);
+        }
+        Collections.shuffle(firsts);
+
+        final String early = RandomStringUtils.randomAlphanumeric(8);
+        final String late = RandomStringUtils.randomAlphanumeric(12);
+
+        final List<String> bodies = new ArrayList<String>();
+        final List<String> keys = new ArrayList<String>();
+        final List<String> subs = new ArrayList<String>();
+        for (int ix = 0; ix < firsts.size(); ix++) {
+            if (firsts.get(ix).equals(f1)) {
+                bodies.add(early);
+            } else {
+                bodies.add(late);
+                subs.add(late);
+                keys.add(firsts.get(ix).toString() + "&&" + constant);
+            }
+        }
+
+        final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubReadThroughMultiCacheListenerImpl listener =
+                (StubReadThroughMultiCacheListenerImpl) context.getBean("stubRTM");
+
+        // This just primes the cache so we can ensure the sub-set feature works in the multi-cache example.
+        test.getCompoundString(f1, early, constant);
+
+        // Get the before count of objects that have been triggered, so we can isolate if the call triggers.
+        final int previous = listener.getTriggers().size();
+
+        final List<String> results = test.getCompoundStrings(firsts, late, constant);
+        for (int ix = 0; ix < results.size(); ix++) {
+            assertEquals(bodies.get(ix), results.get(ix));
+        }
+
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+
+        final String expected = StubReadThroughMultiCacheListenerImpl.formatTriggers(
+                TestDAOImpl.COMPOUND_NAMESPACE,
+                TestDAOImpl.COMPOUND_PREFIX,
+                keys,
+                (List<Object>) (List) subs, // Using Erasure to satisfy the compiler. YUCK!
+                new Object[]{thrus, late, constant});
+        System.out.println("Expected = " + expected);
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+    }
 }

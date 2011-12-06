@@ -208,9 +208,28 @@ public class TestDAOImpl implements TestDAO {
     /** *                  Methods using the velocity templating option.                * **/
     /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
-    @ReadThroughSingleCache(namespace = COMPOUND_NAMESPACE, keyPrefix = COMPOUND_PREFIX, keyTemplate = "$args[0]&&$args[2]", expiration = 30)
+    @ReadThroughSingleCache(
+            namespace=COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            keyTemplate = "$args[0]&&$args[2]",
+            expiration = 30)
     public String getCompoundString(final Long first, final String toReturn, final Long second) {
         return toReturn;
+    }
+
+    @ReadThroughMultiCache(
+            namespace = COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            keyIndex = 0,
+            keyTemplate = "$indexObject&&$args[2]",
+            expiration = 30
+    )
+    public List<String> getCompoundStrings(final List<Long> first, final String toReturn, final Long second) {
+        final List<String> results = new ArrayList<String>();
+        for (final Long f : first) {
+            results.add(toReturn);
+        }
+        return results;
     }
 
 
