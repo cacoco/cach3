@@ -51,7 +51,7 @@ public class StubReadThroughMultiCacheListenerImpl implements ReadThroughMultiCa
                                                final List<String> baseCacheIds,
                                                final List<Object> submissions,
                                                final Object[] alteredArgs) {
-        this.triggers.add(formatTriggers(namespace, prefix, baseCacheIds, submissions, alteredArgs));
+        this.triggers.add(formatTriggers(namespace, prefix, baseCacheIds, submissions, null, alteredArgs));
     }
 
     public static final String SEP = " [-] ";
@@ -59,6 +59,7 @@ public class StubReadThroughMultiCacheListenerImpl implements ReadThroughMultiCa
                                                final String prefix,
                                                final List<String> baseCacheIds,
                                                final List<Object> submissions,
+                                               final Object retVal,
                                                final Object[] alteredArgs) {
         final StringBuilder sb = new StringBuilder(namespace).append(SEP).append(prefix).append(SEP);
 
@@ -70,10 +71,23 @@ public class StubReadThroughMultiCacheListenerImpl implements ReadThroughMultiCa
         for (int ix = 0; ix < idLen; ix++) {
             compounds.add(baseCacheIds.get(ix).toString() + "-&&-" + submissions.get(ix).toString());
         }
+        // Yes, this is a little bit "lossy', but it suits our current purposes.
         Collections.sort(compounds);
         for (final String compound : compounds) {
             sb.append(compound).append(SEP);
         }
+
+        // Yes, this is a little bit "lossy', but it suits our current purposes.
+        if (retVal != null && retVal instanceof Collection) {
+            final List contents = retVal instanceof List ? (List) retVal : new ArrayList<Object>((Collection)retVal);
+            Collections.sort(contents);
+            for (final Object obj : contents) {
+                sb.append(obj == null ? "" : obj.toString()).append("!");
+            }
+        } else if (retVal != null) {
+            sb.append(retVal.toString());
+        }
+        sb.append(SEP);
 
         if (alteredArgs != null && alteredArgs.length > 0) {
             for (int ix = 0; ix < alteredArgs.length; ix++) {

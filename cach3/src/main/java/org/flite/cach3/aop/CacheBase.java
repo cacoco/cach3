@@ -2,6 +2,8 @@ package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
 import org.apache.commons.lang.*;
+import org.apache.velocity.*;
+import org.apache.velocity.app.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.*;
@@ -10,6 +12,7 @@ import org.flite.cach3.api.*;
 import org.flite.cach3.config.*;
 import org.flite.cach3.exceptions.*;
 
+import java.io.*;
 import java.lang.reflect.*;
 import java.security.*;
 import java.util.*;
@@ -65,7 +68,7 @@ public class CacheBase {
 		return target.getClass().getMethod(msig.getName(), msig.getParameterTypes());
 	}
 
-	protected String generateObjectId(final Method keyMethod, final Object keyObject) throws Exception {
+	protected static String generateObjectId(final Method keyMethod, final Object keyObject) throws Exception {
 		final String objectId = (String) keyMethod.invoke(keyObject, null);
 		if (objectId == null || objectId.length() < 1) {
 			throw new RuntimeException("Got an empty key value from " + keyMethod.getName());
@@ -274,6 +277,7 @@ public class CacheBase {
 		return false;
 	}
 
+    @Deprecated
     protected List<String> getCacheKeys(final List<Object> keyObjects,
                                         final AnnotationData annotationData) throws Exception {
         final List<String> results = new ArrayList<String>();
@@ -281,6 +285,36 @@ public class CacheBase {
             final Method keyMethod = getKeyMethod(object);
             final String objectId = generateObjectId(keyMethod, object);
             results.add(buildCacheKey(objectId, annotationData));
+        }
+
+        return results;
+    }
+
+    protected List<String> getBaseKeys(final List<Object> keyObjects,
+                                        final AnnotationData annotationData,
+                                        final Object retVal,
+                                        final Object[] args) throws Exception {
+        final List<String> results = new ArrayList<String>();
+        for (int ix = 0; ix < keyObjects.size(); ix++) {
+            final Object object = keyObjects.get(ix);
+            final String template = annotationData.getKeyTemplate();
+            final String base;
+            if (StringUtils.isBlank(template)) {
+                final Method method = getKeyMethod(object);
+                base = generateObjectId(method, object);
+            } else {
+                final VelocityContext context = new VelocityContext();
+                context.put("StringUtils", StringUtils.class);
+                context.put("args", args);
+                context.put("index", ix);
+                context.put("indexObject", object);
+                context.put("retVal", retVal);
+
+                final StringWriter writer = new StringWriter(250);
+                Velocity.evaluate(context, writer, "", template);
+                base = writer.toString();
+            }
+            results.add(base);
         }
 
         return results;

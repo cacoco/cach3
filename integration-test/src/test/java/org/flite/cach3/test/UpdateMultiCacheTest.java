@@ -1,5 +1,7 @@
 package org.flite.cach3.test;
 
+import org.apache.commons.lang.*;
+import org.apache.commons.lang.math.*;
 import org.flite.cach3.test.dao.*;
 import org.flite.cach3.test.listeners.*;
 import org.flite.cach3.test.svc.*;
@@ -45,11 +47,13 @@ public class UpdateMultiCacheTest {
 		final Long rawNow = System.currentTimeMillis();
 		final Long now = (rawNow / 1000) * 10000;
 		final List<Long> subset = new ArrayList<Long>();
+        final List<String> subsetIds = new ArrayList<String>();
 		final List<Long> superset = new ArrayList<Long>();
 
 		for (Long ix = 1 + now; ix < 35 + now; ix++) {
 			if (ix % 3 == 0) {
 				subset.add(ix);
+                subsetIds.add(ix.toString());
 			}
 			superset.add(ix);
 		}
@@ -79,8 +83,10 @@ public class UpdateMultiCacheTest {
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
         final String expected = StubUpdateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE,
                 null,
-                (List<Object>) (List) subset, // Using Erasure to satisfy the compiler. YUCK!
-                (List<Object>) (List) subsetUpdateResult);
+                subsetIds,
+                (List<Object>) (List) subsetUpdateResult, // Using Erasure to satisfy the compiler. YUCK!
+                (List<Object>) (List) subsetUpdateResult,
+                new Object[] {subset});
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
 		for (int ix = 0; ix < subset.size(); ix++) {
@@ -142,6 +148,49 @@ public class UpdateMultiCacheTest {
             final String value = r2List.get(ix);
             System.out.println(value);
             assertEquals(expectedResults.get(key), value);
+        }
+    }
+
+    @Test
+    public void testVelocity() {
+
+        final String original = RandomStringUtils.randomAlphanumeric(7);
+        final Long second = Long.valueOf("1337" + RandomStringUtils.randomNumeric(5));
+        final List<Long> firsts = new ArrayList<Long>();
+        final List<String> baseIds = new ArrayList<String>();
+        final long base = RandomUtils.nextInt(2000) + 1000;
+        for (int ix = 0; ix < 3; ix++) {
+            final Long val = base + ix;
+            firsts.add(val);
+            baseIds.add(val + "&&" + second);
+        }
+        final Long extra = base + 10;
+        final String extraString = original + extra.toString();
+
+        final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubUpdateMultiCacheListenerImpl listener =
+                (StubUpdateMultiCacheListenerImpl) context.getBean("stubUM");
+
+        final int previous = listener.getTriggers().size();
+		final List<String> results = test.updateCompundStrings(second, original, firsts);
+
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+        final String expected = StubUpdateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.COMPOUND_NAMESPACE,
+                TestDAOImpl.COMPOUND_PREFIX,
+                baseIds,
+                (List<Object>) (List) results, // Using Erasure to satisfy the compiler. YUCK!
+                results,
+                new Object[] {second, original, firsts});
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+
+        // This part just double-checks the sublist aspect of the ReadThroughMultiCache
+        firsts.add(extra);
+        Collections.shuffle(firsts);
+        final List<String> r2 = test.getCompoundStrings(firsts, extraString, second);
+        for (int ix = 0; ix < firsts.size(); ix++) {
+            final Long value = firsts.get(ix);
+            assertEquals(value.equals(extra) ? extraString : original, r2.get(ix));
         }
     }
 }

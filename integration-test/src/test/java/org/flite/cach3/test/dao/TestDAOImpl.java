@@ -232,5 +232,21 @@ public class TestDAOImpl implements TestDAO {
         return results;
     }
 
+    @UpdateMultiCache(
+            namespace = COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            keyIndex = 2,
+            dataIndex = -1,
+            keyTemplate = "$args[2][$index]&&$args[0]",
+            expiration = 30
+    )
+    public List<String> updateCompundStrings(final Long second, final String toReturn, final List<Long> first) {
+        final List<String> results = new ArrayList<String>();
+        for (final Long f : first) {
+            results.add(toReturn);
+        }
+        return results;
+    }
+
 
 }

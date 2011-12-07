@@ -217,6 +217,7 @@ public class ReadThroughMultiCacheTest {
                 TestDAOImpl.COMPOUND_PREFIX,
                 keys,
                 (List<Object>) (List) subs, // Using Erasure to satisfy the compiler. YUCK!
+                null,
                 new Object[]{thrus, late, constant});
         System.out.println("Expected = " + expected);
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));

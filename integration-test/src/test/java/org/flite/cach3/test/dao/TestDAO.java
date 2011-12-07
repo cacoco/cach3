@@ -76,4 +76,6 @@ public interface TestDAO {
 
     public List<String> getCompoundStrings(final List<Long> first, final String toReturn, final Long second);
 
+    public List<String> updateCompundStrings(final Long second, final String toReturn, final List<Long> first);
+
 }

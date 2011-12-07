@@ -24,5 +24,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface UpdateMultiCacheListener extends CacheListener {
-    void triggeredUpdateMultiCache(String namespace, String prefix, List<Object> keyObjects, List<Object> submissions);
+    void triggeredUpdateMultiCache(String namespace, String prefix, List<String> baseCacheIds, List<Object> submissions, Object retVal, Object[] args);
 }
