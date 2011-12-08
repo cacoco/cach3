@@ -50,6 +50,7 @@ public class InvalidateMultiCacheTest {
         final List<Long> allIds = new ArrayList<Long>();
         final List<Long> noChangeIds = new ArrayList<Long>();
         final List<Long> firstChangeIds = new ArrayList<Long>();
+        final List<String> firstChangeStringIds = new ArrayList<String>();
         final List<Long> secondChangeIds = new ArrayList<Long>();
 
         final Long base = RandomUtils.nextLong();
@@ -57,7 +58,10 @@ public class InvalidateMultiCacheTest {
             final Long key = base + (ix * 100);
             allIds.add(key);
             if (ix % 3 == 0) { noChangeIds.add(key); }
-            if (ix % 3 == 1) { firstChangeIds.add(key); }
+            if (ix % 3 == 1) {
+                firstChangeIds.add(key);
+                firstChangeStringIds.add(key.toString());
+            }
             if (ix % 3 == 2) { secondChangeIds.add(key); }
         }
 
@@ -71,7 +75,7 @@ public class InvalidateMultiCacheTest {
         // Make sure the listener is getting triggered.
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-        final String expected = StubInvalidateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.MULTI_NAMESPACE, null, firstChangeIds);
+        final String expected = StubInvalidateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.MULTI_NAMESPACE, null, firstChangeStringIds, null, new Object[] {firstChangeIds});
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
         final Map<Long, String> secondMap = createMap(allIds, test.getRandomStrings(allIds));

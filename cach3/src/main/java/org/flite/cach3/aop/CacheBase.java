@@ -123,9 +123,24 @@ public class CacheBase {
 	}
 
     protected static Object getIndexObject(final int index,
+                                           final Object retVal,
                                            final Object[] args,
                                            final String methodString) throws Exception {
-        if (index < 0) {
+        return getIndexObject(true, index, retVal, args, methodString);
+	}
+
+    protected static Object getIndexObject(final int index,
+                                           final Object[] args,
+                                           final String methodString) throws Exception {
+        return getIndexObject(false, index, null, args, methodString);
+	}
+
+    private static Object getIndexObject(final boolean allowRetVal,
+                                           final int index,
+                                           final Object retVal,
+                                           final Object[] args,
+                                           final String methodString) throws Exception {
+        if (index < -1 || (index == -1 && !allowRetVal)) {
             throw new InvalidParameterException(String.format(
 					"An index of %s is invalid",
 					index));
@@ -136,7 +151,7 @@ public class CacheBase {
 					index,
 					methodString));
 		}
-		final Object indexObject = args[index];
+		final Object indexObject = index == -1 ? retVal : args[index];
 		if (indexObject == null) {
 			throw new InvalidParameterException(String.format(
 					"The argument passed into [%s] at index %s is null.",

@@ -65,11 +65,12 @@ public class StubReadThroughMultiCacheListenerImpl implements ReadThroughMultiCa
 
         final int idLen = baseCacheIds != null ? baseCacheIds.size() : 0;
         final int obLen = submissions != null ? submissions.size() : 0;
-        if (idLen != obLen) { throw new InvalidParameterException("Unequal lengths of objects."); }
+        if (submissions != null && idLen != obLen) { throw new InvalidParameterException("Unequal lengths of objects."); }
 
         final List<String> compounds = new ArrayList<String>(idLen);
         for (int ix = 0; ix < idLen; ix++) {
-            compounds.add(baseCacheIds.get(ix).toString() + "-&&-" + submissions.get(ix).toString());
+            final String submissionString = submissions == null ? "" : submissions.get(ix).toString();
+            compounds.add(baseCacheIds.get(ix).toString() + "-&&-" + submissionString);
         }
         // Yes, this is a little bit "lossy', but it suits our current purposes.
         Collections.sort(compounds);

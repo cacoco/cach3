@@ -57,9 +57,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
             final AnnotationData annotationData =
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             UpdateMultiCache.class, methodToCache.getName());
-            final List<Object> dataList = annotationData.getDataIndex() == -1
-                    ? (List<Object>) retVal
-                    : (List<Object>) getIndexObject(annotationData.getDataIndex(), jp, methodToCache);
+            final List<Object> dataList = (List<Object>) getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());
 			final List<Object> keyObjects = getKeyObjects(annotationData.getKeyIndex(), retVal, jp, methodToCache);
             final List<String> baseKeys = getBaseKeys(keyObjects, annotationData, retVal, jp.getArgs());
             final List<String> cacheKeys = new ArrayList<String>(baseKeys.size());
@@ -111,7 +109,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 	                             final Method methodToCache) throws Exception {
 		final Object keyObject = keyIndex == -1
 									? validateReturnValueAsKeyObject(returnValue, methodToCache)
-									: getIndexObject(keyIndex, jp, methodToCache);
+									: getIndexObject(keyIndex, jp.getArgs(), methodToCache.toString());
 		if (verifyTypeIsList(keyObject.getClass())) {
 			return (List<Object>) keyObject;
 		}

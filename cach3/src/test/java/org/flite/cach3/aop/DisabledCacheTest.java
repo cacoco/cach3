@@ -45,9 +45,9 @@ public class DisabledCacheTest extends EasyMockSupport {
 
         final InvalidateMultiCacheAdvice a2 = new InvalidateMultiCacheAdvice();
         a2.setState(state);
-        final ProceedingJoinPoint pjp2 = createMock(ProceedingJoinPoint.class);
+        final JoinPoint pjp2 = createMock(ProceedingJoinPoint.class);
         final String r2 = RandomStringUtils.randomAlphanumeric(length++);
-        expect(pjp2.proceed()).andReturn(r2);
+//        expect(pjp2.proceed()).andReturn(r2);
 
         final InvalidateSingleCacheAdvice a3 = new InvalidateSingleCacheAdvice();
         a3.setState(state);
@@ -93,7 +93,7 @@ public class DisabledCacheTest extends EasyMockSupport {
         replayAll();
 
         assertEquals(r1, a1.cacheInvalidateAssign(pjp1));
-        assertEquals(r2, a2.cacheInvalidateMulti(pjp2));
+        assertEquals(r2, a2.cacheInvalidateMulti(pjp2, r2));
         assertEquals(r3, a3.cacheInvalidateSingle(pjp3));
 
         assertEquals(r4, a4.cacheAssign(pjp4));
