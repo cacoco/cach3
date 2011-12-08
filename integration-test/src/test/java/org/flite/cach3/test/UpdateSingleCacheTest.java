@@ -1,16 +1,15 @@
 package org.flite.cach3.test;
 
-import org.flite.cach3.test.dao.TestDAOImpl;
-import org.flite.cach3.test.listeners.StubReadThroughSingleCacheListenerImpl;
-import org.flite.cach3.test.listeners.StubUpdateAssignCacheListenerImpl;
-import org.flite.cach3.test.listeners.StubUpdateSingleCacheListenerImpl;
+import org.flite.cach3.test.dao.*;
+import org.flite.cach3.test.listeners.*;
+import org.flite.cach3.test.svc.*;
 import org.springframework.context.*;
 import org.springframework.context.support.*;
 import org.testng.annotations.*;
-import static org.testng.AssertJUnit.*;
-import org.flite.cach3.test.svc.*;
 
 import java.util.*;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -84,7 +83,7 @@ public class UpdateSingleCacheTest {
 
             // Testing that the listener got invoked as required.
             assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-            final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE, null, key, value);
+            final String expected = StubUpdateSingleCacheListenerImpl.formatTriggers(TestDAOImpl.TIME_NAMESPACE, null, key.toString(), value, value, new Object[] {key});
             assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
 			assertFalse(originalResults.get(key).equals(value));

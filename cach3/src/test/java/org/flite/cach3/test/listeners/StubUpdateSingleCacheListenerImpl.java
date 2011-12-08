@@ -47,11 +47,21 @@ public class StubUpdateSingleCacheListenerImpl implements UpdateSingleCacheListe
         return interests;
     }
 
-    public void triggeredUpdateSingleCache(final String namespace, final String prefix, final Object keyObject, final Object submission) {
-        triggers.add(formatTriggers(namespace, prefix, keyObject, submission));
+    public void triggeredUpdateSingleCache(final String namespace,
+                                           final String prefix,
+                                           final String baseCacheId,
+                                           final Object submission,
+                                           final Object retVal,
+                                           final Object[] args) {
+        triggers.add(formatTriggers(namespace, prefix, baseCacheId, submission, retVal, args));
     }
 
-    public static String formatTriggers(final String namespace, final String prefix, final Object keyObject, final Object submission) {
-        return String.format("%s [-] %s [-] %s [-] %s", namespace, prefix, keyObject, submission);
+    public static String formatTriggers(final String namespace,
+                                           final String prefix,
+                                           final String baseCacheId,
+                                           final Object submission,
+                                           final Object retVal,
+                                           final Object[] args) {
+        return StubReadThroughSingleCacheListenerImpl.formatTriggers(namespace, prefix, baseCacheId, submission, retVal, args);
     }
 }

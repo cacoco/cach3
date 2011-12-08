@@ -53,7 +53,7 @@ public class ReadThroughSingleCacheTest {
 
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-        final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.DATE_NAMESPACE, null, currentKey, s1, new Object[] {currentKey});
+        final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.DATE_NAMESPACE, null, currentKey, s1, null, new Object[] {currentKey});
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
 		for (int ix = 0; ix < 10; ix++) {
@@ -79,7 +79,7 @@ public class ReadThroughSingleCacheTest {
 
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-        final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.COMPOUND_NAMESPACE, TestDAOImpl.COMPOUND_PREFIX, expectedKey, v1, new Object[] {key1a, v1, keyB});
+        final String expected = StubReadThroughSingleCacheListenerImpl.formatTriggers(TestDAOImpl.COMPOUND_NAMESPACE, TestDAOImpl.COMPOUND_PREFIX, expectedKey, v1, null, new Object[] {key1a, v1, keyB});
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
         // This time through, we'd better get the CACHED value, not the one being sent in.

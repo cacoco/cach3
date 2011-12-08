@@ -22,5 +22,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface UpdateSingleCacheListener extends CacheListener {
-    void triggeredUpdateSingleCache(String namespace, String prefix, Object keyObject, Object submission);
+    void triggeredUpdateSingleCache(String namespace, String prefix, String baseCacheId, Object submission, Object retVal, Object[] args);
 }

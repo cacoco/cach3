@@ -50,7 +50,7 @@ public class StubReadThroughSingleCacheListenerImpl implements ReadThroughSingle
                                                 final String baseCacheId,
                                                 final Object submission,
                                                 final Object[] args) {
-        triggers.add(formatTriggers(namespace, prefix, baseCacheId, submission, args));
+        triggers.add(formatTriggers(namespace, prefix, baseCacheId, submission, null, args));
     }
 
     public static final String SEP = " [-] ";
@@ -58,6 +58,7 @@ public class StubReadThroughSingleCacheListenerImpl implements ReadThroughSingle
                                         final String prefix,
                                         final String baseCacheId,
                                         final Object submission,
+                                        final Object retVal,
                                         final Object[] args) {
         final StringBuilder sb = new StringBuilder(namespace)
                 .append(SEP)
@@ -66,6 +67,8 @@ public class StubReadThroughSingleCacheListenerImpl implements ReadThroughSingle
                 .append(baseCacheId)
                 .append(SEP)
                 .append(submission)
+                .append(SEP)
+                .append(retVal)
                 .append(SEP);
         if (args != null && args.length > 0) {
             for (int ix = 0; ix < args.length; ix++) {

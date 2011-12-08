@@ -305,6 +305,25 @@ public class CacheBase {
         return results;
     }
 
+    protected String getBaseKey(final AnnotationData annotationData,
+                                final Object retVal,
+                                final Object[] args,
+                                final String methodString) throws Exception {
+        if (StringUtils.isBlank(annotationData.getKeyTemplate())) {
+            final Object keyObject = getIndexObject(annotationData.getKeyIndex(), retVal, args, methodString);
+            return generateObjectId(getKeyMethod(keyObject), keyObject);
+        }
+
+        final VelocityContext context = new VelocityContext();
+        context.put("StringUtils", StringUtils.class);
+        context.put("args", args);
+        context.put("retVal", retVal);
+
+        final StringWriter writer = new StringWriter(250);
+        Velocity.evaluate(context, writer, "", annotationData.getKeyTemplate()); // TODO: Finish the logging string.
+        return writer.toString();
+    }
+
     protected List<String> getBaseKeys(final List<Object> keyObjects,
                                         final AnnotationData annotationData,
                                         final Object retVal,
