@@ -1,7 +1,6 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
-import org.apache.commons.lang.*;
 import org.easymock.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
@@ -49,28 +48,6 @@ public class UpdateMultiCacheAdviceTest {
         state = new Cach3State();
         cut.setState(state);
     }
-
-	@Test
-	public void testGetCacheKeys() throws Exception {
-		final int size = 10;
-		final List<Object> sources= new ArrayList<Object>();
-		for (int ix = 0; ix < size; ix++) {
-			sources.add(RandomStringUtils.randomAlphanumeric(3 + ix));
-		}
-
-		final String namespace = RandomStringUtils.randomAlphabetic(20);
-        final AnnotationData annotationData = new AnnotationData();
-        annotationData.setNamespace(namespace);
-        final List<String> results = cut.getCacheKeys(sources, annotationData);
-
-		assertEquals(size, results.size());
-		for (int ix = 0; ix < size; ix++) {
-			final String result = results.get(ix);
-			assertTrue(result.indexOf(namespace) != -1);
-			final String source = (String) sources.get(ix);
-			assertTrue(result.indexOf(source) != -1);
-		}
-	}
 
 	@Test
 	public void testGetKeyObjects() throws Exception {

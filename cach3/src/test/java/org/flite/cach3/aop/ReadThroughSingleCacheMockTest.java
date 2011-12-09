@@ -9,9 +9,6 @@ import org.flite.cach3.api.*;
 import org.flite.cach3.config.*;
 import org.testng.annotations.*;
 
-import java.lang.reflect.*;
-import java.security.*;
-
 import static org.easymock.EasyMock.*;
 import static org.testng.AssertJUnit.*;
 
@@ -80,44 +77,6 @@ public class ReadThroughSingleCacheMockTest {
 		verify(pjp);
 		verify(cache);
 		verify(sig);
-	}
-
-	@Test
-	public void testKeyObject() throws Exception {
-		final String answer = "bubba";
-		final Object[] args = new Object[] {null, answer, "blue"};
-		expect(pjp.getArgs()).andReturn(args).times(4);
-
-		final Method method = AOPTargetClass1.class.getDeclaredMethod("doIt", String.class, String.class, String.class);
-
-		replayAll();
-
-		try {
-			cut.getIndexObject(3, pjp, method);
-			fail("Expected Exception");
-		} catch (InvalidParameterException ex) {
-			assertTrue(ex.getMessage().indexOf("too big") != -1);
-			System.out.println(ex.getMessage());
-		}
-		try {
-			cut.getIndexObject(4, pjp, method);
-			fail("Expected Exception");
-		} catch (InvalidParameterException ex) {
-			assertTrue(ex.getMessage().indexOf("too big") != -1);
-			System.out.println(ex.getMessage());
-		}
-
-		try {
-			cut.getIndexObject(0, pjp, method);
-			fail("Expected Exception");
-		} catch (InvalidParameterException ex) {
-			assertTrue(ex.getMessage().indexOf("null") != -1);
-			System.out.println(ex.getMessage());
-		}
-
-		assertEquals(answer, cut.getIndexObject(1, pjp, method));
-
-		verifyAll();
 	}
 
 	@Test

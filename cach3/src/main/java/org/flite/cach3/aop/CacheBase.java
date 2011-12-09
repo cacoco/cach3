@@ -96,32 +96,6 @@ public class CacheBase {
         return resultString;
     }
 
-    @Deprecated
-    protected Object getIndexObject(final int index,
-	                             final JoinPoint jp,
-	                             final Method methodToCache) throws Exception {
-        if (index < 0) {
-            throw new InvalidParameterException(String.format(
-					"An index of %s is invalid",
-					index));
-        }
-        final Object[] args = jp.getArgs();
-		if (args.length <= index) {
-			throw new InvalidParameterException(String.format(
-					"An index of %s is too big for the number of arguments in [%s]",
-					index,
-					methodToCache.toString()));
-		}
-		final Object indexObject = args[index];
-		if (indexObject == null) {
-			throw new InvalidParameterException(String.format(
-					"The argument passed into [%s] at index %s is null.",
-					methodToCache.toString(),
-					index));
-		}
-		return indexObject;
-	}
-
     protected static Object getIndexObject(final int index,
                                            final Object retVal,
                                            final Object[] args,
@@ -211,55 +185,6 @@ public class CacheBase {
 		return targetMethod;
 	}
 
-	protected void validateAnnotationExists(final Object annotation, final Class annotationClass) {
-		if (annotation == null) {
-			throw new InvalidParameterException(String.format(
-					"No annotation of type [%s] found.",
-					annotationClass.getName()
-			));
-		}
-	}
-
-	protected void validateAnnotationIndex(final int value,
-	                                       final boolean acceptNegOne,
-	                                       final Class annotationClass,
-	                                       final Method method) {
-		if (value < -1 || (!acceptNegOne && value < 0)) {
-			throw new InvalidParameterException(String.format(
-					"KeyIndex for annotation [%s] must be %s or greater on [%s]",
-					annotationClass.getName(),
-					acceptNegOne ? "-1" : "0",
-					method.toString()
-			));
-		}
-	}
-
-	public void validateAnnotationNamespace(final String value,
-	                                        final Class annotationClass,
-	                                        final Method method) {
-		if (AnnotationConstants.DEFAULT_STRING.equals(value)
-				|| value == null
-				|| value.length() < 1) {
-			throw new InvalidParameterException(String.format(
-					"Namespace for annotation [%s] must be defined on [%s]",
-					annotationClass.getName(),
-					method.toString()
-			));
-		}
-	}
-
-	public void validateAnnotationExpiration(final int value,
-	                                         final Class annotationClass,
-	                                         final Method method) {
-		if (value < 0) {
-			throw new InvalidParameterException(String.format(
-					"Expiration for annotation [%s] must be 0 or greater on [%s]",
-					annotationClass.getName(),
-					method.toString()
-			));
-		}
-	}
-
 	// TODO: Replace by List.class.isInstance(Object obj)
 	protected void verifyReturnTypeIsList(final Method method, final Class annotationClass) {
 		if (verifyTypeIsList(method.getReturnType())) { return; }
@@ -291,19 +216,6 @@ public class CacheBase {
 
 		return false;
 	}
-
-    @Deprecated
-    protected List<String> getCacheKeys(final List<Object> keyObjects,
-                                        final AnnotationData annotationData) throws Exception {
-        final List<String> results = new ArrayList<String>();
-        for (final Object object : keyObjects) {
-            final Method keyMethod = getKeyMethod(object);
-            final String objectId = generateObjectId(keyMethod, object);
-            results.add(buildCacheKey(objectId, annotationData));
-        }
-
-        return results;
-    }
 
     protected String getBaseKey(final AnnotationData annotationData,
                                 final Object retVal,
