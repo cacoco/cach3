@@ -56,16 +56,19 @@
       <groupId>spy</groupId>
       <artifactId>memcached</artifactId>
       <version>2.7.1</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.velocity</groupId>
       <artifactId>velocity</artifactId>
       <version>1.7</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>2.6</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
