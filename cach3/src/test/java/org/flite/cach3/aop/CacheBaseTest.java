@@ -90,7 +90,6 @@ public class CacheBaseTest {
 			fail("Expected exception.");
 		} catch (InvalidParameterException ex) {
 			assertTrue(ex.getMessage().indexOf("at least 1 character") != -1);
-			System.out.println(ex.getMessage());
 		}
 
 		try {
@@ -98,20 +97,42 @@ public class CacheBaseTest {
 			fail("Expected exception.");
 		} catch (InvalidParameterException ex) {
 			assertTrue(ex.getMessage().indexOf("at least 1 character") != -1);
-			System.out.println(ex.getMessage());
 		}
 
-		final String objectId = RandomStringUtils.randomAlphanumeric(20);
         final AnnotationData annotationData = new AnnotationData();
         annotationData.setNamespace(RandomStringUtils.randomAlphanumeric(235));
 
+        final String space = RandomStringUtils.randomAlphanumeric(8) + " " + RandomStringUtils.randomAlphanumeric(8);
+        try {
+            cut.buildCacheKey(space, annotationData);
+            fail("Expected exception.");
+        } catch (InvalidParameterException ex) {
+            assertTrue(ex.getMessage().indexOf("whitespace") != -1);
+        }
+
+        final String endline = RandomStringUtils.randomAlphanumeric(8) + "\n" + RandomStringUtils.randomAlphanumeric(8);
+        try {
+            cut.buildCacheKey(endline, annotationData);
+            fail("Expected exception.");
+        } catch (InvalidParameterException ex) {
+            assertTrue(ex.getMessage().indexOf("whitespace") != -1);
+        }
+
+        final String tab = RandomStringUtils.randomAlphanumeric(8) + "\t" + RandomStringUtils.randomAlphanumeric(8);
+        try {
+            cut.buildCacheKey(tab, annotationData);
+            fail("Expected exception.");
+        } catch (InvalidParameterException ex) {
+            assertTrue(ex.getMessage().indexOf("whitespace") != -1);
+        }
+
+		final String objectId = RandomStringUtils.randomAlphanumeric(20);
         try {
             cut.buildCacheKey(objectId, annotationData);
             fail("Expected exception.");
         } catch (InvalidParameterException ex) {
             assertTrue(ex.getMessage().indexOf("255") != -1);
             assertTrue(ex.getMessage().indexOf(objectId) != -1);
-            System.out.println(ex.getMessage());
         }
 
         final String namespace = RandomStringUtils.randomAlphanumeric(12);

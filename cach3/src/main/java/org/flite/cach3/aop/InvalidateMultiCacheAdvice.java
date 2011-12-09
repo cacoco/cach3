@@ -6,7 +6,6 @@ import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
-import org.flite.cach3.exceptions.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -39,55 +38,33 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
     @Pointcut("@annotation(org.flite.cach3.annotations.InvalidateMultiCache)")
     public void invalidateMulti() {}
 
-    @Around("invalidateMulti()")
-    public Object cacheInvalidateMulti(final ProceedingJoinPoint pjp) throws Throwable {
+    @AfterReturning(pointcut="invalidateMulti()", returning="retVal")
+    public Object cacheInvalidateMulti(final JoinPoint jp, final Object retVal) throws Throwable {
         // If we've disabled the caching programmatically (or via properties file) just flow through.
         if (isCacheDisabled()) {
             LOG.debug("Caching is disabled.");
-            return pjp.proceed();
+            return retVal;
         }
 
         final MemcachedClientIF cache = getMemcachedClient();
+        // For Invalidate*Cache, an AfterReturning aspect is fine. We will only apply our caching
+        // after the underlying method completes successfully, and we will have the same
+        // access to the method params.
+
         // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
         // but do not let it surface up past the AOP injection itself.
-        List<String> cacheKeys = null;
-        List<Object> keyObjects = null;
-        final AnnotationData annotationData;
-        final String methodDescription;
         try {
-            final Method methodToCache = getMethodToCache(pjp);
-            methodDescription = methodToCache.toString();
+            final Method methodToCache = getMethodToCache(jp);
             final InvalidateMultiCache annotation = methodToCache.getAnnotation(InvalidateMultiCache.class);
-            annotationData =
+            final AnnotationData annotationData =
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             InvalidateMultiCache.class,
                             methodToCache.getName());
-            if (annotationData.getKeyIndex() > -1) {
-                final Object keyObject = getIndexObject(annotationData.getKeyIndex(), pjp, methodToCache);
-                keyObjects = convertToKeyObjects(keyObject, annotationData.getKeyIndex(), methodDescription);
-                cacheKeys = getCacheKeys(keyObjects, annotationData);
-            }
-        } catch (Throwable ex) {
-            LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
-            return pjp.proceed();
-        }
-
-        final Object result = pjp.proceed();
-
-        // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
-        // but do not let it surface up past the AOP injection itself.
-        try {
-            // If we have a -1 key index, then build the cacheKeys now.
-            if (annotationData.getKeyIndex() == -1) {
-                keyObjects = convertToKeyObjects(result, annotationData.getKeyIndex(), methodDescription);
-                cacheKeys = getCacheKeys(keyObjects, annotationData);
-            }
-            if (cacheKeys != null && cacheKeys.size() > 0) {
-                for (final String key : cacheKeys) {
-                    if (key != null && key.trim().length() > 0) {
-                        cache.delete(key);
-                    }
-                }
+            final List<Object> keyObjects = (List<Object>) getIndexObject(annotationData.getKeyIndex(), retVal, jp.getArgs(), methodToCache.toString());
+            final List<String> baseKeys = getBaseKeys(keyObjects, annotationData, retVal, jp.getArgs());
+            for (final String base : baseKeys) {
+                final String cacheKey = buildCacheKey(base, annotationData);
+                cache.delete(cacheKey);
             }
 
             // Notify the observers that a cache interaction happened.
@@ -95,31 +72,16 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final InvalidateMultiCacheListener listener : listeners) {
                     try {
-                        listener.triggeredInvalidateMultiCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), keyObjects);
+                        listener.triggeredInvalidateMultiCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKeys, retVal, jp.getArgs());
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }
                 }
             }
         } catch (Throwable ex) {
-            LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
+            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
         }
-        return result;
-
+        return retVal;
     }
 
-    protected List<Object> convertToKeyObjects(final Object keyObject,
-                                               final int keyIndex,
-                                               final String methodDescription) throws Exception {
-        if (verifyTypeIsList(keyObject.getClass())) {
-            return (List<Object>) keyObject;
-        }
-        throw new InvalidAnnotationException(String.format(
-                "The parameter object found at dataIndex [%s] is not a [%s]. " +
-                "[%s] does not fulfill the requirements.",
-                keyIndex,
-                List.class.getName(),
-                methodDescription
-        ));
-    }
 }

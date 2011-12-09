@@ -2,7 +2,6 @@ package org.flite.cach3.test.listeners;
 
 import org.flite.cach3.api.*;
 
-import java.security.*;
 import java.util.*;
 
 /**
@@ -46,35 +45,21 @@ public class StubUpdateMultiCacheListenerImpl implements UpdateMultiCacheListene
         return interests;
     }
 
-    public void triggeredUpdateMultiCache(final String namespace, final String prefix, final List<Object> keyObjects, final List<Object> submissions) {
-        triggers.add(formatTriggers(namespace, prefix, keyObjects, submissions));
+    public void triggeredUpdateMultiCache(final String namespace,
+                                          final String prefix,
+                                          final List<String> baseCacheIds,
+                                          final List<Object> submissions,
+                                          final Object retVal,
+                                          final Object[] args) {
+        triggers.add(formatTriggers(namespace, prefix, baseCacheIds, submissions, retVal, args));
     }
 
-    public static String formatTriggers(final String namespace, final String prefix, final List<Object> keyObjects, final List<Object> submissions) {
-        if (keyObjects == null && submissions == null) {
-            return String.format("%s [-] %s [-] null [-] null", namespace, prefix, keyObjects, submissions);
-        }
-        if (keyObjects == null
-                || submissions == null
-                || keyObjects.size() != submissions.size()) { throw new IllegalStateException("keys and submissions don't match."); }
-
-        final Map<Object, Object> map = new HashMap<Object, Object>();
-        for (int ix = 0; ix < keyObjects.size(); ix++) {
-            if (map.put(keyObjects.get(ix), submissions.get(ix)) != null) {
-                throw new InvalidParameterException("There seems to be duplicate keys. This may not be an actual problem, but this formatter is not equipped to handle that case.");
-            }
-        }
-
-        final List<Comparable> sorted = new ArrayList<Comparable>((List<Comparable>)(List)keyObjects);
-        Collections.sort(sorted);
-
-        final StringBuilder sb = new StringBuilder(namespace).append(" ").append(prefix).append("");
-        for (int ix = 0; ix < sorted.size(); ix++) {
-            final Object key = sorted.get(ix);
-            final Object value = map.get(key);
-            sb.append(key).append("=").append(value).append(";");
-        }
-
-        return sb.toString();
+    public static String formatTriggers(final String namespace,
+                                          final String prefix,
+                                          final List<String> baseCacheIds,
+                                          final List<Object> submissions,
+                                          final Object retVal,
+                                          final Object[] args) {
+        return StubReadThroughMultiCacheListenerImpl.formatTriggers(namespace, prefix, baseCacheIds, submissions, retVal, args);
     }
 }

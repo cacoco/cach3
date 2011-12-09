@@ -57,14 +57,9 @@ public class UpdateSingleCacheAdvice extends CacheBase {
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             UpdateSingleCache.class,
                             methodToCache.getName());
-            final Object keyObject = annotationData.getKeyIndex() == -1
-                                        ? validateReturnValueAsKeyObject(retVal, methodToCache)
-                                        : getIndexObject(annotationData.getKeyIndex(), jp, methodToCache);
-            final String objectId = getObjectId(keyObject);
-			final String cacheKey = buildCacheKey(objectId, annotationData);
-            final Object dataObject = annotationData.getDataIndex() == -1
-                    ? retVal
-                    : getIndexObject(annotationData.getDataIndex(), jp, methodToCache);
+            final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
+			final String cacheKey = buildCacheKey(baseKey, annotationData);
+            final Object dataObject = getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());
             final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
 			cache.set(cacheKey, annotationData.getExpiration(), submission);
 
@@ -73,7 +68,7 @@ public class UpdateSingleCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final UpdateSingleCacheListener listener : listeners) {
                     try {
-                        listener.triggeredUpdateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), keyObject, submission);
+                        listener.triggeredUpdateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKey, dataObject, retVal, jp.getArgs());
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }

@@ -1,11 +1,6 @@
 package org.flite.cach3.aop;
 
-import org.flite.cach3.exceptions.*;
 import org.testng.annotations.*;
-
-import java.util.*;
-
-import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -37,16 +32,16 @@ public class InvalidateMultiCacheAdviceTest {
         cut = new InvalidateMultiCacheAdvice();
         cut.invalidateMulti();
     }
-
-    @Test
-    public void testConvertToKeyObjects() throws Exception {
-        cut.convertToKeyObjects(new ArrayList<String>(), 2, "randomMethodName");
-
-        try {
-            cut.convertToKeyObjects("Not A List", 2, "randomMethodName");
-            fail("Expected Exception.");
-        } catch (InvalidAnnotationException ex) {
-            assertTrue(ex.getMessage().contains("does not fulfill"));
-        }
-    }
+//
+//    @Test
+//    public void testConvertToKeyObjects() throws Exception {
+//        cut.convertToKeyObjects(new ArrayList<String>(), 2, "randomMethodName");
+//
+//        try {
+//            cut.convertToKeyObjects("Not A List", 2, "randomMethodName");
+//            fail("Expected Exception.");
+//        } catch (InvalidAnnotationException ex) {
+//            assertTrue(ex.getMessage().contains("does not fulfill"));
+//        }
+//    }
 }

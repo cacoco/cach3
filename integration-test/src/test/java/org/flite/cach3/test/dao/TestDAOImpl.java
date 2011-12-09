@@ -38,6 +38,9 @@ public class TestDAOImpl implements TestDAO {
     public static final String PREFIX_NAMESPACE = "Foxtrot";
     public static final String PREFIX_STRING = "p-p-p-prefix-";
 
+    public static final String COMPOUND_NAMESPACE = "Cmpnd";
+    public static final String COMPOUND_PREFIX = "c2-";
+
 	@ReadThroughSingleCache(namespace = DATE_NAMESPACE, keyIndex = 0, expiration = 30)
 	public String getDateString(final String key) {
 		final Date now = new Date();
@@ -200,5 +203,76 @@ public class TestDAOImpl implements TestDAO {
         }
         return results;
     }
+
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  Methods using the velocity templating option.                * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+    @ReadThroughSingleCache(
+            namespace=COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            keyTemplate = "$args[0]&&$args[2]",
+            expiration = 30)
+    public String getCompoundString(final Long first, final String toReturn, final Long second) {
+        return toReturn;
+    }
+
+    @ReadThroughMultiCache(
+            namespace = COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            keyIndex = 0,
+            keyTemplate = "$indexObject&&$args[2]",
+            expiration = 30
+    )
+    public List<String> getCompoundStrings(final List<Long> first, final String toReturn, final Long second) {
+        final List<String> results = new ArrayList<String>();
+        for (final Long f : first) {
+            results.add(toReturn);
+        }
+        return results;
+    }
+
+    @UpdateSingleCache(
+            namespace = COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            dataIndex = 1,
+            keyTemplate = "$args[2]&&$args[0]",
+            expiration = 30
+    )
+    public String updateCompoundString(final Long second, final String toReturn, final Long first) {
+        return toReturn;
+    }
+
+    @UpdateMultiCache(
+            namespace = COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            keyIndex = 2,
+            dataIndex = -1,
+            keyTemplate = "$args[2][$index]&&$args[0]",
+            expiration = 30
+    )
+    public List<String> updateCompoundStrings(final Long second, final String toReturn, final List<Long> first) {
+        final List<String> results = new ArrayList<String>();
+        for (final Long f : first) {
+            results.add(toReturn);
+        }
+        return results;
+    }
+
+    @InvalidateSingleCache(
+            namespace = COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            keyTemplate = "$args[1]&&$args[0]"
+    )
+    public void invalidateCompoundString(final Long second, final Long first) { }
+
+    @InvalidateMultiCache(
+            namespace = COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            keyIndex = 1,
+            keyTemplate = "$indexObject&&$args[0]"
+    )
+    public void invalidateCompoundStrings(final Long second, final List<Long> first) { }
+
 
 }

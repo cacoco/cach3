@@ -41,7 +41,18 @@ public @interface UpdateMultiCache {
 	 * that the object being returned is the object responsible for providing the cache key.
 	 * @return the index into the arguments array for the item that will provide the id
 	 */
-	int keyIndex() default Integer.MIN_VALUE;
+	int keyIndex() default AnnotationConstants.DEFAULT_KEY_INDEX;
+
+    /**
+     * This is an <em>optional</em> value for the user to provide a Velocity template
+     * to create the cache id(s). In any of the *MultiCache annotations, keyIndex() is still
+     * required, so that the underlying logic has an indication of the dimensionality
+     * of the multi-values.
+     * For the Velocity template Context, there will be two defined variables:
+     *  1 - args: An array of the objects passed into the method as parameters
+     *  2 - index: the integer pointer of where in the list of multi-values that we are creating an id for.
+     */
+    String keyTemplate() default AnnotationConstants.DEFAULT_STRING;
 
     /**
      * Since keys and the actual data to be cached may be different, we also need to know which

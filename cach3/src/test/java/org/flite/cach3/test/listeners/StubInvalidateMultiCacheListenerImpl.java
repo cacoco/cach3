@@ -45,12 +45,19 @@ public class StubInvalidateMultiCacheListenerImpl implements InvalidateMultiCach
         return interests;
     }
 
-    public void triggeredInvalidateMultiCache(final String namespace, final String prefix, final List<Object> keyObjects) {
-        this.triggers.add(formatTriggers(namespace, prefix, keyObjects));
+    public void triggeredInvalidateMultiCache(final String namespace,
+                                              final String prefix,
+                                              final List<String> baseCacheIds,
+                                              final Object retVal,
+                                              final Object[] args) {
+        this.triggers.add(formatTriggers(namespace, prefix, baseCacheIds, retVal, args));
     }
 
-    public static String formatTriggers(final String namespace, final String prefix, final List<? extends Object> keyObjects) {
-        return String.format("%s [-] %s [-] %s", namespace, prefix, keyObjects.toString());
+    public static String formatTriggers(final String namespace,
+                                              final String prefix,
+                                              final List<String> baseCacheIds,
+                                              final Object retVal,
+                                              final Object[] args) {
+        return StubReadThroughMultiCacheListenerImpl.formatTriggers(namespace, prefix, baseCacheIds, null, retVal, args);
     }
-
 }

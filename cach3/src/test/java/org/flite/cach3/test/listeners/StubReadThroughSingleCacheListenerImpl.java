@@ -45,10 +45,40 @@ public class StubReadThroughSingleCacheListenerImpl implements ReadThroughSingle
         return interests;
     }
 
-    public void triggeredReadThroughSingleCache(final String namespace, final String prefix, final Object keyObject, final Object submission) {
-        triggers.add(formatTriggers(namespace, prefix, keyObject, submission));
+    public void triggeredReadThroughSingleCache(final String namespace,
+                                                final String prefix,
+                                                final String baseCacheId,
+                                                final Object submission,
+                                                final Object[] args) {
+        triggers.add(formatTriggers(namespace, prefix, baseCacheId, submission, null, args));
     }
 
+    public static final String SEP = " [-] ";
+    public static String formatTriggers(final String namespace,
+                                        final String prefix,
+                                        final String baseCacheId,
+                                        final Object submission,
+                                        final Object retVal,
+                                        final Object[] args) {
+        final StringBuilder sb = new StringBuilder(namespace)
+                .append(SEP)
+                .append(prefix)
+                .append(SEP)
+                .append(baseCacheId)
+                .append(SEP)
+                .append(submission)
+                .append(SEP)
+                .append(retVal)
+                .append(SEP);
+        if (args != null && args.length > 0) {
+            for (int ix = 0; ix < args.length; ix++) {
+                sb.append(args[ix] == null ? "null" : args[ix].toString()).append(SEP);
+            }
+        }
+        return sb.toString();
+    }
+
+    @Deprecated
     public static String formatTriggers(final String namespace, final String prefix, final Object keyObject, final Object submission) {
         return String.format("%s [-] %s [-] %s [-] %s", namespace, prefix, keyObject, submission);
     }

@@ -68,4 +68,20 @@ public interface TestDAO {
 
     public List<String> updateDwarves(final List<Long> ids);
 
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  Methods using the velocity templating option.                * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+    public String getCompoundString(final Long first, final String toReturn, final Long second);
+
+    public List<String> getCompoundStrings(final List<Long> first, final String toReturn, final Long second);
+
+    public String updateCompoundString(final Long second, final String toReturn, final Long first);
+
+    public List<String> updateCompoundStrings(final Long second, final String toReturn, final List<Long> first);
+
+    public void invalidateCompoundString(final Long second, final Long first);
+
+    public void invalidateCompoundStrings(final Long second, final List<Long> first);
+
 }

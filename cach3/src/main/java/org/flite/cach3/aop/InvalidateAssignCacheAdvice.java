@@ -39,21 +39,19 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
     @Pointcut("@annotation(org.flite.cach3.annotations.InvalidateAssignCache)")
     public void invalidateAssign() {}
 
-    @Around("invalidateAssign()")
-    public Object cacheInvalidateAssign(final ProceedingJoinPoint pjp) throws Throwable {
-        final Object result = pjp.proceed();
-
+    @AfterReturning(pointcut="invalidateAssign()", returning="retVal")
+    public Object cacheInvalidateAssign(final JoinPoint jp, final Object retVal) throws Throwable {
         // If we've disabled the caching programmatically (or via properties file) just flow through.
         if (isCacheDisabled()) {
             LOG.debug("Caching is disabled.");
-            return result;
+            return retVal;
         }
 
         final MemcachedClientIF cache = getMemcachedClient();
         // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
         // but do not let it surface up past the AOP injection itself.
         try {
-            final Method methodToCache = getMethodToCache(pjp);
+            final Method methodToCache = getMethodToCache(jp);
             final InvalidateAssignCache annotation = methodToCache.getAnnotation(InvalidateAssignCache.class);
             final AnnotationData annotationData =
                     AnnotationDataBuilder.buildAnnotationData(annotation,
@@ -78,8 +76,8 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
                 }
             }
         } catch (Throwable ex) {
-            LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
+            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
         }
-        return result;
+        return retVal;
     }
 }

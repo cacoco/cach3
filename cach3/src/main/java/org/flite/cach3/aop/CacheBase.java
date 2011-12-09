@@ -1,6 +1,9 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
+import org.apache.commons.lang.*;
+import org.apache.velocity.*;
+import org.apache.velocity.app.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.*;
@@ -9,6 +12,7 @@ import org.flite.cach3.api.*;
 import org.flite.cach3.config.*;
 import org.flite.cach3.exceptions.*;
 
+import java.io.*;
 import java.lang.reflect.*;
 import java.security.*;
 import java.util.*;
@@ -64,7 +68,7 @@ public class CacheBase {
 		return target.getClass().getMethod(msig.getName(), msig.getParameterTypes());
 	}
 
-	protected String generateObjectId(final Method keyMethod, final Object keyObject) throws Exception {
+	protected static String generateObjectId(final Method keyMethod, final Object keyObject) throws Exception {
 		final String objectId = (String) keyMethod.invoke(keyObject, null);
 		if (objectId == null || objectId.length() < 1) {
 			throw new RuntimeException("Got an empty key value from " + keyMethod.getName());
@@ -72,43 +76,60 @@ public class CacheBase {
 		return objectId;
 	}
 
-    protected String buildCacheKey(final String objectId, final AnnotationData data) {
+    protected static final char[] WS = new char[] {' ', '\n', '\t'};
+    protected static String buildCacheKey(final String objectId, final AnnotationData data) {
         if (objectId == null || objectId.length() < 1) {
             throw new InvalidParameterException("Ids for objects in the cache must be at least 1 character long.");
         }
-        final StringBuilder result = new StringBuilder(data.getNamespace())
-                .append(SEPARATOR);
-        if (data.getKeyPrefix() != null) {
+        final StringBuilder result = new StringBuilder(data.getNamespace()).append(SEPARATOR);
+        if (StringUtils.isNotBlank(data.getKeyPrefix())) {
             result.append(data.getKeyPrefix());
         }
         result.append(objectId);
         if (result.length() > 255) {
             throw new InvalidParameterException("Ids for objects in the cache must not exceed 255 characters: [" + result.toString() + "]");
         }
-
-        return result.toString();
+        final String resultString = result.toString();
+        if (StringUtils.containsAny(resultString, WS)) {
+            throw new InvalidParameterException("Ids for objects in the cache must not have whitespace: [" + result.toString() + "]");
+        }
+        return resultString;
     }
 
-    protected Object getIndexObject(final int index,
-	                             final JoinPoint jp,
-	                             final Method methodToCache) throws Exception {
-        if (index < 0) {
+    protected static Object getIndexObject(final int index,
+                                           final Object retVal,
+                                           final Object[] args,
+                                           final String methodString) throws Exception {
+        return getIndexObject(true, index, retVal, args, methodString);
+	}
+
+    protected static Object getIndexObject(final int index,
+                                           final Object[] args,
+                                           final String methodString) throws Exception {
+        return getIndexObject(false, index, null, args, methodString);
+	}
+
+    private static Object getIndexObject(final boolean allowRetVal,
+                                           final int index,
+                                           final Object retVal,
+                                           final Object[] args,
+                                           final String methodString) throws Exception {
+        if (index < -1 || (index == -1 && !allowRetVal)) {
             throw new InvalidParameterException(String.format(
 					"An index of %s is invalid",
 					index));
         }
-        final Object[] args = jp.getArgs();
 		if (args.length <= index) {
 			throw new InvalidParameterException(String.format(
 					"An index of %s is too big for the number of arguments in [%s]",
 					index,
-					methodToCache.toString()));
+					methodString));
 		}
-		final Object indexObject = args[index];
+		final Object indexObject = index == -1 ? retVal : args[index];
 		if (indexObject == null) {
 			throw new InvalidParameterException(String.format(
 					"The argument passed into [%s] at index %s is null.",
-					methodToCache.toString(),
+					methodString,
 					index));
 		}
 		return indexObject;
@@ -164,55 +185,6 @@ public class CacheBase {
 		return targetMethod;
 	}
 
-	protected void validateAnnotationExists(final Object annotation, final Class annotationClass) {
-		if (annotation == null) {
-			throw new InvalidParameterException(String.format(
-					"No annotation of type [%s] found.",
-					annotationClass.getName()
-			));
-		}
-	}
-
-	protected void validateAnnotationIndex(final int value,
-	                                       final boolean acceptNegOne,
-	                                       final Class annotationClass,
-	                                       final Method method) {
-		if (value < -1 || (!acceptNegOne && value < 0)) {
-			throw new InvalidParameterException(String.format(
-					"KeyIndex for annotation [%s] must be %s or greater on [%s]",
-					annotationClass.getName(),
-					acceptNegOne ? "-1" : "0",
-					method.toString()
-			));
-		}
-	}
-
-	public void validateAnnotationNamespace(final String value,
-	                                        final Class annotationClass,
-	                                        final Method method) {
-		if (AnnotationConstants.DEFAULT_STRING.equals(value)
-				|| value == null
-				|| value.length() < 1) {
-			throw new InvalidParameterException(String.format(
-					"Namespace for annotation [%s] must be defined on [%s]",
-					annotationClass.getName(),
-					method.toString()
-			));
-		}
-	}
-
-	public void validateAnnotationExpiration(final int value,
-	                                         final Class annotationClass,
-	                                         final Method method) {
-		if (value < 0) {
-			throw new InvalidParameterException(String.format(
-					"Expiration for annotation [%s] must be 0 or greater on [%s]",
-					annotationClass.getName(),
-					method.toString()
-			));
-		}
-	}
-
 	// TODO: Replace by List.class.isInstance(Object obj)
 	protected void verifyReturnTypeIsList(final Method method, final Class annotationClass) {
 		if (verifyTypeIsList(method.getReturnType())) { return; }
@@ -245,13 +217,50 @@ public class CacheBase {
 		return false;
 	}
 
-    protected List<String> getCacheKeys(final List<Object> keyObjects,
-                                        final AnnotationData annotationData) throws Exception {
+    protected String getBaseKey(final AnnotationData annotationData,
+                                final Object retVal,
+                                final Object[] args,
+                                final String methodString) throws Exception {
+        if (StringUtils.isBlank(annotationData.getKeyTemplate())) {
+            final Object keyObject = getIndexObject(annotationData.getKeyIndex(), retVal, args, methodString);
+            return generateObjectId(getKeyMethod(keyObject), keyObject);
+        }
+
+        final VelocityContext context = new VelocityContext();
+        context.put("StringUtils", StringUtils.class);
+        context.put("args", args);
+        context.put("retVal", retVal);
+
+        final StringWriter writer = new StringWriter(250);
+        Velocity.evaluate(context, writer, "", annotationData.getKeyTemplate()); // TODO: Finish the logging string.
+        return writer.toString();
+    }
+
+    protected List<String> getBaseKeys(final List<Object> keyObjects,
+                                        final AnnotationData annotationData,
+                                        final Object retVal,
+                                        final Object[] args) throws Exception {
         final List<String> results = new ArrayList<String>();
-        for (final Object object : keyObjects) {
-            final Method keyMethod = getKeyMethod(object);
-            final String objectId = generateObjectId(keyMethod, object);
-            results.add(buildCacheKey(objectId, annotationData));
+        for (int ix = 0; ix < keyObjects.size(); ix++) {
+            final Object object = keyObjects.get(ix);
+            final String template = annotationData.getKeyTemplate();
+            final String base;
+            if (StringUtils.isBlank(template)) {
+                final Method method = getKeyMethod(object);
+                base = generateObjectId(method, object);
+            } else {
+                final VelocityContext context = new VelocityContext();
+                context.put("StringUtils", StringUtils.class);
+                context.put("args", args);
+                context.put("index", ix);
+                context.put("indexObject", object);
+                context.put("retVal", retVal);
+
+                final StringWriter writer = new StringWriter(250);
+                Velocity.evaluate(context, writer, "", template);
+                base = writer.toString();
+            }
+            results.add(base);
         }
 
         return results;

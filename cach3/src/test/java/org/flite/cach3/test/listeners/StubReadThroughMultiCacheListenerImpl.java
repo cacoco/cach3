@@ -2,6 +2,7 @@ package org.flite.cach3.test.listeners;
 
 import org.flite.cach3.api.*;
 
+import java.security.*;
 import java.util.*;
 
 /**
@@ -47,12 +48,65 @@ public class StubReadThroughMultiCacheListenerImpl implements ReadThroughMultiCa
 
     public void triggeredReadThroughMultiCache(final String namespace,
                                                final String prefix,
-                                               final List<Object> keyObjects,
-                                               final List<Object> submissions) {
-        this.triggers.add(formatTriggers(namespace, prefix, keyObjects, submissions));
+                                               final List<String> baseCacheIds,
+                                               final List<Object> submissions,
+                                               final Object[] alteredArgs) {
+        this.triggers.add(formatTriggers(namespace, prefix, baseCacheIds, submissions, null, alteredArgs));
     }
 
-    public static String formatTriggers(final String namespace, final String prefix, final List<Object> keyObjects, final List<Object> submissions) {
-        return StubUpdateMultiCacheListenerImpl.formatTriggers(namespace, prefix, keyObjects, submissions);
+    public static final String SEP = " [-] ";
+    public static String formatTriggers(final String namespace,
+                                               final String prefix,
+                                               final List<String> baseCacheIds,
+                                               final List<Object> submissions,
+                                               final Object retVal,
+                                               final Object[] alteredArgs) {
+        final StringBuilder sb = new StringBuilder(namespace).append(SEP).append(prefix).append(SEP);
+
+        final int idLen = baseCacheIds != null ? baseCacheIds.size() : 0;
+        final int obLen = submissions != null ? submissions.size() : 0;
+        if (submissions != null && idLen != obLen) { throw new InvalidParameterException("Unequal lengths of objects."); }
+
+        final List<String> compounds = new ArrayList<String>(idLen);
+        for (int ix = 0; ix < idLen; ix++) {
+            final String submissionString = submissions == null ? "" : submissions.get(ix).toString();
+            compounds.add(baseCacheIds.get(ix).toString() + "-&&-" + submissionString);
+        }
+        // Yes, this is a little bit "lossy', but it suits our current purposes.
+        Collections.sort(compounds);
+        for (final String compound : compounds) {
+            sb.append(compound).append(SEP);
+        }
+
+        // Yes, this is a little bit "lossy', but it suits our current purposes.
+        if (retVal != null && retVal instanceof Collection) {
+            final List contents = retVal instanceof List ? (List) retVal : new ArrayList<Object>((Collection)retVal);
+            Collections.sort(contents);
+            for (final Object obj : contents) {
+                sb.append(obj == null ? "" : obj.toString()).append("!");
+            }
+        } else if (retVal != null) {
+            sb.append(retVal.toString());
+        }
+        sb.append(SEP);
+
+        if (alteredArgs != null && alteredArgs.length > 0) {
+            for (int ix = 0; ix < alteredArgs.length; ix++) {
+                final Object arg = alteredArgs[ix];
+                if (arg instanceof Collection) {
+                    final Collection collection = (Collection) arg;
+                    if (collection != null) {
+                        if (collection instanceof List) { Collections.sort((List) collection); }
+                        for (final Object item : collection) {
+                            sb.append(item == null ? "" : item.toString()).append("&_&");
+                        }
+                    }
+                    sb.append(SEP);
+                } else {
+                    sb.append(alteredArgs[ix].toString()).append(SEP);
+                }
+            }
+        }
+        return sb.toString();
     }
 }

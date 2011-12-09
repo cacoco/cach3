@@ -1,12 +1,16 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
+import org.apache.commons.lang.*;
 import org.apache.commons.logging.*;
+import org.apache.velocity.*;
+import org.apache.velocity.app.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
 
+import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -49,10 +53,11 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
         final MemcachedClientIF cache = getMemcachedClient();
 		// This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
 		// but do not let it surface up past the AOP injection itself.
+        final String baseKey;
 		final String cacheKey;
 		final ReadThroughSingleCache annotation;
         final AnnotationData annotationData;
-        final Object keyObject;
+        final Object[] args = pjp.getArgs();
 		try {
 			final Method methodToCache = getMethodToCache(pjp);
 			annotation = methodToCache.getAnnotation(ReadThroughSingleCache.class);
@@ -60,9 +65,8 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             ReadThroughSingleCache.class,
                             methodToCache.getName());
-            keyObject = getIndexObject(annotation.keyIndex(), pjp, methodToCache);
-            final String objectId = getObjectId(keyObject);
-			cacheKey = buildCacheKey(objectId, annotationData);
+			baseKey = generateBaseKeySingle(args, annotationData, methodToCache.toString());
+            cacheKey = buildCacheKey(baseKey, annotationData);
 			final Object result = cache.get(cacheKey);
 			if (result != null) {
 				LOG.debug("Cache hit.");
@@ -86,7 +90,7 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final ReadThroughSingleCacheListener listener : listeners) {
                     try {
-                        listener.triggeredReadThroughSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), keyObject, result);
+                        listener.triggeredReadThroughSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKey, result, args);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }
@@ -102,4 +106,22 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
 		final Method keyMethod = getKeyMethod(keyObject);
 		return generateObjectId(keyMethod, keyObject);
 	}
+
+    protected String generateBaseKeySingle(final Object[] args,
+                                           final AnnotationData annotationData,
+                                           final String methodString) throws Exception {
+        if (StringUtils.isBlank(annotationData.getKeyTemplate())) {
+            return getObjectId(getIndexObject(annotationData.getKeyIndex(), args, methodString));
+        }
+
+        final VelocityContext context = new VelocityContext();
+        context.put("StringUtils", StringUtils.class);
+        context.put("args", args);
+
+        final StringWriter writer = new StringWriter(250);
+        Velocity.evaluate(context, writer, "", annotationData.getKeyTemplate());
+
+        return writer.toString();
+    }
+
 }

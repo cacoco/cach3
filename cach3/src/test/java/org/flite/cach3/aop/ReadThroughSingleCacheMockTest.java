@@ -1,15 +1,13 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
+import org.apache.commons.lang.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.reflect.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
 import org.flite.cach3.config.*;
 import org.testng.annotations.*;
-
-import java.lang.reflect.*;
-import java.security.*;
 
 import static org.easymock.EasyMock.*;
 import static org.testng.AssertJUnit.*;
@@ -82,44 +80,6 @@ public class ReadThroughSingleCacheMockTest {
 	}
 
 	@Test
-	public void testKeyObject() throws Exception {
-		final String answer = "bubba";
-		final Object[] args = new Object[] {null, answer, "blue"};
-		expect(pjp.getArgs()).andReturn(args).times(4);
-
-		final Method method = AOPTargetClass1.class.getDeclaredMethod("doIt", String.class, String.class, String.class);
-
-		replayAll();
-
-		try {
-			cut.getIndexObject(3, pjp, method);
-			fail("Expected Exception");
-		} catch (InvalidParameterException ex) {
-			assertTrue(ex.getMessage().indexOf("too big") != -1);
-			System.out.println(ex.getMessage());
-		}
-		try {
-			cut.getIndexObject(4, pjp, method);
-			fail("Expected Exception");
-		} catch (InvalidParameterException ex) {
-			assertTrue(ex.getMessage().indexOf("too big") != -1);
-			System.out.println(ex.getMessage());
-		}
-
-		try {
-			cut.getIndexObject(0, pjp, method);
-			fail("Expected Exception");
-		} catch (InvalidParameterException ex) {
-			assertTrue(ex.getMessage().indexOf("null") != -1);
-			System.out.println(ex.getMessage());
-		}
-
-		assertEquals(answer, cut.getIndexObject(1, pjp, method));
-
-		verifyAll();
-	}
-
-	@Test
 	public void testTopLevelCacheIndividualCacheHit() throws Throwable {
 		final String methodName = "cacheThis";
 		expect(pjp.getSignature()).andReturn(sig);
@@ -161,6 +121,7 @@ public class ReadThroughSingleCacheMockTest {
 	@Test
 	public void testTopLevelCacheIndividualCachePreException() throws Throwable {
 		expect(pjp.toShortString()).andReturn("SHORTSTRING").anyTimes();
+        expect(pjp.getArgs()).andReturn(new Object[]{}).once();
 		expect(pjp.getSignature()).andThrow(new RuntimeException("FORCE FOR TEST"));
 		final String targetResult = "A VALUE FROM THE TARGET OBJECT";
 		expect(pjp.proceed()).andReturn(targetResult);
@@ -218,6 +179,33 @@ public class ReadThroughSingleCacheMockTest {
 		assertNull(result);
 	}
 
+    @Test
+    public void testNonVelocityBaseKey() throws Exception {
+        final AnnotationData data = new AnnotationData();
+        data.setKeyIndex(3);
+        final String key = RandomStringUtils.randomAlphanumeric(8);
+
+        final String result = cut.generateBaseKeySingle(new Object[]{"alpha", "beta", "gamma", key}, data, "fakeMethodName()");
+
+        assertEquals(key, result);
+    }
+
+    @Test
+    public void testVelocityBaseKey() throws Exception {
+        final String arbitrary = RandomStringUtils.randomAlphanumeric(10);
+        final String template = "$args[0]-" + arbitrary + "-$args[3]";
+        final String alpha = RandomStringUtils.randomAlphabetic(7);
+        final String delta = RandomStringUtils.randomAlphanumeric(11);
+        final String expected = alpha + "-" + arbitrary + "-" + delta;
+
+        final AnnotationData data = new AnnotationData();
+        data.setKeyTemplate(template);
+
+        final String result = cut.generateBaseKeySingle(new Object[]{alpha, "beta", "gamma", delta}, data, "fakeMethodName()");
+
+        assertEquals(expected, result);
+    }
+
 	private static class AOPTargetClass1 {
 		public String doIt(final String s1, final String s2, final String s3) { return null; }
 	}
@@ -230,7 +218,7 @@ public class ReadThroughSingleCacheMockTest {
 	}
 
 	private static class AOPKeyClass {
-		public static final String result = "CACHE KEY";
+		public static final String result = "CACHE_KEY";
 		@CacheKeyMethod
 		public String getKey() {
 			return result;
