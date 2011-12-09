@@ -251,7 +251,7 @@ public class TestDAOImpl implements TestDAO {
             keyTemplate = "$args[2][$index]&&$args[0]",
             expiration = 30
     )
-    public List<String> updateCompundStrings(final Long second, final String toReturn, final List<Long> first) {
+    public List<String> updateCompoundStrings(final Long second, final String toReturn, final List<Long> first) {
         final List<String> results = new ArrayList<String>();
         for (final Long f : first) {
             results.add(toReturn);
@@ -259,13 +259,20 @@ public class TestDAOImpl implements TestDAO {
         return results;
     }
 
+    @InvalidateSingleCache(
+            namespace = COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            keyTemplate = "$args[1]&&$args[0]"
+    )
+    public void invalidateCompoundString(final Long second, final Long first) { }
+
     @InvalidateMultiCache(
             namespace = COMPOUND_NAMESPACE,
             keyPrefix = COMPOUND_PREFIX,
             keyIndex = 1,
             keyTemplate = "$indexObject&&$args[0]"
     )
-    public void invalidateCompundStrings(final Long second, final List<Long> first) { }
+    public void invalidateCompoundStrings(final Long second, final List<Long> first) { }
 
 
 }

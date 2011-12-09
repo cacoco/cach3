@@ -172,7 +172,7 @@ public class UpdateMultiCacheTest {
                 (StubUpdateMultiCacheListenerImpl) context.getBean("stubUM");
 
         final int previous = listener.getTriggers().size();
-		final List<String> results = test.updateCompundStrings(second, original, firsts);
+		final List<String> results = test.updateCompoundStrings(second, original, firsts);
 
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);

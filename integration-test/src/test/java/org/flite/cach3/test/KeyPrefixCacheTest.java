@@ -1,8 +1,7 @@
 package org.flite.cach3.test;
 
-import org.flite.cach3.test.dao.TestDAOImpl;
-import org.flite.cach3.test.listeners.StubInvalidateMultiCacheListenerImpl;
-import org.flite.cach3.test.listeners.StubInvalidateSingleCacheListenerImpl;
+import org.flite.cach3.test.dao.*;
+import org.flite.cach3.test.listeners.*;
 import org.flite.cach3.test.svc.*;
 import org.springframework.context.*;
 import org.springframework.context.support.*;
@@ -78,7 +77,7 @@ public class KeyPrefixCacheTest {
         // Make sure the listener is getting triggered.
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-        final String expected = StubInvalidateSingleCacheListenerImpl.formatTriggers(TestDAOImpl.PREFIX_NAMESPACE, TestDAOImpl.PREFIX_STRING, singleId);
+        final String expected = StubInvalidateSingleCacheListenerImpl.formatTriggers(TestDAOImpl.PREFIX_NAMESPACE, TestDAOImpl.PREFIX_STRING, singleId.toString(), null, new Object[]{singleId});
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
         final List<String> mResult2 = test.getDwarves(allIds);

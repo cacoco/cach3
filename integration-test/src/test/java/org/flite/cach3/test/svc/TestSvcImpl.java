@@ -132,12 +132,16 @@ public class TestSvcImpl implements TestSvc {
         return this.dao.updateCompoundString(second, toReturn, first);
     }
 
-    public List<String> updateCompundStrings(final Long second, final String toReturn, final List<Long> first) {
-        return this.dao.updateCompundStrings(second, toReturn, first);
+    public List<String> updateCompoundStrings(final Long second, final String toReturn, final List<Long> first) {
+        return this.dao.updateCompoundStrings(second, toReturn, first);
     }
 
-    public void invalidateCompundStrings(final Long second, final List<Long> first) {
-        this.dao.invalidateCompundStrings(second, first);
+    public void invalidateCompoundString(final Long second, final Long first) {
+        this.dao.invalidateCompoundString(second, first);
+    }
+
+    public void invalidateCompoundStrings(final Long second, final List<Long> first) {
+        this.dao.invalidateCompoundStrings(second, first);
     }
 
 }

@@ -149,7 +149,7 @@ public class InvalidateMultiCacheTest {
         }
 
         final int previous = listener.getTriggers().size();
-        test.invalidateCompundStrings(second, invalidSubset);
+        test.invalidateCompoundStrings(second, invalidSubset);
 
         // Make sure the listener is getting triggered.
         // Testing that the listener got invoked as required.

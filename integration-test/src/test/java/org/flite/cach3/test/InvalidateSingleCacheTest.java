@@ -1,5 +1,6 @@
 package org.flite.cach3.test;
 
+import org.apache.commons.lang.*;
 import org.flite.cach3.test.dao.*;
 import org.flite.cach3.test.listeners.*;
 import org.flite.cach3.test.svc.*;
@@ -62,7 +63,7 @@ public class InvalidateSingleCacheTest {
         // Make sure the listener is getting triggered.
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-        final String expected = StubInvalidateSingleCacheListenerImpl.formatTriggers(TestDAOImpl.SINGLE_NAMESPACE, null, key1);
+        final String expected = StubInvalidateSingleCacheListenerImpl.formatTriggers(TestDAOImpl.SINGLE_NAMESPACE, null, key1.toString(), null,new Object[] {key1});
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
         test.updateRandomString(key2);
@@ -91,5 +92,39 @@ public class InvalidateSingleCacheTest {
 
         assertEquals(t1, test.getRandomString(key1));
         assertEquals(t2, test.getRandomString(key2));
+    }
+
+    @Test
+    public void testVelocity() {
+        final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubInvalidateSingleCacheListenerImpl listener =
+                (StubInvalidateSingleCacheListenerImpl) context.getBean("stubIS");
+
+        final String original = RandomStringUtils.randomAlphanumeric(4);
+        final String replace = RandomStringUtils.randomAlphanumeric(6);
+        final String finish = RandomStringUtils.randomAlphanumeric(8);
+
+        final Long first = System.currentTimeMillis() + 3600000;
+        final Long second = first + 1337;
+        final String baseKey = first.toString() + "&&" + second.toString();
+
+        final String r1 = test.getCompoundString(first, original, second);
+        assertEquals(r1, original);
+
+        final String r2 = test.getCompoundString(first, replace, second);
+        assertEquals(r2, original);
+
+        final int previous = listener.getTriggers().size();
+        test.invalidateCompoundString(second, first);
+
+        // Make sure the listener is getting triggered.
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+        final String expected = StubInvalidateSingleCacheListenerImpl.formatTriggers(TestDAOImpl.COMPOUND_NAMESPACE, TestDAOImpl.COMPOUND_PREFIX, baseKey, null, new Object[] {second, first});
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+
+        // Now, by retrieving again we ensure the invalidate actually took place.
+        final String r3 = test.getCompoundString(first, finish, second);
+        assertEquals(r3, finish);
     }
 }

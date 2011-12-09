@@ -78,8 +78,10 @@ public interface TestDAO {
 
     public String updateCompoundString(final Long second, final String toReturn, final Long first);
 
-    public List<String> updateCompundStrings(final Long second, final String toReturn, final List<Long> first);
+    public List<String> updateCompoundStrings(final Long second, final String toReturn, final List<Long> first);
 
-    public void invalidateCompundStrings(final Long second, final List<Long> first);
+    public void invalidateCompoundString(final Long second, final Long first);
+
+    public void invalidateCompoundStrings(final Long second, final List<Long> first);
 
 }
