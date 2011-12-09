@@ -1,5 +1,6 @@
 package org.flite.cach3.test;
 
+import org.apache.commons.lang.*;
 import org.apache.commons.lang.math.*;
 import org.flite.cach3.test.dao.*;
 import org.flite.cach3.test.listeners.*;
@@ -116,5 +117,54 @@ public class InvalidateMultiCacheTest {
             result.put(keys.get(ix), values.get(ix));
         }
         return result;
+    }
+
+    @Test
+    public void testVelocity() {
+        final TestSvc test = (TestSvc) context.getBean("testSvc");
+        final StubInvalidateMultiCacheListenerImpl listener =
+                (StubInvalidateMultiCacheListenerImpl) context.getBean("stubIM");
+
+        final String original = RandomStringUtils.randomAlphanumeric(10);
+        final String replace = RandomStringUtils.randomAlphanumeric(8);
+        final Long second = 10661337L;
+
+        final long base = RandomUtils.nextInt(2000) + 4000;
+        final List<Long> keys = new ArrayList<Long>();
+        final List<Long> invalidSubset = new ArrayList<Long>();
+        final List<String> baseKeys = new ArrayList<String>();
+        for (int ix = 0; ix < 4; ix++) {
+            final Long id = base + ix;
+            keys.add(id);
+            if (ix % 2  == 0) {
+                invalidSubset.add(id);
+                baseKeys.add(id.toString() + "&&" + second.toString());
+            }
+        }
+
+        // Set up the cache via the read-thru.
+        final List<String> r1 = test.getCompoundStrings(keys, original, second);
+        for (final String str : r1) {
+            assertEquals(original, str);
+        }
+
+        final int previous = listener.getTriggers().size();
+        test.invalidateCompundStrings(second, invalidSubset);
+
+        // Make sure the listener is getting triggered.
+        // Testing that the listener got invoked as required.
+        assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
+        final String expected = StubInvalidateMultiCacheListenerImpl.formatTriggers(TestDAOImpl.COMPOUND_NAMESPACE, TestDAOImpl.COMPOUND_PREFIX, baseKeys, null, new Object[] {second, invalidSubset});
+        assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
+
+        // Now we ensure that the invalidation occurred.
+        final List<String> r2 = test.getCompoundStrings(keys, replace, second);
+        for (int ix = 0; ix < keys.size(); ix++) {
+            if (invalidSubset.contains(keys.get(ix))) {
+                assertEquals(replace, r2.get(ix));
+            } else {
+                assertEquals(original, r2.get(ix));
+            }
+        }
     }
 }

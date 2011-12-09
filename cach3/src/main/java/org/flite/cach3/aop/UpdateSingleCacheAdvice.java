@@ -57,9 +57,6 @@ public class UpdateSingleCacheAdvice extends CacheBase {
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             UpdateSingleCache.class,
                             methodToCache.getName());
-            final Object keyObject = annotationData.getKeyIndex() == -1
-                                        ? validateReturnValueAsKeyObject(retVal, methodToCache)
-                                        : getIndexObject(annotationData.getKeyIndex(), jp.getArgs(), methodToCache.toString());
             final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
 			final String cacheKey = buildCacheKey(baseKey, annotationData);
             final Object dataObject = getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());

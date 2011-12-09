@@ -232,6 +232,17 @@ public class TestDAOImpl implements TestDAO {
         return results;
     }
 
+    @UpdateSingleCache(
+            namespace = COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            dataIndex = 1,
+            keyTemplate = "$args[2]&&$args[0]",
+            expiration = 30
+    )
+    public String updateCompoundString(final Long second, final String toReturn, final Long first) {
+        return toReturn;
+    }
+
     @UpdateMultiCache(
             namespace = COMPOUND_NAMESPACE,
             keyPrefix = COMPOUND_PREFIX,
@@ -247,6 +258,14 @@ public class TestDAOImpl implements TestDAO {
         }
         return results;
     }
+
+    @InvalidateMultiCache(
+            namespace = COMPOUND_NAMESPACE,
+            keyPrefix = COMPOUND_PREFIX,
+            keyIndex = 1,
+            keyTemplate = "$indexObject&&$args[0]"
+    )
+    public void invalidateCompundStrings(final Long second, final List<Long> first) { }
 
 
 }
