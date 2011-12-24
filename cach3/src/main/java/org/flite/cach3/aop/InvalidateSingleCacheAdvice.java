@@ -6,6 +6,8 @@ import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -33,7 +35,7 @@ THE SOFTWARE.
  */
 @Aspect
 public class InvalidateSingleCacheAdvice extends CacheBase {
-    private static final Log LOG = LogFactory.getLog(InvalidateSingleCacheAdvice.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InvalidateSingleCacheAdvice.class);
 
     @Pointcut("@annotation(org.flite.cach3.annotations.InvalidateSingleCache)")
     public void invalidateSingle() {}

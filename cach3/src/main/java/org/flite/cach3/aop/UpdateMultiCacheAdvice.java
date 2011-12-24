@@ -7,6 +7,8 @@ import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
 import org.flite.cach3.exceptions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -34,7 +36,7 @@ THE SOFTWARE.
  */
 @Aspect
 public class UpdateMultiCacheAdvice extends CacheBase {
-	private static final Log LOG = LogFactory.getLog(UpdateMultiCacheAdvice.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UpdateMultiCacheAdvice.class);
 
 	@Pointcut("@annotation(org.flite.cach3.annotations.UpdateMultiCache)")
 	public void updateMulti() {}

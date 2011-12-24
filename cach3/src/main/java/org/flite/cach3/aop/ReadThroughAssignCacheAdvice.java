@@ -5,8 +5,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.flite.cach3.annotations.ReadThroughAssignCache;
 import org.flite.cach3.api.*;
 
@@ -36,7 +36,7 @@ THE SOFTWARE.
  */
 @Aspect
 public class ReadThroughAssignCacheAdvice extends CacheBase {
-    private static final Log LOG = LogFactory.getLog(ReadThroughAssignCacheAdvice.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ReadThroughAssignCacheAdvice.class);
 
     @Pointcut("@annotation(org.flite.cach3.annotations.ReadThroughAssignCache)")
     public void getSingleAssign() {}
