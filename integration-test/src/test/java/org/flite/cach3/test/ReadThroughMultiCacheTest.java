@@ -7,6 +7,8 @@ import org.flite.cach3.config.*;
 import org.flite.cach3.test.dao.*;
 import org.flite.cach3.test.listeners.*;
 import org.flite.cach3.test.svc.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.*;
 import org.springframework.context.support.*;
 import org.testng.annotations.*;
@@ -37,6 +39,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public class ReadThroughMultiCacheTest {
+    private static final Logger LOG = LoggerFactory.getLogger(ReadThroughMultiCacheTest.class);
+
 	private ApplicationContext context;
 
 	@BeforeClass
@@ -78,7 +82,7 @@ public class ReadThroughMultiCacheTest {
 		for (int ix = 0; ix < subset.size(); ix++) {
 			final Long key = subset.get(ix);
 			final String value = subsetResult.get(ix);
-			System.out.println("Subset: " + value);
+			LOG.info("Subset: " + value);
 			final String[] parts = value.split("-X-");
 			if (subsetTime == null) {
 				subsetTime = parts[0];
@@ -99,7 +103,7 @@ public class ReadThroughMultiCacheTest {
 		for (int ix = 0; ix < superset.size(); ix++) {
 			final Long key = superset.get(ix);
 			final String value = supersetResult.get(ix);
-			System.out.println("Superset: " + value);
+			LOG.info("Superset: " + value);
 			final String[] parts = value.split("-X-");
 			final boolean inSubset = subset.contains(key);
 			if (!inSubset && supersetTime == null) {
@@ -128,7 +132,7 @@ public class ReadThroughMultiCacheTest {
 		for (int ix = 0; ix < jumbleset.size(); ix++) {
 			final Long key = jumbleset.get(ix);
 			final String value = jumblesetResult.get(ix);
-			System.out.println("Jumbleset: " + value);
+			LOG.info("Jumbleset: " + value);
 			final String[] parts = value.split("-X-");
 			final boolean inSubset = subset.contains(key);
 			if (inSubset) {
@@ -219,7 +223,7 @@ public class ReadThroughMultiCacheTest {
                 (List<Object>) (List) subs, // Using Erasure to satisfy the compiler. YUCK!
                 null,
                 new Object[]{thrus, late, constant});
-        System.out.println("Expected = " + expected);
+        LOG.info("Expected = " + expected);
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
     }
 }

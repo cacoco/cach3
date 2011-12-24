@@ -121,7 +121,7 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
         context.put("args", args);
 
         final StringWriter writer = new StringWriter(250);
-        Velocity.evaluate(context, writer, "", annotationData.getKeyTemplate());
+        Velocity.evaluate(context, writer, this.getClass().getSimpleName(), annotationData.getKeyTemplate());
 
         return writer.toString();
     }

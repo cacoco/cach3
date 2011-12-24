@@ -52,7 +52,6 @@ public class CacheBaseTest {
 			fail("Expected exception.");
 		} catch (InvalidAnnotationException ex) {
 			assertTrue(ex.getMessage().indexOf("0 arguments") != -1);
-			System.out.println(ex.getMessage());
 		}
 
 		try {
@@ -60,7 +59,6 @@ public class CacheBaseTest {
 			fail("Expected exception.");
 		} catch (InvalidAnnotationException ex) {
 			assertTrue(ex.getMessage().indexOf("String") != -1);
-			System.out.println(ex.getMessage());
 		}
 
 		try {
@@ -68,7 +66,6 @@ public class CacheBaseTest {
 			fail("Expected exception.");
 		} catch (InvalidAnnotationException ex) {
 			assertTrue(ex.getMessage().indexOf("String") != -1);
-			System.out.println(ex.getMessage());
 		}
 
 		try {
@@ -76,7 +73,6 @@ public class CacheBaseTest {
 			fail("Expected exception.");
 		} catch (InvalidAnnotationException ex) {
 			assertTrue(ex.getMessage().indexOf("only one method") != -1);
-			System.out.println(ex.getMessage());
 		}
 
 		assertEquals("doIt", cut.getKeyMethod(new KeyObject05()).getName());

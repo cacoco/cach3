@@ -41,7 +41,7 @@ public class AnnotationsTest {
 //
 //        final StringWriter writer = new StringWriter(250);
 //
-//        Velocity.evaluate(context, writer, "bubba knows", "$result&$StringUtils.defaultString($args[0])&$args[2]");
+//        Velocity.evaluate(context, writer, this.getClass().getSimpleName() , "$result&$StringUtils.defaultString($args[0])&$args[2]");
 //
 //        System.out.println(writer.toString());
 //    }

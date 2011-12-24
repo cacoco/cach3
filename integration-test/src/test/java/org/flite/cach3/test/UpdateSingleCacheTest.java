@@ -4,6 +4,8 @@ import org.apache.commons.lang.*;
 import org.flite.cach3.test.dao.*;
 import org.flite.cach3.test.listeners.*;
 import org.flite.cach3.test.svc.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.*;
 import org.springframework.context.support.*;
 import org.testng.annotations.*;
@@ -34,6 +36,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public class UpdateSingleCacheTest {
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateSingleCacheTest.class);
+
 	private ApplicationContext context;
 
 	@BeforeClass
@@ -98,7 +102,7 @@ public class UpdateSingleCacheTest {
 		for (int ix = 0; ix < r2List.size(); ix++) {
 			final Long key = superset.get(ix);
 			final String value = r2List.get(ix);
-			System.out.println(value);
+			LOG.info(value);
 			assertEquals(expectedResults.get(key), value);
 		}
 	}

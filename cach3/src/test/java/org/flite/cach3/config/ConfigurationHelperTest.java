@@ -107,7 +107,6 @@ public class ConfigurationHelperTest {
 
     private static class MyInvocationHandler implements InvocationHandler {
         public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
-            System.out.println("Name: " + method.getName());
             if ("hashCode".equals(method.getName())) {
                 return this.hashCode();
             } else if ("equals".equals(method.getName())) {

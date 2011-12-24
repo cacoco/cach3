@@ -4,7 +4,7 @@
   <!--<parent>-->
     <!--<groupId>org.flite</groupId>-->
     <!--<artifactId>cach3-parent</artifactId>-->
-    <!--<version>0.2-SNAPSHOT</version>-->
+    <!--<version>0.X-SNAPSHOT</version>-->
   <!--</parent>-->
 
   <groupId>org.flite</groupId>
@@ -51,12 +51,6 @@
       <artifactId>slf4j-api</artifactId>
       <version>1.6.4</version>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>log4j</groupId>-->
-      <!--<artifactId>log4j</artifactId>-->
-      <!--<version>1.2.11</version>-->
-      <!--<scope>provided</scope>-->
-    <!--</dependency>-->
     <dependency>
       <groupId>spy</groupId>
       <artifactId>memcached</artifactId>
@@ -95,6 +89,19 @@
       <version>1.6.1</version>
       <scope>test</scope>
     </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.slf4j</groupId>-->
+      <!--<artifactId>slf4j-log4j12</artifactId>-->
+      <!--<version>1.6.4</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>log4j</groupId>-->
+      <!--<artifactId>log4j</artifactId>-->
+      <!--<version>1.2.16</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+
   </dependencies>
 
 

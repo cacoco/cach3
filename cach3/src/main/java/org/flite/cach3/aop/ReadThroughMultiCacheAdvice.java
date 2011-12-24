@@ -165,7 +165,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
                 context.put("indexObject", obj);
 
                 final StringWriter writer = new StringWriter(250);
-                Velocity.evaluate(context, writer, "", template);
+                Velocity.evaluate(context, writer, this.getClass().getSimpleName() , template);
                 base = writer.toString();
             }
             final String key = buildCacheKey(base,data);

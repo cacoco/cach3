@@ -48,7 +48,6 @@ public class ReadThroughAssignCacheTest {
             AnnotationDataBuilder.buildAnnotationData(annotation, ReadThroughAssignCache.class, method.getName());
             fail("Expected Exception.");
         } catch (InvalidParameterException ex) {
-            System.out.println(ex.getMessage());
             assertTrue(ex.getMessage().indexOf("AssignedKey") != -1);
         }
 
@@ -58,7 +57,6 @@ public class ReadThroughAssignCacheTest {
             AnnotationDataBuilder.buildAnnotationData(annotation, ReadThroughAssignCache.class, method.getName());
             fail("Expected Exception.");
         } catch (InvalidParameterException ex) {
-            System.out.println(ex.getMessage());
             assertTrue(ex.getMessage().indexOf("AssignedKey") != -1);
         }
 

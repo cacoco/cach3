@@ -232,7 +232,7 @@ public class CacheBase {
         context.put("retVal", retVal);
 
         final StringWriter writer = new StringWriter(250);
-        Velocity.evaluate(context, writer, "", annotationData.getKeyTemplate()); // TODO: Finish the logging string.
+        Velocity.evaluate(context, writer, this.getClass().getSimpleName() , annotationData.getKeyTemplate());
         return writer.toString();
     }
 
@@ -257,7 +257,7 @@ public class CacheBase {
                 context.put("retVal", retVal);
 
                 final StringWriter writer = new StringWriter(250);
-                Velocity.evaluate(context, writer, "", template);
+                Velocity.evaluate(context, writer, this.getClass().getSimpleName() , template);
                 base = writer.toString();
             }
             results.add(base);
