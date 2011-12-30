@@ -2,6 +2,7 @@ package org.flite.cach3.config;
 
 import net.spy.memcached.*;
 import org.apache.commons.logging.*;
+import org.apache.velocity.VelocityContext;
 import org.flite.cach3.api.*;
 import org.flite.cach3.api.MemcachedClientProvider;
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.*;
 import org.springframework.context.*;
 
+import javax.annotation.Resource;
 import java.security.*;
 import java.util.*;
 
@@ -40,6 +42,7 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
 
     private boolean cacheDisabled = false;
     private MemcachedClientProvider provider;
+    private VelocityContextFactory factory;
 
     private Map<Class<? extends CacheListener>, List<? extends CacheListener>> listeners = new HashMap<Class<? extends CacheListener>, List<? extends CacheListener>>();
     {
@@ -160,5 +163,14 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
 
     public MemcachedClientIF getMemcachedClient() {
         return provider == null ? null : provider.getMemcachedClient();
+    }
+
+    @Resource(name = "cach3-velocityContextFactory")
+    public void setFactory(VelocityContextFactory factory) {
+        this.factory = factory;
+    }
+
+    public VelocityContext getVelocityContext() {
+        return factory == null ? null : factory.getNewExtendedContext();
     }
 }

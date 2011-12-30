@@ -61,4 +61,6 @@
     <property name="state" ref="cach3-state" />
   </bean>
 
+  <bean id="cach3-velocityContextFactory" class="org.flite.cach3.config.VelocityContextFactory" />
+
 </beans>

@@ -44,7 +44,7 @@ public class CacheBase {
 
 //	protected MemcachedClientIF cache;
 	CacheKeyMethodStore methodStore;
-    private Cach3State state;
+    protected Cach3State state;
 
     public void setState(Cach3State state) {
         this.state = state;
@@ -226,7 +226,7 @@ public class CacheBase {
             return generateObjectId(getKeyMethod(keyObject), keyObject);
         }
 
-        final VelocityContext context = new VelocityContext();
+        final VelocityContext context = state.getVelocityContext();
         context.put("StringUtils", StringUtils.class);
         context.put("args", args);
         context.put("retVal", retVal);
@@ -249,7 +249,7 @@ public class CacheBase {
                 final Method method = getKeyMethod(object);
                 base = generateObjectId(method, object);
             } else {
-                final VelocityContext context = new VelocityContext();
+                final VelocityContext context = state.getVelocityContext();
                 context.put("StringUtils", StringUtils.class);
                 context.put("args", args);
                 context.put("index", ix);
