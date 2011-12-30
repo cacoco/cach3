@@ -116,10 +116,11 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 			return (List<Object>) keyObject;
 		}
 		throw new InvalidAnnotationException(String.format(
-				"The parameter object found at dataIndex [%s] is not a [%s]. " +
+				"The parameter object found at dataIndex [%s] is not a [%s] but is of type [%s]. " +
 				"[%s] does not fulfill the requirements.",
 				UpdateMultiCache.class.getName(),
 				List.class.getName(),
+                keyObject.getClass().getName(),
 				methodToCache.toString()
 		));
 	}

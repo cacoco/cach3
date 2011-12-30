@@ -42,7 +42,6 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
 
     private boolean cacheDisabled = false;
     private MemcachedClientProvider provider;
-    private VelocityContextFactory factory;
 
     private Map<Class<? extends CacheListener>, List<? extends CacheListener>> listeners = new HashMap<Class<? extends CacheListener>, List<? extends CacheListener>>();
     {
@@ -163,14 +162,5 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
 
     public MemcachedClientIF getMemcachedClient() {
         return provider == null ? null : provider.getMemcachedClient();
-    }
-
-    @Resource(name = "cach3-velocityContextFactory")
-    public void setFactory(VelocityContextFactory factory) {
-        this.factory = factory;
-    }
-
-    public VelocityContext getVelocityContext() {
-        return factory == null ? null : factory.getNewExtendedContext();
     }
 }

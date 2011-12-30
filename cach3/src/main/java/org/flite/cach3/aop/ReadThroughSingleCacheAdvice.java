@@ -116,7 +116,7 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
             return getObjectId(getIndexObject(annotationData.getKeyIndex(), args, methodString));
         }
 
-        final VelocityContext context = state.getVelocityContext();
+        final VelocityContext context = factory.getNewExtendedContext();
         context.put("StringUtils", StringUtils.class);
         context.put("args", args);
 

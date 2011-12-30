@@ -45,6 +45,11 @@ public class CacheBase {
 //	protected MemcachedClientIF cache;
 	CacheKeyMethodStore methodStore;
     protected Cach3State state;
+    protected VelocityContextFactory factory;
+
+    public void setFactory(VelocityContextFactory factory) {
+        this.factory = factory;
+    }
 
     public void setState(Cach3State state) {
         this.state = state;
@@ -185,36 +190,20 @@ public class CacheBase {
 		return targetMethod;
 	}
 
-	// TODO: Replace by List.class.isInstance(Object obj)
 	protected void verifyReturnTypeIsList(final Method method, final Class annotationClass) {
 		if (verifyTypeIsList(method.getReturnType())) { return; }
 		throw new InvalidAnnotationException(String.format(
 				"The annotation [%s] is only valid on a method that returns a [%s]. " +
-				"[%s] does not fulfill this requirement.",
-				ReadThroughMultiCache.class.getName(),
+				"[%s] does not fulfill this requirement by returning [%s].",
+				annotationClass.getName(),
 				List.class.getName(),
-				method.toString()
+				method.toString(),
+                method.getReturnType().getName()
 		));
 	}
 
-	// TODO: Replace by List.class.isInstance(Object obj)
-	protected boolean verifyTypeIsList(final Class clazz) {
-		if (List.class.equals(clazz)) { return true; }
-		final Type[] types = clazz.getGenericInterfaces();
-		if (types != null) {
-			for (final Type type : types) {
-				if (type != null) {
-					if (type instanceof ParameterizedType) {
-						final ParameterizedType ptype = (ParameterizedType) type;
-						if (List.class.equals(ptype.getRawType())) { return true; }
-					} else {
-						if (List.class.equals(type)) { return true; }
-					}
-				}
-			}
-		}
-
-		return false;
+	protected static boolean verifyTypeIsList(final Class clazz) {
+        return java.util.List.class.isAssignableFrom(clazz);
 	}
 
     protected String getBaseKey(final AnnotationData annotationData,
@@ -226,7 +215,7 @@ public class CacheBase {
             return generateObjectId(getKeyMethod(keyObject), keyObject);
         }
 
-        final VelocityContext context = state.getVelocityContext();
+        final VelocityContext context = factory.getNewExtendedContext();
         context.put("StringUtils", StringUtils.class);
         context.put("args", args);
         context.put("retVal", retVal);
@@ -249,7 +238,7 @@ public class CacheBase {
                 final Method method = getKeyMethod(object);
                 base = generateObjectId(method, object);
             } else {
-                final VelocityContext context = state.getVelocityContext();
+                final VelocityContext context = factory.getNewExtendedContext();
                 context.put("StringUtils", StringUtils.class);
                 context.put("args", args);
                 context.put("index", ix);

@@ -10,6 +10,11 @@
   <name>cach3-parent</name>
   <url>https://github.com/flite/cach3</url>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+  
   <modules>
     <module>cach3</module>
     <module>integration-test</module>

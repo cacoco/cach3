@@ -29,8 +29,8 @@ public class SlugifierTest {
 
     @Test
     public void testSlugify() throws Exception {
-        assertEquals("foobar", Slugifier.slugify("fóòbâr"));
-        assertEquals("special-characters-sic", Slugifier.slugify("Special Characters šíč"));
+        assertEquals("foobar", Slugifier.slugify("f\u00F3\u00F2b\u00e2r")); // Looks like "fóòbâr"
+        assertEquals("special-characters-sic", Slugifier.slugify("Special Characters \u0161\u00ed\u010d")); // Looks like "Special Characters šíč"
         assertEquals("it-rocks", Slugifier.slugify("It Rocks"));
     }
 }

@@ -158,7 +158,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
                 final Method method = getKeyMethod(obj);
                 base = generateObjectId(method, obj);
             } else {
-                final VelocityContext context = state.getVelocityContext();
+                final VelocityContext context = factory.getNewExtendedContext();
                 context.put("StringUtils", StringUtils.class);
                 context.put("args", args);
                 context.put("index", ix);
@@ -188,10 +188,11 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
         final Object keyObjects = getIndexObject(keyIndex, jp.getArgs(), method.toString());
 		if (verifyTypeIsList(keyObjects.getClass())) { return (List<Object>) keyObjects;}
 		throw new InvalidAnnotationException(String.format(
-				"The parameter object found at keyIndex [%s] is not a [%s]. " +
+				"The parameter object found at keyIndex [%s] is not a [%s], but is of type [%s]. " +
 				"[%s] does not fulfill the requirements.",
 				keyIndex,
 				List.class.getName(),
+                keyObjects.getClass().getName(),
 				method.toString()
 		));
 	}

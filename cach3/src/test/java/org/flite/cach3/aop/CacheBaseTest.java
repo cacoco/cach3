@@ -1,6 +1,7 @@
 package org.flite.cach3.aop;
 
 import org.apache.commons.lang.*;
+import org.apache.commons.lang.math.RandomUtils;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
 import org.flite.cach3.config.*;
@@ -250,6 +251,22 @@ public class CacheBaseTest {
         final List<UpdateMultiCacheListener> r4 = cut.getPertinentListeners(UpdateMultiCacheListener.class, "shrimp");
         assertTrue(r4.isEmpty());
     }
+
+    @Test
+    public void testIsList() {
+        assertFalse(CacheBase.verifyTypeIsList(Object.class));
+        assertFalse(CacheBase.verifyTypeIsList(String.class));
+
+        assertTrue(CacheBase.verifyTypeIsList(ArrayList.class));
+
+        final List<Long> full = new ArrayList<Long>();
+        for (int ix = 0; ix < 10; ix++) {
+            full.add(RandomUtils.nextLong());
+        }
+        final List<Long> sub = full.subList(2, 7);
+        assertTrue(CacheBase.verifyTypeIsList(sub.getClass()));
+    }
+
 
 	private static class ReturnTypeCheck {
 		@ReadThroughMultiCache(keyIndex = 0, namespace = "bubba", expiration = 10)
