@@ -24,5 +24,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface UpdateMultiCacheListener extends CacheListener {
+
+    /**
+     * This method gets triggered only after a modification to the cache is made.
+     * Actual cache ids are built the following way:
+     *  (namespace) + ":" + (prefix, if exists) + (baseCacheId)
+     *
+     * @param namespace  The string supplied to the associated annotation
+     * @param prefix  The string optionally supplied to the associated annotation
+     * @param baseCacheIds The calculated ids (no prefix, no namespace) for the objects written to the cache
+     * @param submissions  The objects that were just written to the cache
+     * @param retVal  Object returned by the underlying method (null if of void return type)
+     * @param args  Object[] that are the passed in parameters to the underlying method (empty/null if no-arg)
+     */
     void triggeredUpdateMultiCache(String namespace, String prefix, List<String> baseCacheIds, List<Object> submissions, Object retVal, Object[] args);
 }

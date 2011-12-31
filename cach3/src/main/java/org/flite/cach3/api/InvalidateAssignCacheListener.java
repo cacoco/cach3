@@ -22,5 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface InvalidateAssignCacheListener extends CacheListener {
-    void triggeredInvalidateAssignCache(String namespace, String assignedKey, Object retVal, Object[] args);
+
+    /**
+     * This method gets triggered only after a modification to the cache is made.
+     * Actual cache ids are built the following way:
+     *  (namespace) + ":" + (assignKey)
+     *
+     * @param namespace  The string supplied to the associated annotation
+     * @param assignKey  The specific cache id assigned to the associated annotation
+     * @param retVal  Object returned by the underlying method (null if of void return type)
+     * @param args  Object[] that are the passed in parameters to the underlying method (empty/null if no-arg)
+     */
+    void triggeredInvalidateAssignCache(String namespace, String assignKey, Object retVal, Object[] args);
 }
