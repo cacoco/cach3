@@ -22,5 +22,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface ReadThroughAssignCacheListener extends CacheListener {
-    void triggeredReadThroughAssignCache(String namespace, String assignKey, Object submission);
+    void triggeredReadThroughAssignCache(String namespace, String assignKey, Object submission, Object[] args);
 }

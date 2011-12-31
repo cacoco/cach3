@@ -62,7 +62,7 @@ public class UpdateAssignCacheTest {
 
         // Testing that the listener got invoked as required.
         assertTrue("Doesn't look like the listener got called.", listener.getTriggers().size() == previous+1);
-        final String expected = StubUpdateAssignCacheListenerImpl.formatTriggers(TestDAOImpl.ASSIGN_NAMESPACE, TestDAOImpl.ASSIGN_KEY, altData);
+        final String expected = StubUpdateAssignCacheListenerImpl.formatTriggers(TestDAOImpl.ASSIGN_NAMESPACE, TestDAOImpl.ASSIGN_KEY, altData, null, new Object[] {25, altData});
         assertEquals(expected, listener.getTriggers().get(listener.getTriggers().size() - 1));
 
         final List<String> result2 = test.getAssignStrings();

@@ -71,7 +71,7 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final InvalidateAssignCacheListener listener : listeners) {
                     try {
-                        listener.triggeredInvalidateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey());
+                        listener.triggeredInvalidateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), retVal, jp.getArgs());
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }
