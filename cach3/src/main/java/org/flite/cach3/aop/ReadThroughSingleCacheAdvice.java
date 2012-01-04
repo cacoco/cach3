@@ -11,6 +11,8 @@ import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.*;
+import org.springframework.core.annotation.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -38,6 +40,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 @Aspect
+@Order(Ordered.HIGHEST_PRECEDENCE / 2)
 public class ReadThroughSingleCacheAdvice extends CacheBase {
 	private static final Logger LOG = LoggerFactory.getLogger(ReadThroughSingleCacheAdvice.class);
 
