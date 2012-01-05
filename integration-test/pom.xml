@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.flite</groupId>
     <artifactId>cach3-parent</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
   </parent>
   <artifactId>integration-test</artifactId>
   <packaging>jar</packaging>
