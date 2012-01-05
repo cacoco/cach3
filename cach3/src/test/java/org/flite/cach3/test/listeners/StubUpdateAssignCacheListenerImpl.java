@@ -47,8 +47,20 @@ public class StubUpdateAssignCacheListenerImpl implements UpdateAssignCacheListe
         return interests;
     }
 
-    public void triggeredUpdateAssignCache(final String namespace, final String assignKey, final Object submission) {
-        triggers.add(formatTriggers(namespace, assignKey, submission));
+    public void triggeredUpdateAssignCache(final String namespace,
+                                           final String assignKey,
+                                           final Object submission,
+                                           final Object retVal,
+                                           final Object[] args) {
+        triggers.add(formatTriggers(namespace, assignKey, submission, retVal, args));
+    }
+
+    public static String formatTriggers(final String namespace,
+                                      final String assignKey,
+                                      final Object submission,
+                                      final Object retVal,
+                                      final Object[] args) {
+        return StubReadThroughSingleCacheListenerImpl.formatTriggers(namespace, null, assignKey, submission, retVal, args);
     }
 
     public static String formatTriggers(final String namespace, final String assignedKey, final Object submission) {

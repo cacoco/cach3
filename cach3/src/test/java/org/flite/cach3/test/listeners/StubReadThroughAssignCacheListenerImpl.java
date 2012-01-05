@@ -45,11 +45,17 @@ public class StubReadThroughAssignCacheListenerImpl implements ReadThroughAssign
         return interests;
     }
 
-    public void triggeredReadThroughAssignCache(String namespace, String assignKey, Object submission) {
-        this.triggers.add(formatTriggers(namespace, assignKey, submission));
+    public void triggeredReadThroughAssignCache(final String namespace,
+                                                final String assignKey,
+                                                final Object submission,
+                                                final Object[] args) {
+        this.triggers.add(formatTriggers(namespace, assignKey, submission, args));
     }
 
-    public static String formatTriggers(final String namespace, final String assignedKey, final Object submission) {
-        return String.format("%s [-] %s [-] %s", namespace, assignedKey, submission);
+    public static String formatTriggers(final String namespace,
+                                        final String assignedKey,
+                                        final Object submission,
+                                        final Object[] args) {
+        return StubReadThroughSingleCacheListenerImpl.formatTriggers(namespace, null, assignedKey, submission, null, args);
     }
 }

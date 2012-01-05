@@ -5,10 +5,12 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.flite.cach3.annotations.ReadThroughAssignCache;
 import org.flite.cach3.api.*;
+import org.springframework.core.*;
+import org.springframework.core.annotation.*;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -35,8 +37,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 @Aspect
+@Order(Ordered.HIGHEST_PRECEDENCE / 2)
 public class ReadThroughAssignCacheAdvice extends CacheBase {
-    private static final Log LOG = LogFactory.getLog(ReadThroughAssignCacheAdvice.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ReadThroughAssignCacheAdvice.class);
 
     @Pointcut("@annotation(org.flite.cach3.annotations.ReadThroughAssignCache)")
     public void getSingleAssign() {}
@@ -85,7 +88,7 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final ReadThroughAssignCacheListener listener : listeners) {
                     try {
-                        listener.triggeredReadThroughAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), result);
+                        listener.triggeredReadThroughAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), result, pjp.getArgs());
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }

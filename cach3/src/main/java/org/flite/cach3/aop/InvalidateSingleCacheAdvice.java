@@ -1,11 +1,13 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
-import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
+import org.slf4j.*;
+import org.springframework.core.*;
+import org.springframework.core.annotation.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -32,8 +34,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 @Aspect
+@Order(Ordered.HIGHEST_PRECEDENCE / 2)
 public class InvalidateSingleCacheAdvice extends CacheBase {
-    private static final Log LOG = LogFactory.getLog(InvalidateSingleCacheAdvice.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InvalidateSingleCacheAdvice.class);
 
     @Pointcut("@annotation(org.flite.cach3.annotations.InvalidateSingleCache)")
     public void invalidateSingle() {}

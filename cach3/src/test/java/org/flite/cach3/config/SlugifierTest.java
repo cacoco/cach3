@@ -1,6 +1,8 @@
-package org.flite.cach3.api;
+package org.flite.cach3.config;
 
-import java.util.*;
+import org.testng.annotations.Test;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -23,18 +25,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
-public interface InvalidateMultiCacheListener extends CacheListener {
+public class SlugifierTest {
 
-    /**
-     * This method gets triggered only after a modification to the cache is made.
-     * Actual cache ids are built the following way:
-     *  (namespace) + ":" + (prefix, if exists) + (baseCacheId)
-     *
-     * @param namespace  The string supplied to the associated annotation
-     * @param prefix  The string optionally supplied to the associated annotation
-     * @param baseCacheIds The calculated ids (no prefix, no namespace) for the objects removed from the cache
-     * @param retVal  Object returned by the underlying method (null if of void return type)
-     * @param args  Object[] that are the passed in parameters to the underlying method (empty/null if no-arg)
-     */
-    void triggeredInvalidateMultiCache(String namespace, String prefix, List<String> baseCacheIds, Object retVal, Object[] args);
+    @Test
+    public void testSlugify() throws Exception {
+        assertEquals("foobar", Slugifier.slugify("f\u00F3\u00F2b\u00e2r")); // Looks like "fóòbâr"
+        assertEquals("special-characters-sic", Slugifier.slugify("Special Characters \u0161\u00ed\u010d")); // Looks like "Special Characters šíč"
+        assertEquals("it-rocks", Slugifier.slugify("It Rocks"));
+    }
 }

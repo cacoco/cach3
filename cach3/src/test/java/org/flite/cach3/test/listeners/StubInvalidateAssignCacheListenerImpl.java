@@ -45,11 +45,18 @@ public class StubInvalidateAssignCacheListenerImpl implements InvalidateAssignCa
         return interests;
     }
 
-    public void triggeredInvalidateAssignCache(final String namespace, final String assignedKey) {
-        triggers.add(formatTriggers(namespace, assignedKey));
+    public void triggeredInvalidateAssignCache(final String namespace,
+                                               final String assignedKey,
+                                               final Object retVal,
+                                               final Object[] args) {
+        triggers.add(formatTriggers(namespace, assignedKey, retVal, args));
     }
 
-    public static String formatTriggers(final String namespace, final String assignedKey) {
-        return String.format("%s [-] %s", namespace, assignedKey);
+    public static String formatTriggers(final String namespace,
+                                               final String assignedKey,
+                                               final Object retVal,
+                                               final Object[] args) {
+        return StubReadThroughSingleCacheListenerImpl.formatTriggers(namespace, null, assignedKey, null, retVal, args);
     }
+
 }

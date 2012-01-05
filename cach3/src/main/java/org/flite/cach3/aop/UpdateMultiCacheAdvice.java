@@ -7,6 +7,10 @@ import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
 import org.flite.cach3.exceptions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.*;
+import org.springframework.core.annotation.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -33,8 +37,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 @Aspect
+@Order(Ordered.HIGHEST_PRECEDENCE / 2)
 public class UpdateMultiCacheAdvice extends CacheBase {
-	private static final Log LOG = LogFactory.getLog(UpdateMultiCacheAdvice.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UpdateMultiCacheAdvice.class);
 
 	@Pointcut("@annotation(org.flite.cach3.annotations.UpdateMultiCache)")
 	public void updateMulti() {}
@@ -114,10 +119,11 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 			return (List<Object>) keyObject;
 		}
 		throw new InvalidAnnotationException(String.format(
-				"The parameter object found at dataIndex [%s] is not a [%s]. " +
+				"The parameter object found at dataIndex [%s] is not a [%s] but is of type [%s]. " +
 				"[%s] does not fulfill the requirements.",
 				UpdateMultiCache.class.getName(),
 				List.class.getName(),
+                keyObject.getClass().getName(),
 				methodToCache.toString()
 		));
 	}

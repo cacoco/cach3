@@ -22,5 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public interface UpdateAssignCacheListener extends CacheListener {
-    void triggeredUpdateAssignCache(String namespace, String assignKey, Object submission);
+
+    /**
+     * This method gets triggered only after a modification to the cache is made.
+     * Actual cache ids are built the following way:
+     *  (namespace) + ":" + (assignKey)
+     *
+     * @param namespace  The string supplied to the associated annotation
+     * @param assignKey  The specific cache id assigned to the associated annotation
+     * @param submission  The object that was just written to the cache
+     * @param retVal  Object returned by the underlying method (null if of void return type)
+     * @param args  Object[] that are the passed in parameters to the underlying method (empty/null if no-arg)
+     */
+    void triggeredUpdateAssignCache(String namespace, String assignKey, Object submission, Object retVal, Object[] args);
+
 }

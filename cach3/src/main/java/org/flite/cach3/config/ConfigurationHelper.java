@@ -2,6 +2,8 @@ package org.flite.cach3.config;
 
 import org.apache.commons.logging.*;
 import org.flite.cach3.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.*;
 
@@ -27,7 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 public class ConfigurationHelper {
-    private static final Log LOG = LogFactory.getLog(ConfigurationHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigurationHelper.class);
 
     public static void setCacheDisabled(final Cach3State state, final boolean disabled) {
         if (state == null) { throw new InvalidParameterException("Cach3State must be defined."); }

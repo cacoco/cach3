@@ -4,12 +4,12 @@
   <!--<parent>-->
     <!--<groupId>org.flite</groupId>-->
     <!--<artifactId>cach3-parent</artifactId>-->
-    <!--<version>0.2-SNAPSHOT</version>-->
+    <!--<version>0.X-SNAPSHOT</version>-->
   <!--</parent>-->
 
   <groupId>org.flite</groupId>
   <artifactId>cach3</artifactId>
-  <version>0.3</version>
+  <version>0.4</version>
   <packaging>jar</packaging>
   <name>cach3</name>
   <url>https://github.com/flite/cach3</url>
@@ -47,10 +47,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.11</version>
-      <scope>provided</scope>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.4</version>
     </dependency>
     <dependency>
       <groupId>spy</groupId>
@@ -90,6 +89,19 @@
       <version>1.6.1</version>
       <scope>test</scope>
     </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.slf4j</groupId>-->
+      <!--<artifactId>slf4j-log4j12</artifactId>-->
+      <!--<version>1.6.4</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>log4j</groupId>-->
+      <!--<artifactId>log4j</artifactId>-->
+      <!--<version>1.2.16</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
+
   </dependencies>
 
 

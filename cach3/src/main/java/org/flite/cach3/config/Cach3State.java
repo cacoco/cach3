@@ -2,11 +2,15 @@ package org.flite.cach3.config;
 
 import net.spy.memcached.*;
 import org.apache.commons.logging.*;
+import org.apache.velocity.VelocityContext;
 import org.flite.cach3.api.*;
 import org.flite.cach3.api.MemcachedClientProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.*;
 import org.springframework.context.*;
 
+import javax.annotation.Resource;
 import java.security.*;
 import java.util.*;
 
@@ -32,7 +36,7 @@ import java.util.*;
  * THE SOFTWARE.
  */
 public class Cach3State implements ApplicationContextAware, InitializingBean {
-    private static final Log LOG = LogFactory.getLog(Cach3State.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Cach3State.class);
 
     private ApplicationContext context;
 

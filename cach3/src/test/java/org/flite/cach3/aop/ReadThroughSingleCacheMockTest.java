@@ -53,6 +53,8 @@ public class ReadThroughSingleCacheMockTest {
         cut.setState(state);
 		cut.setMethodStore(new CacheKeyMethodStoreImpl());
 
+        cut.setFactory(new VelocityContextFactory());
+        
         state.setProvider(new MemcachedClientProvider() {
             public MemcachedClientIF getMemcachedClient() {
                 return cache;

@@ -10,6 +10,10 @@ import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
 import org.flite.cach3.exceptions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.*;
+import org.springframework.core.annotation.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -38,8 +42,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 @Aspect
+@Order(Ordered.HIGHEST_PRECEDENCE / 2)
 public class ReadThroughMultiCacheAdvice extends CacheBase {
-	private static final Log LOG = LogFactory.getLog(ReadThroughMultiCacheAdvice.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ReadThroughMultiCacheAdvice.class);
 
 	@Pointcut("@annotation(org.flite.cach3.annotations.ReadThroughMultiCache)")
 	public void getMulti() {}
@@ -156,14 +161,14 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
                 final Method method = getKeyMethod(obj);
                 base = generateObjectId(method, obj);
             } else {
-                final VelocityContext context = new VelocityContext();
+                final VelocityContext context = factory.getNewExtendedContext();
                 context.put("StringUtils", StringUtils.class);
                 context.put("args", args);
                 context.put("index", ix);
                 context.put("indexObject", obj);
 
                 final StringWriter writer = new StringWriter(250);
-                Velocity.evaluate(context, writer, "", template);
+                Velocity.evaluate(context, writer, this.getClass().getSimpleName() , template);
                 base = writer.toString();
             }
             final String key = buildCacheKey(base,data);
@@ -186,10 +191,11 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
         final Object keyObjects = getIndexObject(keyIndex, jp.getArgs(), method.toString());
 		if (verifyTypeIsList(keyObjects.getClass())) { return (List<Object>) keyObjects;}
 		throw new InvalidAnnotationException(String.format(
-				"The parameter object found at dataIndex [%s] is not a [%s]. " +
+				"The parameter object found at keyIndex [%s] is not a [%s], but is of type [%s]. " +
 				"[%s] does not fulfill the requirements.",
-				ReadThroughMultiCache.class.getName(),
+				keyIndex,
 				List.class.getName(),
+                keyObjects.getClass().getName(),
 				method.toString()
 		));
 	}

@@ -1,11 +1,13 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
-import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
+import org.slf4j.*;
+import org.springframework.core.*;
+import org.springframework.core.annotation.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -32,8 +34,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 @Aspect
+@Order(Ordered.HIGHEST_PRECEDENCE / 2)
 public class UpdateAssignCacheAdvice extends CacheBase {
-    private static final Log LOG = LogFactory.getLog(UpdateAssignCacheAdvice.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateAssignCacheAdvice.class);
 
     @Pointcut("@annotation(org.flite.cach3.annotations.UpdateAssignCache)")
     public void updateAssign() {}
@@ -67,7 +70,7 @@ public class UpdateAssignCacheAdvice extends CacheBase {
             if (listeners != null && !listeners.isEmpty()) {
                 for (final UpdateAssignCacheListener listener : listeners) {
                     try {
-                        listener.triggeredUpdateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), dataObject);
+                        listener.triggeredUpdateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), dataObject, retVal, jp.getArgs());
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }
