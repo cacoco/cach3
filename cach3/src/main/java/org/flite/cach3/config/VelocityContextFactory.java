@@ -52,8 +52,9 @@ public class VelocityContextFactory {
         baseContext.put("Slugifier", Slugifier.class);
     }
 
-    public void addVelocityContextItems(final Map<String, Object> items) {
-        if (items == null || items.size() == 0) { return; }
+    public Object addVelocityContextItems(final Map<String, Object> items) {
+        final Object result = null;
+        if (items == null || items.size() == 0) { return result; }
 
         for (final Map.Entry<String, Object> entry : items.entrySet()) {
             if (entry == null) { continue; }
@@ -69,6 +70,7 @@ public class VelocityContextFactory {
                 LOG.warn("Problem adding an item to the VelocityContext", ex);
             }
         }
+        return result;
     }
 
     public VelocityContext getNewExtendedContext() {

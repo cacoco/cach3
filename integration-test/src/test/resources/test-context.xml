@@ -35,4 +35,16 @@
   <bean id="stubUA" class="org.flite.cach3.test.listeners.StubUpdateAssignCacheListenerImpl" />
   <bean id="stubUS" class="org.flite.cach3.test.listeners.StubUpdateSingleCacheListenerImpl" />
   <bean id="stubUM" class="org.flite.cach3.test.listeners.StubUpdateMultiCacheListenerImpl" />
+
+  <bean factory-bean="cach3-velocityContextFactory" factory-method="addVelocityContextItems">
+    <constructor-arg>
+      <map>
+        <entry key="literal-string" value="this is just a literal string" />
+        <entry key="bean-reference" value-ref="testDao" />
+        <entry key="static-class">
+          <value type="java.lang.Class">org.apache.commons.lang.math.NumberUtils</value>
+        </entry>
+      </map>
+    </constructor-arg>
+  </bean>
 </beans>
