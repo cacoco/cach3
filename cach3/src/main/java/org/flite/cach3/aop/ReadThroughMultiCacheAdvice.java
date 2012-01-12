@@ -162,7 +162,6 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
                 base = generateObjectId(method, obj);
             } else {
                 final VelocityContext context = factory.getNewExtendedContext();
-                context.put("StringUtils", StringUtils.class);
                 context.put("args", args);
                 context.put("index", ix);
                 context.put("indexObject", obj);

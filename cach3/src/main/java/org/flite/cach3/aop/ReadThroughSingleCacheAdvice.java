@@ -2,15 +2,13 @@ package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
 import org.apache.commons.lang.*;
-import org.apache.commons.logging.*;
 import org.apache.velocity.*;
 import org.apache.velocity.app.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 import org.springframework.core.*;
 import org.springframework.core.annotation.*;
 
@@ -119,14 +117,27 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
             return getObjectId(getIndexObject(annotationData.getKeyIndex(), args, methodString));
         }
 
-        final VelocityContext context = factory.getNewExtendedContext();
-        context.put("StringUtils", StringUtils.class);
-        context.put("args", args);
+        try {
+            final VelocityContext context = factory.getNewExtendedContext();
+            context.put("args", args);
 
-        final StringWriter writer = new StringWriter(250);
-        Velocity.evaluate(context, writer, this.getClass().getSimpleName(), annotationData.getKeyTemplate());
-
-        return writer.toString();
+            final StringWriter writer = new StringWriter(250);
+            Velocity.evaluate(context, writer, this.getClass().getSimpleName(), annotationData.getKeyTemplate());
+            return writer.toString();
+        } catch (Exception ex) {
+            if (LOG.isInfoEnabled()) {
+                final StringBuilder sb = new StringBuilder("\nArgs: ")
+                        .append(args == null ? "null" : args.length).append("\n");
+                if (args != null && args.length > 0) {
+                    for (int ix = 0; ix < args.length; ix++) {
+                        sb.append("Arg[").append(ix).append("]: ").append(args[ix] == null ? "null" : args[ix].toString()).append("\n");
+                    }
+                }
+                sb.append("Template: \"").append(annotationData.getKeyTemplate()).append("\"");
+                LOG.info(sb.toString(), ex);
+            }
+            throw ex;
+        }
     }
 
 }

@@ -216,7 +216,6 @@ public class CacheBase {
         }
 
         final VelocityContext context = factory.getNewExtendedContext();
-        context.put("StringUtils", StringUtils.class);
         context.put("args", args);
         context.put("retVal", retVal);
 
@@ -239,7 +238,6 @@ public class CacheBase {
                 base = generateObjectId(method, object);
             } else {
                 final VelocityContext context = factory.getNewExtendedContext();
-                context.put("StringUtils", StringUtils.class);
                 context.put("args", args);
                 context.put("index", ix);
                 context.put("indexObject", object);
