@@ -14,6 +14,7 @@ import org.springframework.core.annotation.*;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.security.*;
 import java.util.*;
 
 /**
@@ -123,7 +124,9 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
 
             final StringWriter writer = new StringWriter(250);
             Velocity.evaluate(context, writer, this.getClass().getSimpleName(), annotationData.getKeyTemplate());
-            return writer.toString();
+            final String result = writer.toString();
+            if (annotationData.getKeyTemplate().equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
+            return result;
         } catch (Exception ex) {
             if (LOG.isInfoEnabled()) {
                 final StringBuilder sb = new StringBuilder("\nArgs: ")
