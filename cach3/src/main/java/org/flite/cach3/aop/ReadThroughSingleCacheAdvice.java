@@ -118,29 +118,14 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
             return getObjectId(getIndexObject(annotationData.getKeyIndex(), args, methodString));
         }
 
-        try {
-            final VelocityContext context = factory.getNewExtendedContext();
-            context.put("args", args);
+        final VelocityContext context = factory.getNewExtendedContext();
+        context.put("args", args);
 
-            final StringWriter writer = new StringWriter(250);
-            Velocity.evaluate(context, writer, this.getClass().getSimpleName(), annotationData.getKeyTemplate());
-            final String result = writer.toString();
-            if (annotationData.getKeyTemplate().equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
-            return result;
-        } catch (Exception ex) {
-            if (LOG.isInfoEnabled()) {
-                final StringBuilder sb = new StringBuilder("\nArgs: ")
-                        .append(args == null ? "null" : args.length).append("\n");
-                if (args != null && args.length > 0) {
-                    for (int ix = 0; ix < args.length; ix++) {
-                        sb.append("Arg[").append(ix).append("]: ").append(args[ix] == null ? "null" : args[ix].toString()).append("\n");
-                    }
-                }
-                sb.append("Template: \"").append(annotationData.getKeyTemplate()).append("\"");
-                LOG.info(sb.toString(), ex);
-            }
-            throw ex;
-        }
+        final StringWriter writer = new StringWriter(250);
+        Velocity.evaluate(context, writer, this.getClass().getSimpleName(), annotationData.getKeyTemplate());
+        final String result = writer.toString();
+        if (annotationData.getKeyTemplate().equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
+        return result;
     }
 
 }
