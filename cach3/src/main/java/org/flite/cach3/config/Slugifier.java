@@ -1,8 +1,8 @@
 package org.flite.cach3.config;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.text.Normalizer;
+import java.io.*;
+import java.net.*;
+import java.text.*;
 
 /**
 Copyright (c) 2011 Flite, Inc
@@ -44,13 +44,17 @@ as the name is changed.
  */
 public class Slugifier {
 
-    public static String slugify(final String input) throws UnsupportedEncodingException {
-        if (input == null || input.length() == 0) { return ""; }
-        String toReturn = normalize(input);
-        toReturn = toReturn.replace(" ", "-");
-        toReturn = toReturn.toLowerCase();
-        toReturn = URLEncoder.encode(toReturn, "UTF-8");
-        return toReturn;
+    public static String slugify(final String input) {
+        try {
+            if (input == null || input.length() == 0) { return ""; }
+            String toReturn = normalize(input);
+            toReturn = toReturn.replace(" ", "-");
+            toReturn = toReturn.toLowerCase();
+            toReturn = URLEncoder.encode(toReturn, "UTF-8");
+            return toReturn;
+        } catch (UnsupportedEncodingException ex) {
+            throw new IllegalStateException("Problem slugifying the string: " + input, ex);
+        }
     }
 
     private static String normalize(String input) {

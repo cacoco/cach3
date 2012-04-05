@@ -9,6 +9,8 @@ import org.flite.cach3.api.*;
 import org.flite.cach3.config.*;
 import org.testng.annotations.*;
 
+import java.security.*;
+
 import static org.easymock.EasyMock.*;
 import static org.testng.AssertJUnit.*;
 
@@ -54,7 +56,7 @@ public class ReadThroughSingleCacheMockTest {
 		cut.setMethodStore(new CacheKeyMethodStoreImpl());
 
         cut.setFactory(new VelocityContextFactory());
-        
+
         state.setProvider(new MemcachedClientProvider() {
             public MemcachedClientIF getMemcachedClient() {
                 return cache;
@@ -206,6 +208,22 @@ public class ReadThroughSingleCacheMockTest {
         final String result = cut.generateBaseKeySingle(new Object[]{alpha, "beta", "gamma", delta}, data, "fakeMethodName()");
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void testVelocityBaseKeyBadTemplate() throws Exception {
+        final String arbitrary = RandomStringUtils.randomAlphanumeric(10);
+        final String template = "args[0]-" + arbitrary + "-args[3]";
+        final String alpha = RandomStringUtils.randomAlphabetic(7);
+        final String delta = RandomStringUtils.randomAlphanumeric(11);
+
+        final AnnotationData data = new AnnotationData();
+        data.setKeyTemplate(template);
+
+        try {
+            cut.generateBaseKeySingle(new Object[]{alpha, "beta", "gamma", delta}, data, "fakeMethodName()");
+            fail("Expected Exception");
+        } catch (InvalidParameterException ex) { }
     }
 
 	private static class AOPTargetClass1 {

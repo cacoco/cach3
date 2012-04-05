@@ -1,7 +1,11 @@
 package org.flite.cach3.annotations;
 
+import org.apache.velocity.*;
+import org.apache.velocity.app.*;
+import org.flite.cach3.config.*;
 import org.testng.annotations.*;
 
+import java.io.*;
 import java.lang.annotation.*;
 import java.lang.reflect.*;
 
@@ -30,21 +34,20 @@ THE SOFTWARE.
  */
 public class AnnotationsTest {
 
-//    @Test
-//    public void testVelocity() {
-//        final String result = "This Is A Big Fat Result.";
-//        final Object[] args = new Object[] {null, "key 2", Long.valueOf(1337)};
-//        final VelocityContext context = new VelocityContext();
-//        context.put("result", result);
-//        context.put("args", args);
-//        context.put("StringUtils", StringUtils.class);
-//
-//        final StringWriter writer = new StringWriter(250);
-//
-//        Velocity.evaluate(context, writer, this.getClass().getSimpleName() , "$result&$StringUtils.defaultString($args[0])&$args[2]");
-//
-//        System.out.println(writer.toString());
-//    }
+    @Test
+    public void testVelocity() {
+        final String result = "This Is A Big Fat Result.";
+        final Object[] args = new Object[] {null, "key 2", Long.valueOf(1337)};
+        final VelocityContext context = new VelocityContextFactory().getNewExtendedContext();
+        context.put("result", result);
+        context.put("args", args);
+
+        final StringWriter writer = new StringWriter(250);
+
+        Velocity.evaluate(context, writer, this.getClass().getSimpleName(), "$result&$StringUtils.defaultString($args[0])&$args[2]");
+
+        assertEquals("This Is A Big Fat Result.&&1337", writer.toString());
+    }
 
 	@Test
 	public void testIndividual() throws Exception {

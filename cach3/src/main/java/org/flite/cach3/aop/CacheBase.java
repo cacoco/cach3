@@ -216,13 +216,14 @@ public class CacheBase {
         }
 
         final VelocityContext context = factory.getNewExtendedContext();
-        context.put("StringUtils", StringUtils.class);
         context.put("args", args);
         context.put("retVal", retVal);
 
         final StringWriter writer = new StringWriter(250);
         Velocity.evaluate(context, writer, this.getClass().getSimpleName() , annotationData.getKeyTemplate());
-        return writer.toString();
+        final String result = writer.toString();
+        if (annotationData.getKeyTemplate().equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
+        return result;
     }
 
     protected List<String> getBaseKeys(final List<Object> keyObjects,
@@ -239,7 +240,6 @@ public class CacheBase {
                 base = generateObjectId(method, object);
             } else {
                 final VelocityContext context = factory.getNewExtendedContext();
-                context.put("StringUtils", StringUtils.class);
                 context.put("args", args);
                 context.put("index", ix);
                 context.put("indexObject", object);
@@ -248,6 +248,7 @@ public class CacheBase {
                 final StringWriter writer = new StringWriter(250);
                 Velocity.evaluate(context, writer, this.getClass().getSimpleName() , template);
                 base = writer.toString();
+                if (template.equals(base)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
             }
             results.add(base);
         }

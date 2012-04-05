@@ -2,20 +2,19 @@ package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
 import org.apache.commons.lang.*;
-import org.apache.commons.logging.*;
 import org.apache.velocity.*;
 import org.apache.velocity.app.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 import org.springframework.core.*;
 import org.springframework.core.annotation.*;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.security.*;
 import java.util.*;
 
 /**
@@ -120,13 +119,13 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
         }
 
         final VelocityContext context = factory.getNewExtendedContext();
-        context.put("StringUtils", StringUtils.class);
         context.put("args", args);
 
         final StringWriter writer = new StringWriter(250);
         Velocity.evaluate(context, writer, this.getClass().getSimpleName(), annotationData.getKeyTemplate());
-
-        return writer.toString();
+        final String result = writer.toString();
+        if (annotationData.getKeyTemplate().equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
+        return result;
     }
 
 }
