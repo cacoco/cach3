@@ -13,25 +13,25 @@ import java.lang.reflect.*;
 import java.util.*;
 
 /**
-Copyright (c) 2011 Flite, Inc
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+ * Copyright (c) 2011 Flite, Inc
+ * <p/>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * <p/>
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * <p/>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 @Aspect
 @Order(Ordered.HIGHEST_PRECEDENCE / 2)
@@ -39,9 +39,10 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
     private static final Logger LOG = LoggerFactory.getLogger(InvalidateSingleCacheAdvice.class);
 
     @Pointcut("@annotation(org.flite.cach3.annotations.InvalidateSingleCache)")
-    public void invalidateSingle() {}
+    public void invalidateSingle() {
+    }
 
-    @AfterReturning(pointcut="invalidateSingle()", returning="retVal")
+    @AfterReturning(pointcut = "invalidateSingle()", returning = "retVal")
     public Object cacheInvalidateSingle(final JoinPoint jp, final Object retVal) throws Throwable {
         // If we've disabled the caching programmatically (or via properties file) just flow through.
         if (isCacheDisabled()) {
@@ -59,16 +60,52 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
         try {
             final Method methodToCache = getMethodToCache(jp);
             final InvalidateSingleCache annotation = methodToCache.getAnnotation(InvalidateSingleCache.class);
+
+            doInvalidate(cache, jp, retVal, methodToCache, annotation);
+
+        } catch (Throwable ex) {
+            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+        }
+        return retVal;
+    }
+
+
+    @Pointcut("@annotation(org.flite.cach3.annotations.InvalidateSingleCaches)")
+    public void invalidateSingles() {
+    }
+
+    @AfterReturning(pointcut = "invalidateSingles()", returning = "retVal")
+    public Object cacheInvalidateSingles(final JoinPoint jp, final Object retVal) throws Throwable {
+        try {
+            final MemcachedClientIF cache = getMemcachedClient();
+            final Method methodToCache = getMethodToCache(jp);
+            final InvalidateSingleCaches annotation = methodToCache.getAnnotation(InvalidateSingleCaches.class);
+            if (annotation != null && annotation.value() != null) {
+                for (int i = 0; i < annotation.value().length; i++) {
+                    doInvalidate(cache, jp, retVal, methodToCache, annotation.value()[i]);
+                }
+            }
+        } catch (Throwable ex) {
+            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+        }
+        return retVal;
+    }
+
+
+    private void doInvalidate(final MemcachedClientIF cache, final JoinPoint jp, final Object retVal, final Method methodToCache, final InvalidateSingleCache annotation) throws Throwable {
+        try {
             final AnnotationData annotationData =
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             InvalidateSingleCache.class,
                             methodToCache.getName());
             final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
             final String cacheKey = buildCacheKey(baseKey, annotationData);
+
+            LOG.debug("Invalidating cache for key " + cacheKey);
             cache.delete(cacheKey);
 
             // Notify the observers that a cache interaction happened.
-            final List<InvalidateSingleCacheListener> listeners = getPertinentListeners(InvalidateSingleCacheListener.class,annotationData.getNamespace());
+            final List<InvalidateSingleCacheListener> listeners = getPertinentListeners(InvalidateSingleCacheListener.class, annotationData.getNamespace());
             if (listeners != null && !listeners.isEmpty()) {
                 for (final InvalidateSingleCacheListener listener : listeners) {
                     try {
@@ -79,11 +116,10 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
                     }
                 }
             }
-
         } catch (Throwable ex) {
             LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
         }
-        return retVal;
     }
+
 
 }

@@ -84,4 +84,15 @@ public interface TestDAO {
 
     public void invalidateCompoundStrings(final Long second, final List<Long> first);
 
+
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  Mulitple cache methods.                                      * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+    void setFunkFactor(Long number, Long funkFactor);
+    void undercoverSetFunkFactor(Long number, Long funkFactor);
+
+    Long funkySquare(Long number);
+    Long funkyCube(Long number);
+
 }
