@@ -80,5 +80,12 @@ public interface TestSvc {
 
     public void invalidateCompoundStrings(final Long second, final List<Long> first);
 
+
+    void setFunkFactor(long number, long funkFactor);
+    void undercoverSetFunkFactor(long number, long funkFactor);
+
+    long funkySquare(long number);
+    long funkyCube(long number);
+
 }
 

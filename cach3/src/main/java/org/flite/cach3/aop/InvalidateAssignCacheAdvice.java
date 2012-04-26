@@ -4,6 +4,7 @@ import net.spy.memcached.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.annotations.groups.InvalidateAssignCaches;
 import org.flite.cach3.api.*;
 import org.slf4j.*;
 import org.springframework.core.*;
@@ -44,43 +45,77 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
 
     @AfterReturning(pointcut="invalidateAssign()", returning="retVal")
     public Object cacheInvalidateAssign(final JoinPoint jp, final Object retVal) throws Throwable {
-        // If we've disabled the caching programmatically (or via properties file) just flow through.
-        if (isCacheDisabled()) {
-            LOG.debug("Caching is disabled.");
-            return retVal;
-        }
-
-        final MemcachedClientIF cache = getMemcachedClient();
-        // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
-        // but do not let it surface up past the AOP injection itself.
         try {
-            final Method methodToCache = getMethodToCache(jp);
-            final InvalidateAssignCache annotation = methodToCache.getAnnotation(InvalidateAssignCache.class);
-            final AnnotationData annotationData =
-                    AnnotationDataBuilder.buildAnnotationData(annotation,
-                            InvalidateAssignCache.class,
-                            methodToCache.getName());
-
-            final String cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
-            if (cacheKey == null || cacheKey.trim().length() == 0) {
-                throw new InvalidParameterException("Unable to find a cache key");
-            }
-            cache.delete(cacheKey);
-
-            // Notify the observers that a cache interaction happened.
-            final List<InvalidateAssignCacheListener> listeners = getPertinentListeners(InvalidateAssignCacheListener.class,annotationData.getNamespace());
-            if (listeners != null && !listeners.isEmpty()) {
-                for (final InvalidateAssignCacheListener listener : listeners) {
-                    try {
-                        listener.triggeredInvalidateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), retVal, jp.getArgs());
-                    } catch (Exception ex) {
-                        LOG.warn("Problem when triggering a listener.", ex);
-                    }
-                }
-            }
+            doInvalidate(jp, retVal);
         } catch (Throwable ex) {
             LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
         }
         return retVal;
     }
+
+
+
+    @Pointcut("@annotation(org.flite.cach3.annotations.groups.InvalidateAssignCaches)")
+    public void invalidateAssigns() {}
+
+    @AfterReturning(pointcut = "invalidateAssigns()", returning = "retVal")
+    public Object cacheInvalidateAssigns(final JoinPoint jp, final Object retVal) throws Throwable {
+        try {
+            doInvalidate(jp, retVal);
+        } catch (Throwable ex) {
+            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+        }
+        return retVal;
+    }
+
+
+
+    private void doInvalidate(final JoinPoint jp, final Object retVal) throws Throwable {
+        if (isCacheDisabled()) {
+            LOG.debug("Caching is disabled.");
+            return;
+        }
+
+        final MemcachedClientIF cache = getMemcachedClient();
+        final Method methodToCache = getMethodToCache(jp);
+        List<InvalidateAssignCache> lAnnotations;
+
+        if (methodToCache.getAnnotation(InvalidateAssignCache.class) != null) {
+            lAnnotations = Arrays.asList(methodToCache.getAnnotation(InvalidateAssignCache.class));
+        } else {
+            lAnnotations = Arrays.asList(methodToCache.getAnnotation(InvalidateAssignCaches.class).value());
+        }
+
+        for (int i = 0; i < lAnnotations.size(); i++) {
+            // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
+            // but do not let it surface up past the AOP injection itself.
+            try {
+                final AnnotationData annotationData =
+                        AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
+                                InvalidateAssignCache.class,
+                                methodToCache.getName());
+
+                final String cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
+                if (cacheKey == null || cacheKey.trim().length() == 0) {
+                    throw new InvalidParameterException("Unable to find a cache key");
+                }
+                cache.delete(cacheKey);
+
+                // Notify the observers that a cache interaction happened.
+                final List<InvalidateAssignCacheListener> listeners = getPertinentListeners(InvalidateAssignCacheListener.class, annotationData.getNamespace());
+                if (listeners != null && !listeners.isEmpty()) {
+                    for (final InvalidateAssignCacheListener listener : listeners) {
+                        try {
+                            listener.triggeredInvalidateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), retVal, jp.getArgs());
+                        } catch (Exception ex) {
+                            LOG.warn("Problem when triggering a listener.", ex);
+                        }
+                    }
+                }
+            } catch (Throwable ex) {
+                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+            }
+        }
+    }
+
 }

@@ -144,4 +144,20 @@ public class TestSvcImpl implements TestSvc {
         this.dao.invalidateCompoundStrings(second, first);
     }
 
+
+    public void setFunkFactor(long number, long funkFactor) {
+        this.dao.setFunkFactor(number, funkFactor);
+    }
+
+    public void undercoverSetFunkFactor(long number, long funkFactor) {
+        this.dao.undercoverSetFunkFactor(number, funkFactor);
+    }
+
+    public long funkySquare(long number) {
+        return this.dao.funkySquare(number);
+    }
+
+    public long funkyCube(long number) {
+        return this.dao.funkyCube(number);
+    }
 }
