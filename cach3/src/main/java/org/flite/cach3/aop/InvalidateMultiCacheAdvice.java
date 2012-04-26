@@ -4,6 +4,7 @@ import net.spy.memcached.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.annotations.groups.InvalidateMultiCaches;
 import org.flite.cach3.api.*;
 import org.slf4j.*;
 import org.springframework.core.*;
@@ -42,26 +43,17 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
     public void invalidateMulti() {
     }
 
+    // For Invalidate*Cache, an AfterReturning aspect is fine. We will only apply our caching
+    // after the underlying method completes successfully, and we will have the same
+    // access to the method params.
+
+    // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
+    // but do not let it surface up past the AOP injection itself.
+
     @AfterReturning(pointcut = "invalidateMulti()", returning = "retVal")
     public Object cacheInvalidateMulti(final JoinPoint jp, final Object retVal) throws Throwable {
-        // If we've disabled the caching programmatically (or via properties file) just flow through.
-        if (isCacheDisabled()) {
-            LOG.debug("Caching is disabled.");
-            return retVal;
-        }
-
-        final MemcachedClientIF cache = getMemcachedClient();
-        // For Invalidate*Cache, an AfterReturning aspect is fine. We will only apply our caching
-        // after the underlying method completes successfully, and we will have the same
-        // access to the method params.
-
-        // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
-        // but do not let it surface up past the AOP injection itself.
         try {
-            final Method methodToCache = getMethodToCache(jp);
-            final InvalidateMultiCache annotation = methodToCache.getAnnotation(InvalidateMultiCache.class);
-
-            doInvalidate(cache, jp, retVal, methodToCache, annotation);
+            doInvalidate(jp, retVal);
         } catch (Throwable ex) {
             LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
         }
@@ -69,21 +61,13 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
     }
 
 
-    @Pointcut("@annotation(org.flite.cach3.annotations.InvalidateMultiCaches)")
-    public void invalidateMultis() {
-    }
+    @Pointcut("@annotation(org.flite.cach3.annotations.groups.InvalidateMultiCaches)")
+    public void invalidateMultis() {}
 
     @AfterReturning(pointcut = "invalidateMultis()", returning = "retVal")
     public Object cacheInvalidateMultis(final JoinPoint jp, final Object retVal) throws Throwable {
         try {
-            final MemcachedClientIF cache = getMemcachedClient();
-            final Method methodToCache = getMethodToCache(jp);
-            final InvalidateMultiCaches annotation = methodToCache.getAnnotation(InvalidateMultiCaches.class);
-            if (annotation != null && annotation.value() != null) {
-                for (int i = 0; i < annotation.value().length; i++) {
-                    doInvalidate(cache, jp, retVal, methodToCache, annotation.value()[i]);
-                }
-            }
+            doInvalidate(jp, retVal);
         } catch (Throwable ex) {
             LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
         }
@@ -91,33 +75,55 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
     }
 
 
-    private void doInvalidate(final MemcachedClientIF cache, final JoinPoint jp, final Object retVal, final Method methodToCache, final InvalidateMultiCache annotation) throws Throwable {
-        try {
-            final AnnotationData annotationData =
-                    AnnotationDataBuilder.buildAnnotationData(annotation,
-                            InvalidateMultiCache.class,
-                            methodToCache.getName());
-            final List<Object> keyObjects = (List<Object>) getIndexObject(annotationData.getKeyIndex(), retVal, jp.getArgs(), methodToCache.toString());
-            final List<String> baseKeys = getBaseKeys(keyObjects, annotationData, retVal, jp.getArgs());
-            for (final String base : baseKeys) {
-                final String cacheKey = buildCacheKey(base, annotationData);
-                cache.delete(cacheKey);
-            }
+    private void doInvalidate(final JoinPoint jp, final Object retVal) throws Throwable {
+        if (isCacheDisabled()) {
+            LOG.debug("Caching is disabled.");
+            return;
+        }
 
-            // Notify the observers that a cache interaction happened.
-            final List<InvalidateMultiCacheListener> listeners = getPertinentListeners(InvalidateMultiCacheListener.class, annotationData.getNamespace());
-            if (listeners != null && !listeners.isEmpty()) {
-                for (final InvalidateMultiCacheListener listener : listeners) {
-                    try {
-                        listener.triggeredInvalidateMultiCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKeys, retVal, jp.getArgs());
-                    } catch (Exception ex) {
-                        LOG.warn("Problem when triggering a listener.", ex);
+        final MemcachedClientIF cache = getMemcachedClient();
+        final Method methodToCache = getMethodToCache(jp);
+
+        List<InvalidateMultiCache> lAnnotations;
+
+        if (methodToCache.getAnnotation(InvalidateMultiCache.class) != null) {
+            lAnnotations = Arrays.asList(methodToCache.getAnnotation(InvalidateMultiCache.class));
+        } else {
+            lAnnotations = Arrays.asList(methodToCache.getAnnotation(InvalidateMultiCaches.class).value());
+        }
+
+        for (int i = 0; i < lAnnotations.size(); i++) {
+            // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
+            // but do not let it surface up past the AOP injection itself.
+            try {
+                final AnnotationData annotationData =
+                        AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
+                                InvalidateMultiCache.class,
+                                methodToCache.getName());
+                final List<Object> keyObjects = (List<Object>) getIndexObject(annotationData.getKeyIndex(), retVal, jp.getArgs(), methodToCache.toString());
+                final List<String> baseKeys = getBaseKeys(keyObjects, annotationData, retVal, jp.getArgs());
+                for (final String base : baseKeys) {
+                    final String cacheKey = buildCacheKey(base, annotationData);
+                    cache.delete(cacheKey);
+                }
+
+                // Notify the observers that a cache interaction happened.
+                final List<InvalidateMultiCacheListener> listeners = getPertinentListeners(InvalidateMultiCacheListener.class, annotationData.getNamespace());
+                if (listeners != null && !listeners.isEmpty()) {
+                    for (final InvalidateMultiCacheListener listener : listeners) {
+                        try {
+                            listener.triggeredInvalidateMultiCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKeys, retVal, jp.getArgs());
+                        } catch (Exception ex) {
+                            LOG.warn("Problem when triggering a listener.", ex);
+                        }
                     }
                 }
+            } catch (Throwable ex) {
+                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
             }
-        } catch (Throwable ex) {
-            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
         }
+
     }
+
 
 }

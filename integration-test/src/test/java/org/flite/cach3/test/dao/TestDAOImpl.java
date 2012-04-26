@@ -3,6 +3,7 @@ package org.flite.cach3.test.dao;
 import org.apache.commons.lang.*;
 import org.apache.commons.lang.math.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.annotations.groups.InvalidateSingleCaches;
 
 import java.util.*;
 

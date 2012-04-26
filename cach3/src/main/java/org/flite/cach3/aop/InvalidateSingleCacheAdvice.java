@@ -4,6 +4,7 @@ import net.spy.memcached.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.annotations.groups.InvalidateSingleCaches;
 import org.flite.cach3.api.*;
 import org.slf4j.*;
 import org.springframework.core.*;
@@ -42,27 +43,17 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
     public void invalidateSingle() {
     }
 
+    // For Invalidate*Cache, an AfterReturning aspect is fine. We will only apply our caching
+    // after the underlying method completes successfully, and we will have the same
+    // access to the method params.
+
+    // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
+    // but do not let it surface up past the AOP injection itself.
+
     @AfterReturning(pointcut = "invalidateSingle()", returning = "retVal")
     public Object cacheInvalidateSingle(final JoinPoint jp, final Object retVal) throws Throwable {
-        // If we've disabled the caching programmatically (or via properties file) just flow through.
-        if (isCacheDisabled()) {
-            LOG.debug("Caching is disabled.");
-            return retVal;
-        }
-
-        final MemcachedClientIF cache = getMemcachedClient();
-        // For Invalidate*Cache, an AfterReturning aspect is fine. We will only apply our caching
-        // after the underlying method completes successfully, and we will have the same
-        // access to the method params.
-
-        // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
-        // but do not let it surface up past the AOP injection itself.
         try {
-            final Method methodToCache = getMethodToCache(jp);
-            final InvalidateSingleCache annotation = methodToCache.getAnnotation(InvalidateSingleCache.class);
-
-            doInvalidate(cache, jp, retVal, methodToCache, annotation);
-
+            doInvalidate(jp, retVal);
         } catch (Throwable ex) {
             LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
         }
@@ -70,21 +61,14 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
     }
 
 
-    @Pointcut("@annotation(org.flite.cach3.annotations.InvalidateSingleCaches)")
+    @Pointcut("@annotation(org.flite.cach3.annotations.groups.InvalidateSingleCaches)")
     public void invalidateSingles() {
     }
 
     @AfterReturning(pointcut = "invalidateSingles()", returning = "retVal")
     public Object cacheInvalidateSingles(final JoinPoint jp, final Object retVal) throws Throwable {
         try {
-            final MemcachedClientIF cache = getMemcachedClient();
-            final Method methodToCache = getMethodToCache(jp);
-            final InvalidateSingleCaches annotation = methodToCache.getAnnotation(InvalidateSingleCaches.class);
-            if (annotation != null && annotation.value() != null) {
-                for (int i = 0; i < annotation.value().length; i++) {
-                    doInvalidate(cache, jp, retVal, methodToCache, annotation.value()[i]);
-                }
-            }
+            doInvalidate(jp, retVal);
         } catch (Throwable ex) {
             LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
         }
@@ -92,34 +76,55 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
     }
 
 
-    private void doInvalidate(final MemcachedClientIF cache, final JoinPoint jp, final Object retVal, final Method methodToCache, final InvalidateSingleCache annotation) throws Throwable {
-        try {
-            final AnnotationData annotationData =
-                    AnnotationDataBuilder.buildAnnotationData(annotation,
-                            InvalidateSingleCache.class,
-                            methodToCache.getName());
-            final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
-            final String cacheKey = buildCacheKey(baseKey, annotationData);
+    private void doInvalidate(final JoinPoint jp, final Object retVal) throws Throwable {
+        if (isCacheDisabled()) {
+            LOG.debug("Caching is disabled.");
+            return;
+        }
 
-            LOG.debug("Invalidating cache for key " + cacheKey);
-            cache.delete(cacheKey);
+        final MemcachedClientIF cache = getMemcachedClient();
+        final Method methodToCache = getMethodToCache(jp);
+        List<InvalidateSingleCache> lAnnotations;
 
-            // Notify the observers that a cache interaction happened.
-            final List<InvalidateSingleCacheListener> listeners = getPertinentListeners(InvalidateSingleCacheListener.class, annotationData.getNamespace());
-            if (listeners != null && !listeners.isEmpty()) {
-                for (final InvalidateSingleCacheListener listener : listeners) {
-                    try {
+        if (methodToCache.getAnnotation(InvalidateSingleCache.class) != null) {
+            lAnnotations = Arrays.asList(methodToCache.getAnnotation(InvalidateSingleCache.class));
+        } else {
+            lAnnotations = Arrays.asList(methodToCache.getAnnotation(InvalidateSingleCaches.class).value());
+        }
+
+        for (int i = 0; i < lAnnotations.size(); i++) {
+            // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
+            // but do not let it surface up past the AOP injection itself.
+            try {
+                final AnnotationData annotationData =
+                        AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
+                                InvalidateSingleCache.class,
+                                methodToCache.getName());
+                final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
+                final String cacheKey = buildCacheKey(baseKey, annotationData);
+
+                LOG.debug("Invalidating cache for key " + cacheKey);
+                cache.delete(cacheKey);
+
+                // Notify the observers that a cache interaction happened.
+                final List<InvalidateSingleCacheListener> listeners = getPertinentListeners(InvalidateSingleCacheListener.class, annotationData.getNamespace());
+                if (listeners != null && !listeners.isEmpty()) {
+                    for (final InvalidateSingleCacheListener listener : listeners) {
+                        try {
 //                        listener.triggeredInvalidateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), keyObject);
-                        listener.triggeredInvalidateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKey, retVal, jp.getArgs());
-                    } catch (Exception ex) {
-                        LOG.warn("Problem when triggering a listener.", ex);
+                            listener.triggeredInvalidateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKey, retVal, jp.getArgs());
+                        } catch (Exception ex) {
+                            LOG.warn("Problem when triggering a listener.", ex);
+                        }
                     }
                 }
+            } catch (Throwable ex) {
+                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
             }
-        } catch (Throwable ex) {
-            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
         }
     }
+
+
 
 
 }

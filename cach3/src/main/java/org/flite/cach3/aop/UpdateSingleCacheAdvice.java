@@ -4,6 +4,7 @@ import net.spy.memcached.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.annotations.groups.UpdateSingleCaches;
 import org.flite.cach3.api.*;
 import org.slf4j.*;
 import org.springframework.core.*;
@@ -43,50 +44,91 @@ public class UpdateSingleCacheAdvice extends CacheBase {
 
 	@AfterReturning(pointcut="updateSingle()", returning="retVal")
 	public Object cacheUpdateSingle(final JoinPoint jp, final Object retVal) throws Throwable {
-        // If we've disabled the caching programmatically (or via properties file) just flow through.
+        try {
+            doUpdate(jp, retVal);
+        } catch (Throwable ex) {
+            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+        }
+        return retVal;
+	}
+
+
+    @Pointcut("@annotation(org.flite.cach3.annotations.groups.UpdateSingleCaches)")
+	public void updateSingles() {}
+
+	@AfterReturning(pointcut="updateSingles()", returning="retVal")
+	public Object cacheUpdateSingles(final JoinPoint jp, final Object retVal) throws Throwable {
+        try {
+            doUpdate(jp, retVal);
+        } catch (Throwable ex) {
+            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+        }
+        return retVal;
+    }
+
+
+
+    private void doUpdate(final JoinPoint jp, final Object retVal) throws Throwable {
         if (isCacheDisabled()) {
             LOG.debug("Caching is disabled.");
-            return retVal;
+            return;
         }
 
         final MemcachedClientIF cache = getMemcachedClient();
-        // For Update*Cache, an AfterReturning aspect is fine. We will only apply our caching
-        // after the underlying method completes successfully, and we will have the same
-        // access to the method params.
-        try {
-			final Method methodToCache = getMethodToCache(jp);
-			final UpdateSingleCache annotation = methodToCache.getAnnotation(UpdateSingleCache.class);
-            final AnnotationData annotationData =
-                    AnnotationDataBuilder.buildAnnotationData(annotation,
-                            UpdateSingleCache.class,
-                            methodToCache.getName());
-            final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
-			final String cacheKey = buildCacheKey(baseKey, annotationData);
-            final Object dataObject = getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());
-            final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
-			cache.set(cacheKey, annotationData.getExpiration(), submission);
+        final Method methodToCache = getMethodToCache(jp);
+        List<UpdateSingleCache> lAnnotations;
 
-            // Notify the observers that a cache interaction happened.
-            final List<UpdateSingleCacheListener> listeners = getPertinentListeners(UpdateSingleCacheListener.class,annotationData.getNamespace());
-            if (listeners != null && !listeners.isEmpty()) {
-                for (final UpdateSingleCacheListener listener : listeners) {
-                    try {
-                        listener.triggeredUpdateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKey, dataObject, retVal, jp.getArgs());
-                    } catch (Exception ex) {
-                        LOG.warn("Problem when triggering a listener.", ex);
+        if (methodToCache.getAnnotation(UpdateSingleCache.class) != null) {
+            lAnnotations = Arrays.asList(methodToCache.getAnnotation(UpdateSingleCache.class));
+        } else {
+            lAnnotations = Arrays.asList(methodToCache.getAnnotation(UpdateSingleCaches.class).value());
+        }
+
+        for (int i = 0; i < lAnnotations.size(); i++) {
+            // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
+            // but do not let it surface up past the AOP injection itself.
+            try {
+                final AnnotationData annotationData =
+                        AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
+                                UpdateSingleCache.class,
+                                methodToCache.getName());
+                final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
+                final String cacheKey = buildCacheKey(baseKey, annotationData);
+                final Object dataObject = getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());
+                final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
+                cache.set(cacheKey, annotationData.getExpiration(), submission);
+
+                // Notify the observers that a cache interaction happened.
+                final List<UpdateSingleCacheListener> listeners = getPertinentListeners(UpdateSingleCacheListener.class,annotationData.getNamespace());
+                if (listeners != null && !listeners.isEmpty()) {
+                    for (final UpdateSingleCacheListener listener : listeners) {
+                        try {
+                            listener.triggeredUpdateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKey, dataObject, retVal, jp.getArgs());
+                        } catch (Exception ex) {
+                            LOG.warn("Problem when triggering a listener.", ex);
+                        }
                     }
                 }
+            } catch (Exception ex) {
+                LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
             }
-		} catch (Exception ex) {
-			LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
-		}
-		return retVal;
-	}
+        }
+    }
+
 
 	protected String getObjectId(final Object keyObject) throws Exception {
 		final Method keyMethod = getKeyMethod(keyObject);
 		return generateObjectId(keyMethod, keyObject);
 	}
+
+
+
+
+
+
+
+
+
 //  TODO: Not needed?
 //	protected void validateAnnotation(final UpdateSingleCache annotation,
 //	                                  final Method method) {
