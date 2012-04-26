@@ -14,7 +14,7 @@ import java.util.List;
 import static org.testng.AssertJUnit.*;
 
 /**
- * Copyright (c) 2011 Flite, Inc
+ * Copyright (c) 2011-2012 Flite, Inc
  * <p/>
  * All rights reserved.
  * THIS PROGRAM IS CONFIDENTIAL AND AN UNPUBLISHED WORK AND TRADE
