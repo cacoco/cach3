@@ -3,7 +3,7 @@ package org.flite.cach3.test.dao;
 import java.util.*;
 
 /**
-Copyright (c) 2011 Flite, Inc
+Copyright (c) 2011-2012 Flite, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -83,5 +83,16 @@ public interface TestDAO {
     public void invalidateCompoundString(final Long second, final Long first);
 
     public void invalidateCompoundStrings(final Long second, final List<Long> first);
+
+
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  Mulitple cache methods.                                      * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+    void setFunkFactor(Long number, Long funkFactor);
+    void undercoverSetFunkFactor(Long number, Long funkFactor);
+
+    Long funkySquare(Long number);
+    Long funkyCube(Long number);
 
 }

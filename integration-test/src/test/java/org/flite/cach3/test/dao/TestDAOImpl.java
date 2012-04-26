@@ -3,11 +3,12 @@ package org.flite.cach3.test.dao;
 import org.apache.commons.lang.*;
 import org.apache.commons.lang.math.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.annotations.groups.InvalidateSingleCaches;
 
 import java.util.*;
 
 /**
-Copyright (c) 2011 Flite, Inc
+Copyright (c) 2011-2012 Flite, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -273,6 +274,46 @@ public class TestDAOImpl implements TestDAO {
             keyTemplate = "$indexObject&&$args[0]"
     )
     public void invalidateCompoundStrings(final Long second, final List<Long> first) { }
+
+
+
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  Mulitple cache methods.                                      * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+
+    private Map<Long, Long> funkFactor = new HashMap<Long, Long>();
+
+    @InvalidateSingleCaches(
+            {@InvalidateSingleCache(namespace = PREFIX_NAMESPACE, keyPrefix = "square", keyIndex = 0),
+            @InvalidateSingleCache(namespace = PREFIX_NAMESPACE, keyPrefix = "cube", keyIndex = 0)}
+    )
+    public void setFunkFactor(Long number, Long funkFactor) {
+        this.funkFactor.put(number, funkFactor);
+    }
+
+    //this changes the funk factor without notifying the caching mechanism
+    public void undercoverSetFunkFactor(Long number, Long funkFactor) {
+        this.funkFactor.put(number, funkFactor);
+    }
+
+    private Long getFunkFactor(Long number) {
+        if (funkFactor.containsKey(number)) {
+            return funkFactor.get(number);
+        }
+        return 0l;
+    }
+
+    @ReadThroughSingleCache(namespace = PREFIX_NAMESPACE, keyPrefix = "square", keyIndex = 0, expiration = 3000)
+    public Long funkySquare(Long number) {
+        return number * number + getFunkFactor(number);
+    }
+
+    @ReadThroughSingleCache(namespace = PREFIX_NAMESPACE, keyPrefix = "cube", keyIndex = 0, expiration = 3000)
+    public Long funkyCube(Long number) {
+        return number * number * number + getFunkFactor(number);
+    }
+
 
 
 }

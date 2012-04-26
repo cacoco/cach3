@@ -1,4 +1,11 @@
-package org.flite.cach3.api;
+package org.flite.cach3.annotations.groups;
+
+import org.flite.cach3.annotations.UpdateSingleCache;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
 Copyright (c) 2011-2012 Flite, Inc
@@ -21,18 +28,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
-public interface InvalidateSingleCacheListener extends CacheListener {
 
-    /**
-     * This method gets triggered only after a modification to the cache is made.
-     * Actual cache ids are built the following way:
-     *  (namespace) + ":" + (prefix, if exists) + (baseCacheId)
-     *
-     * @param namespace  The string supplied to the associated annotation
-     * @param prefix  The string optionally supplied to the associated annotation
-     * @param baseCacheId The calculated id (no prefix, no namespace) for the object removed from the cache
-     * @param retVal  Object returned by the underlying method (null if of void return type)
-     * @param args  Object[] that are the passed in parameters to the underlying method (empty/null if no-arg)
-     */
-    void triggeredInvalidateSingleCache(String namespace, String prefix, String baseCacheId, Object retVal, Object[] args);
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface UpdateSingleCaches {
+    UpdateSingleCache[] value() default {};
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.*;
 import java.util.*;
 
 /**
-Copyright (c) 2011 Flite, Inc
+Copyright (c) 2011-2012 Flite, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -144,4 +144,20 @@ public class TestSvcImpl implements TestSvc {
         this.dao.invalidateCompoundStrings(second, first);
     }
 
+
+    public void setFunkFactor(long number, long funkFactor) {
+        this.dao.setFunkFactor(number, funkFactor);
+    }
+
+    public void undercoverSetFunkFactor(long number, long funkFactor) {
+        this.dao.undercoverSetFunkFactor(number, funkFactor);
+    }
+
+    public long funkySquare(long number) {
+        return this.dao.funkySquare(number);
+    }
+
+    public long funkyCube(long number) {
+        return this.dao.funkyCube(number);
+    }
 }

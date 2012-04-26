@@ -18,7 +18,7 @@ import java.security.*;
 import java.util.*;
 
 /**
-Copyright (c) 2011 Flite, Inc
+Copyright (c) 2011-2012 Flite, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -73,7 +73,7 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
             cacheKey = buildCacheKey(baseKey, annotationData);
 			final Object result = cache.get(cacheKey);
 			if (result != null) {
-				LOG.debug("Cache hit.");
+				LOG.debug("Cache hit for key " + cacheKey);
 				return (result instanceof PertinentNegativeNull) ? null : result;
 			}
 		} catch (Throwable ex) {

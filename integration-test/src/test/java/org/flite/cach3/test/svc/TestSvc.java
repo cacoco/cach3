@@ -3,7 +3,7 @@ package org.flite.cach3.test.svc;
 import java.util.*;
 
 /**
-Copyright (c) 2011 Flite, Inc
+Copyright (c) 2011-2012 Flite, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,6 +79,13 @@ public interface TestSvc {
     public void invalidateCompoundString(final Long second, final Long first);
 
     public void invalidateCompoundStrings(final Long second, final List<Long> first);
+
+
+    void setFunkFactor(long number, long funkFactor);
+    void undercoverSetFunkFactor(long number, long funkFactor);
+
+    long funkySquare(long number);
+    long funkyCube(long number);
 
 }
 

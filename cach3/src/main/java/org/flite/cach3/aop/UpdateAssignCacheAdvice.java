@@ -4,6 +4,7 @@ import net.spy.memcached.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
+import org.flite.cach3.annotations.groups.UpdateAssignCaches;
 import org.flite.cach3.api.*;
 import org.slf4j.*;
 import org.springframework.core.*;
@@ -13,7 +14,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 /**
-Copyright (c) 2011 Flite, Inc
+Copyright (c) 2011-2012 Flite, Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -81,6 +82,74 @@ public class UpdateAssignCacheAdvice extends CacheBase {
 		}
 
         return retVal;
+    }
+
+
+    @Pointcut("@annotation(org.flite.cach3.annotations.groups.UpdateAssignCaches)")
+    public void updateAssigns() {}
+
+    @AfterReturning(pointcut = "updateAssigns()", returning = "retVal")
+    public Object cacheUpdateAssigns(final JoinPoint jp, final Object retVal) throws Throwable {
+        try {
+            doUpdate(jp, retVal);
+        } catch (Throwable ex) {
+            LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
+        }
+        return retVal;
+    }
+
+
+
+    private void doUpdate(final JoinPoint jp, final Object retVal) throws Throwable {
+        // If we've disabled the caching programmatically (or via properties file) just flow through.
+        if (isCacheDisabled()) {
+            LOG.debug("Caching is disabled.");
+            return;
+        }
+
+        final MemcachedClientIF cache = getMemcachedClient();
+        final Method methodToCache = getMethodToCache(jp);
+        List<UpdateAssignCache> lAnnotations;
+
+        if (methodToCache.getAnnotation(UpdateAssignCache.class) != null) {
+            lAnnotations = Arrays.asList(methodToCache.getAnnotation(UpdateAssignCache.class));
+        } else {
+            lAnnotations = Arrays.asList(methodToCache.getAnnotation(UpdateAssignCaches.class).value());
+        }
+
+        for (int i = 0; i < lAnnotations.size(); i++) {
+            try {
+                // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
+                // but do not let it surface up past the AOP injection itself.
+
+                final AnnotationData annotationData = AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
+                                UpdateAssignCache.class,
+                                methodToCache.getName());
+                final String cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
+                final Object dataObject = annotationData.getDataIndex() == -1
+                        ? retVal
+                        : getIndexObject(annotationData.getDataIndex(), jp.getArgs(), methodToCache.toString());
+                final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
+                cache.set(cacheKey, annotationData.getExpiration(), submission);
+
+                // Notify the observers that a cache interaction happened.
+                final List<UpdateAssignCacheListener> listeners = getPertinentListeners(UpdateAssignCacheListener.class,annotationData.getNamespace());
+                if (listeners != null && !listeners.isEmpty()) {
+                    for (final UpdateAssignCacheListener listener : listeners) {
+                        try {
+                            listener.triggeredUpdateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), dataObject, retVal, jp.getArgs());
+                        } catch (Exception ex) {
+                            LOG.warn("Problem when triggering a listener.", ex);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
+            }
+        }
 
     }
+
+
+
 }
