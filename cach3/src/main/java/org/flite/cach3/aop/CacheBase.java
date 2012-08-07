@@ -59,6 +59,10 @@ public class CacheBase {
         return state == null ? false : state.isCacheDisabled();
     }
 
+    protected int getJitterDefault() {
+        return state.getJitterDefault();
+    }
+
 	public void setMethodStore(CacheKeyMethodStore methodStore) {
 		this.methodStore = methodStore;
 	}

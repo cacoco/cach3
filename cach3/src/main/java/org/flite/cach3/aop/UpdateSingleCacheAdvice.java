@@ -91,7 +91,8 @@ public class UpdateSingleCacheAdvice extends CacheBase {
                 final AnnotationData annotationData =
                         AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
                                 UpdateSingleCache.class,
-                                methodToCache.getName());
+                                methodToCache.getName(),
+                                getJitterDefault());
                 final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
                 final String cacheKey = buildCacheKey(baseKey, annotationData);
                 final Object dataObject = getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());

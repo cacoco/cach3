@@ -1,14 +1,13 @@
 package org.flite.cach3.aop;
 
-import org.flite.cach3.annotations.ReadThroughAssignCache;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import static org.testng.AssertJUnit.fail;
-import static org.testng.AssertJUnit.assertTrue;
+import org.flite.cach3.annotations.*;
+import org.testng.annotations.*;
 
-import java.lang.reflect.Method;
-import java.lang.annotation.Annotation;
-import java.security.InvalidParameterException;
+import java.lang.annotation.*;
+import java.lang.reflect.*;
+import java.security.*;
+
+import static org.testng.AssertJUnit.*;
 
 /**
 Copyright (c) 2011-2012 Flite, Inc
@@ -45,7 +44,7 @@ public class ReadThroughAssignCacheTest {
         Method method = testClass.getClass().getMethod("cacheMe1",null);
         Annotation annotation = method.getAnnotation(ReadThroughAssignCache.class);
         try {
-            AnnotationDataBuilder.buildAnnotationData(annotation, ReadThroughAssignCache.class, method.getName());
+            AnnotationDataBuilder.buildAnnotationData(annotation, ReadThroughAssignCache.class, method.getName(), 0);
             fail("Expected Exception.");
         } catch (InvalidParameterException ex) {
             assertTrue(ex.getMessage().indexOf("AssignedKey") != -1);
@@ -54,7 +53,7 @@ public class ReadThroughAssignCacheTest {
         method = testClass.getClass().getMethod("cacheMe2",null);
         annotation = method.getAnnotation(ReadThroughAssignCache.class);
         try {
-            AnnotationDataBuilder.buildAnnotationData(annotation, ReadThroughAssignCache.class, method.getName());
+            AnnotationDataBuilder.buildAnnotationData(annotation, ReadThroughAssignCache.class, method.getName(), 0);
             fail("Expected Exception.");
         } catch (InvalidParameterException ex) {
             assertTrue(ex.getMessage().indexOf("AssignedKey") != -1);
@@ -62,7 +61,7 @@ public class ReadThroughAssignCacheTest {
 
         method = testClass.getClass().getMethod("cacheMe3",null);
         annotation = method.getAnnotation(ReadThroughAssignCache.class);
-        AnnotationDataBuilder.buildAnnotationData(annotation, ReadThroughAssignCache.class, method.getName());
+        AnnotationDataBuilder.buildAnnotationData(annotation, ReadThroughAssignCache.class, method.getName(), 0);
 
     }
 

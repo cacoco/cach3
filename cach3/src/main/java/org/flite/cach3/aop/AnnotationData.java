@@ -32,6 +32,7 @@ class AnnotationData {
     private String assignedKey = "";
     private String keyPrefix = null;
     private String keyTemplate = null;
+    private int jitter = 0;
 
     public String getNamespace() {
         return namespace;
@@ -95,5 +96,13 @@ class AnnotationData {
 
     public void setKeyTemplate(String keyTemplate) {
         this.keyTemplate = keyTemplate;
+    }
+
+    public int getJitter() {
+        return jitter;
+    }
+
+    public void setJitter(int jitter) {
+        this.jitter = jitter;
     }
 }

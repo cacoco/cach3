@@ -63,7 +63,8 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
             annotationData =
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             ReadThroughAssignCache.class,
-                            methodToCache.getName());
+                            methodToCache.getName(),
+                            getJitterDefault());
             cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
             final Object result = cache.get(cacheKey);
             if (result != null) {

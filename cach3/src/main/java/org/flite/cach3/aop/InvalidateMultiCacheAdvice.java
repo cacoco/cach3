@@ -99,7 +99,8 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
                 final AnnotationData annotationData =
                         AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
                                 InvalidateMultiCache.class,
-                                methodToCache.getName());
+                                methodToCache.getName(),
+                                getJitterDefault());
                 final List<Object> keyObjects = (List<Object>) getIndexObject(annotationData.getKeyIndex(), retVal, jp.getArgs(), methodToCache.toString());
                 final List<String> baseKeys = getBaseKeys(keyObjects, annotationData, retVal, jp.getArgs());
                 for (final String base : baseKeys) {

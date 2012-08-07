@@ -1,16 +1,11 @@
 package org.flite.cach3.config;
 
 import net.spy.memcached.*;
-import org.apache.commons.logging.*;
-import org.apache.velocity.VelocityContext;
 import org.flite.cach3.api.*;
-import org.flite.cach3.api.MemcachedClientProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 import org.springframework.beans.factory.*;
 import org.springframework.context.*;
 
-import javax.annotation.Resource;
 import java.security.*;
 import java.util.*;
 
@@ -42,6 +37,7 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
 
     private boolean cacheDisabled = false;
     private MemcachedClientProvider provider;
+    private int jitterDefault = 0;
 
     private Map<Class<? extends CacheListener>, List<? extends CacheListener>> listeners = new HashMap<Class<? extends CacheListener>, List<? extends CacheListener>>();
     {
@@ -100,6 +96,17 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
 
     public void setCacheDisabled(boolean cacheDisabled) {
         this.cacheDisabled = cacheDisabled;
+    }
+
+    public int getJitterDefault() {
+        return jitterDefault;
+    }
+
+    public void setJitterDefault(int jitterDefault) {
+        if (jitterDefault < 0 || jitterDefault > 99) {
+            throw new InvalidParameterException("Parameter 'jitterDefault' must be between 0 and 99.");
+        }
+        this.jitterDefault = jitterDefault;
     }
 
     public void addListener(final CacheListener listener) {

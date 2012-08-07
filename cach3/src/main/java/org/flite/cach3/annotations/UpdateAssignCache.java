@@ -55,7 +55,7 @@ public @interface UpdateAssignCache {
     int dataIndex() default Integer.MIN_VALUE;
 
     /**
-     *  The exp value is passed along to memcached exactly as given, and will be
+     * The exp value is passed along to memcached, and will be
      * processed per the memcached protocol specification:
      *
      * The actual value sent may either be Unix time (number of seconds since January 1, 1970,
@@ -70,5 +70,24 @@ public @interface UpdateAssignCache {
      * @return
      */
     int expiration() default 0;
+
+    /**
+     * The jitter value is used as a bounded randomizer for the expiration time. Jittering your
+     * expiration times can help to alleviate stampeding if many objects all expire at the same
+     * time.
+     *
+     * Jitter will not be applied to expirations that exceed 60*60*24*30.
+     *
+     * The default value of -1 means the calculations will rely whatever jitter value is set
+     * as a system default in the <code>Cach3State</code>.
+     *
+     * Other accepted values are integers between 0 and 99. These numbers represent a bounded
+     * percentage of possible reductions to the expiration time.
+     *
+     * For example, if you have an <code>expiration</code> value of 1000, and you apply a
+     * jitter value of 20, a modification to the cache would set the actual expiration
+     * to a random value between 800 and 1000.
+     */
+    int jitter() default -1;
 
 }

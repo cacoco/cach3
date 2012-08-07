@@ -68,7 +68,7 @@ public class UpdateMultiCacheAdviceTest {
     public void testUpdateCache() throws Exception {
         final Method method = AnnotationTest.class.getMethod("cacheMe01", null);
         final UpdateMultiCache annotation = method.getAnnotation(UpdateMultiCache.class);
-        final AnnotationData data = AnnotationDataBuilder.buildAnnotationData(annotation, UpdateMultiCache.class, "cacheMe01");
+        final AnnotationData data = AnnotationDataBuilder.buildAnnotationData(annotation, UpdateMultiCache.class, "cacheMe01", 0);
 
         final MemcachedClientIF cache = EasyMock.createMock(MemcachedClientIF.class);
         state.setProvider(new MemcachedClientProvider() {

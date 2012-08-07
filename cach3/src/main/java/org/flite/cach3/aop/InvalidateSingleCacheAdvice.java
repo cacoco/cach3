@@ -99,7 +99,8 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
                 final AnnotationData annotationData =
                         AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
                                 InvalidateSingleCache.class,
-                                methodToCache.getName());
+                                methodToCache.getName(),
+                                getJitterDefault());
                 final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
                 final String cacheKey = buildCacheKey(baseKey, annotationData);
 

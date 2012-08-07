@@ -58,7 +58,8 @@ public class UpdateAssignCacheAdvice extends CacheBase {
             final UpdateAssignCache annotation = methodToCache.getAnnotation(UpdateAssignCache.class);
             final AnnotationData annotationData = AnnotationDataBuilder.buildAnnotationData(annotation,
                             UpdateAssignCache.class,
-                            methodToCache.getName());
+                            methodToCache.getName(),
+                            getJitterDefault());
             final String cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
             final Object dataObject = annotationData.getDataIndex() == -1
                     ? retVal
@@ -124,7 +125,8 @@ public class UpdateAssignCacheAdvice extends CacheBase {
 
                 final AnnotationData annotationData = AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
                                 UpdateAssignCache.class,
-                                methodToCache.getName());
+                                methodToCache.getName(),
+                                getJitterDefault());
                 final String cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
                 final Object dataObject = annotationData.getDataIndex() == -1
                         ? retVal
