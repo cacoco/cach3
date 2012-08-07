@@ -65,7 +65,7 @@ public class UpdateAssignCacheAdvice extends CacheBase {
                     ? retVal
                     : getIndexObject(annotationData.getDataIndex(), jp.getArgs(), methodToCache.toString());
             final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
-			cache.set(cacheKey, annotationData.getExpiration(), submission);
+			cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
 
             // Notify the observers that a cache interaction happened.
             final List<UpdateAssignCacheListener> listeners = getPertinentListeners(UpdateAssignCacheListener.class,annotationData.getNamespace());
@@ -132,7 +132,7 @@ public class UpdateAssignCacheAdvice extends CacheBase {
                         ? retVal
                         : getIndexObject(annotationData.getDataIndex(), jp.getArgs(), methodToCache.toString());
                 final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
-                cache.set(cacheKey, annotationData.getExpiration(), submission);
+                cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
 
                 // Notify the observers that a cache interaction happened.
                 final List<UpdateAssignCacheListener> listeners = getPertinentListeners(UpdateAssignCacheListener.class,annotationData.getNamespace());

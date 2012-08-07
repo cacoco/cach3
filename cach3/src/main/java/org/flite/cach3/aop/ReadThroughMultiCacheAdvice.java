@@ -115,7 +115,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 				final String cacheKey = coord.obj2Key.get(keyObject);
                 final String cacheBase = coord.obj2Base.get(keyObject);
 				cache.set(cacheKey,
-						coord.getAnnotationData().getExpiration(),
+						coord.getAnnotationData().getJitteredExpiration(),
 						resultObject);
 				coord.getKey2Result().put(cacheKey, resultObject);
                 cacheBaseIds[ix] = cacheBase;

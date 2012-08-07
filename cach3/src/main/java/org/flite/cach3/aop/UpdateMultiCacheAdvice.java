@@ -140,7 +140,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 			final Object result = returnList.get(ix);
 			final String cacheKey = cacheKeys.get(ix);
 			final Object cacheObject = result != null ? result : new PertinentNegativeNull();
-			cache.set(cacheKey, annotationData.getExpiration(), cacheObject);
+			cache.set(cacheKey, annotationData.getJitteredExpiration(), cacheObject);
 		}
 	}
 

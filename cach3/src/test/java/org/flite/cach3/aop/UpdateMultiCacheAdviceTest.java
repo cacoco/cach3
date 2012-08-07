@@ -108,7 +108,7 @@ public class UpdateMultiCacheAdviceTest {
     }
 
     static class AnnotationTest {
-		@UpdateMultiCache(namespace = "Bubba", expiration = 300, keyIndex = 0, dataIndex = 0)
+		@UpdateMultiCache(namespace = "Bubba", expiration = (60*60*24*30 + 1000), keyIndex = 0, dataIndex = 0)
 		public void cacheMe01() {}
 
 		public String cacheMe02() { return null; }
