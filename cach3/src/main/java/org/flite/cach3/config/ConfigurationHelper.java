@@ -1,9 +1,6 @@
 package org.flite.cach3.config;
 
-import org.apache.commons.logging.*;
-import org.flite.cach3.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 
 import java.security.*;
 
@@ -31,22 +28,30 @@ THE SOFTWARE.
 public class ConfigurationHelper {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationHelper.class);
 
-    public static void setCacheDisabled(final Cach3State state, final boolean disabled) {
+    public static Boolean setCacheDisabled(final Cach3State state, final boolean disabled) {
         if (state == null) { throw new InvalidParameterException("Cach3State must be defined."); }
         state.setCacheDisabled(disabled);
+        return disabled;
     }
 
-    public static boolean addCacheListeners(final Cach3State state, final CacheListener... listeners) {
+    public static Integer setJitterDefault(final Cach3State state, final int jitterDefault) {
         if (state == null) { throw new InvalidParameterException("Cach3State must be defined."); }
-        if (listeners != null && listeners.length > 0) {
-            for (final CacheListener listener : listeners) {
-                if (listener == null) {
-                    LOG.info("Skipping null CacheListener");
-                } else {
-                    state.addListener(listener);
-                }
-            }
-        }
-        return true;
+        state.setJitterDefault(jitterDefault);
+        return jitterDefault;
     }
+
+//    Not sure why this method is needed...?
+//    public static boolean addCacheListeners(final Cach3State state, final CacheListener... listeners) {
+//        if (state == null) { throw new InvalidParameterException("Cach3State must be defined."); }
+//        if (listeners != null && listeners.length > 0) {
+//            for (final CacheListener listener : listeners) {
+//                if (listener == null) {
+//                    LOG.info("Skipping null CacheListener");
+//                } else {
+//                    state.addListener(listener);
+//                }
+//            }
+//        }
+//        return true;
+//    }
 }

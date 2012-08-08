@@ -47,4 +47,9 @@
       </map>
     </constructor-arg>
   </bean>
+
+  <bean class="org.flite.cach3.config.ConfigurationHelper" factory-method="setJitterDefault">
+    <constructor-arg index="0" ref="cach3-state" />
+    <constructor-arg index="1" value="10" />
+  </bean>
 </beans>
