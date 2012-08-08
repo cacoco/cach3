@@ -93,7 +93,8 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
                 final AnnotationData annotationData =
                         AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
                                 InvalidateAssignCache.class,
-                                methodToCache.getName());
+                                methodToCache.getName(),
+                                getJitterDefault());
 
                 final String cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
                 if (cacheKey == null || cacheKey.trim().length() == 0) {

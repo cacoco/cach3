@@ -91,12 +91,13 @@ public class UpdateSingleCacheAdvice extends CacheBase {
                 final AnnotationData annotationData =
                         AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
                                 UpdateSingleCache.class,
-                                methodToCache.getName());
+                                methodToCache.getName(),
+                                getJitterDefault());
                 final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
                 final String cacheKey = buildCacheKey(baseKey, annotationData);
                 final Object dataObject = getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());
                 final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
-                cache.set(cacheKey, annotationData.getExpiration(), submission);
+                cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
 
                 // Notify the observers that a cache interaction happened.
                 final List<UpdateSingleCacheListener> listeners = getPertinentListeners(UpdateSingleCacheListener.class,annotationData.getNamespace());

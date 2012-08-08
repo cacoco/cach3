@@ -40,12 +40,12 @@ public class AnnotationDataBuilderTest {
     @Test
     public void testExample() {
         final Map<Class, Pair<String, List<String>>> map = new HashMap<Class, Pair<String, List<String>>>();
-        map.put(ReadThroughSingleCache.class, new Pair<String, List<String>>("rts", Arrays.asList("Bad1", "Bad2", "Bad3", "GoodIndex", "GoodTemplate")));
-        map.put(ReadThroughMultiCache.class, new Pair<String, List<String>>("rtm", Arrays.asList("Bad1", "Bad2", "Bad3", "Good", "GoodTemplate")));
+        map.put(ReadThroughSingleCache.class, new Pair<String, List<String>>("rts", Arrays.asList("Bad1", "Bad2", "Bad3", "GoodIndex", "GoodTemplate", "GoodJitter")));
+        map.put(ReadThroughMultiCache.class, new Pair<String, List<String>>("rtm", Arrays.asList("Bad1", "Bad2", "Bad3", "Good", "GoodTemplate", "GoodJitter")));
         map.put(InvalidateSingleCache.class, new Pair<String, List<String>>("is", Arrays.asList("Bad1", "Good", "GoodTemplate")));
         map.put(InvalidateMultiCache.class, new Pair<String, List<String>>("im", Arrays.asList("Bad1", "Good", "GoodTemplate")));
-        map.put(UpdateSingleCache.class, new Pair<String, List<String>>("us", Arrays.asList("Bad1", "Good", "GoodTemplate")));
-        map.put(UpdateMultiCache.class, new Pair<String, List<String>>("um", Arrays.asList("Bad1", "Good", "GoodTemplate")));
+        map.put(UpdateSingleCache.class, new Pair<String, List<String>>("us", Arrays.asList("Bad1", "BadJitter", "Good", "GoodTemplate")));
+        map.put(UpdateMultiCache.class, new Pair<String, List<String>>("um", Arrays.asList("Bad1", "BadJitter", "Good", "GoodTemplate")));
 
         for (Map.Entry<Class, Pair<String, List<String>>> entry : map.entrySet()) {
             final Class clazz = entry.getKey();
@@ -58,7 +58,7 @@ public class AnnotationDataBuilderTest {
 //                System.out.println(id);
                 final Method method = new Mirror().on(ExampleClass.class).reflect().method(name).withAnyArgs();
                 try {
-                    final AnnotationData data = AnnotationDataBuilder.buildAnnotationData(method.getAnnotation(clazz), clazz, method.getName());
+                    final AnnotationData data = AnnotationDataBuilder.buildAnnotationData(method.getAnnotation(clazz), clazz, method.getName(), 0);
                     if (!StringUtils.contains(suffix, "Good")) {
                         fail("Expected exception for " + id);
                     } else {
@@ -84,6 +84,9 @@ public class AnnotationDataBuilderTest {
         @UpdateMultiCache(namespace="A", dataIndex=-1, keyTemplate=TMPL)
         public String umBad1(final Long id, final String alt) { return ""; }
 
+        @UpdateMultiCache(namespace="A", dataIndex=-1, keyIndex=1, jitter = -2)
+        public String umBadJitter(final Long id, final String alt) { return ""; }
+
         @UpdateMultiCache(namespace="A", dataIndex=-1, keyIndex=1)
         public String umGood(final Long id, final String alt) { return ""; }
 
@@ -93,6 +96,9 @@ public class AnnotationDataBuilderTest {
 
         @UpdateSingleCache(namespace="A", dataIndex=-1, keyIndex=-1, keyTemplate=TMPL)
         public String usBad1(final Long id, final String alt) { return ""; }
+
+        @UpdateSingleCache(namespace="A", dataIndex=-1, keyIndex=1, jitter = 100)
+        public String usBadJitter(final Long id, final String alt) { return ""; }
 
         @UpdateSingleCache(namespace="A", dataIndex=-1, keyIndex=1)
         public String usGood(final Long id, final String alt) { return ""; }
@@ -136,6 +142,9 @@ public class AnnotationDataBuilderTest {
         @ReadThroughMultiCache(namespace="A", expiration=123, keyIndex=0, keyTemplate=TMPL)
         public List<String> rtmGoodTemplate(final Long id, final String alt) { return Collections.EMPTY_LIST; }
 
+        @ReadThroughMultiCache(namespace="A", expiration=123, keyIndex=1, jitter = -1)
+        public List<String> rtmGoodJitter(final Long id, final String alt) { return Collections.EMPTY_LIST; }
+
 
         @ReadThroughSingleCache(namespace="A", expiration=123, keyIndex = 0, keyTemplate=TMPL)
         public String rtsBad1(final Long id, final String alt) { return ""; }
@@ -151,5 +160,8 @@ public class AnnotationDataBuilderTest {
 
         @ReadThroughSingleCache(namespace="A", expiration=123, keyTemplate=TMPL)
         public String rtsGoodTemplate(final Long id, final String alt) { return ""; }
+
+        @ReadThroughSingleCache(namespace="A", expiration=123, keyIndex=1, jitter = 99)
+        public String rtsGoodJitter(final Long id, final String alt) { return ""; }
     }
 }

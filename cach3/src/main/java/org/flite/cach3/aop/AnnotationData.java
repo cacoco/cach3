@@ -1,5 +1,6 @@
 package org.flite.cach3.aop;
 
+import org.apache.commons.lang.math.*;
 import org.flite.cach3.annotations.*;
 
 /**
@@ -24,6 +25,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
 class AnnotationData {
+
+    /*default*/ static final int JITTER_BOUND = 60 * 60 * 24 * 30;
+
     private String namespace = "";
     private int keyIndex = AnnotationConstants.DEFAULT_KEY_INDEX;
     private int dataIndex = Integer.MIN_VALUE;
@@ -32,6 +36,7 @@ class AnnotationData {
     private String assignedKey = "";
     private String keyPrefix = null;
     private String keyTemplate = null;
+    private int jitter = 0;
 
     public String getNamespace() {
         return namespace;
@@ -95,5 +100,22 @@ class AnnotationData {
 
     public void setKeyTemplate(String keyTemplate) {
         this.keyTemplate = keyTemplate;
+    }
+
+    public int getJitter() {
+        return jitter;
+    }
+
+    public void setJitter(int jitter) {
+        this.jitter = jitter;
+    }
+
+    public int getJitteredExpiration() {
+        if (jitter <= 0 || jitter > 99) { return expiration; }
+        if (expiration >= JITTER_BOUND) { return expiration; }
+
+        final double seed = RandomUtils.nextDouble() * expiration * jitter;
+        final int difference = (int) Math.floor(seed/100);
+        return (expiration - difference);
     }
 }

@@ -63,7 +63,8 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
             annotationData =
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             ReadThroughAssignCache.class,
-                            methodToCache.getName());
+                            methodToCache.getName(),
+                            getJitterDefault());
             cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
             final Object result = cache.get(cacheKey);
             if (result != null) {
@@ -81,7 +82,7 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
         // but do not let it surface up past the AOP injection itself.
         try {
             final Object submission = (result == null) ? new PertinentNegativeNull() : result;
-            cache.set(cacheKey, annotationData.getExpiration(), submission);
+            cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
 
             // Notify the observers that a cache interaction happened.
             final List<ReadThroughAssignCacheListener> listeners = getPertinentListeners(ReadThroughAssignCacheListener.class,annotationData.getNamespace());

@@ -32,7 +32,8 @@ class AnnotationDataBuilder {
 
     static AnnotationData buildAnnotationData(final Annotation annotation,
                                               final Class expectedAnnotationClass,
-                                              final String targetMethodName) {
+                                              final String targetMethodName,
+                                              final int jitterDefault) {
         final AnnotationData data = new AnnotationData();
 
         if (annotation == null) {
@@ -143,6 +144,17 @@ class AnnotationDataBuilder {
                     ));
                 }
                 data.setExpiration(expiration);
+
+                final Method jitterMethod = clazz.getDeclaredMethod("jitter", null);
+                final int jitter = (Integer) jitterMethod.invoke(annotation, null);
+                if (jitter < -1 || jitter > 99) {
+                    throw new InvalidParameterException(String.format(
+                            "Jitter for annotation [%s] must be -1 <= jitter <= 99 on [%s]",
+                            expectedAnnotationClass.getName(),
+                            targetMethodName
+                    ));
+                }
+                data.setJitter(jitter == -1 ? jitterDefault : jitter);
             }
 
             final Method namespaceMethod = clazz.getDeclaredMethod("namespace", null);

@@ -68,7 +68,8 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
             annotationData =
                     AnnotationDataBuilder.buildAnnotationData(annotation,
                             ReadThroughSingleCache.class,
-                            methodToCache.getName());
+                            methodToCache.getName(),
+                            getJitterDefault());
 			baseKey = generateBaseKeySingle(args, annotationData, methodToCache.toString());
             cacheKey = buildCacheKey(baseKey, annotationData);
 			final Object result = cache.get(cacheKey);

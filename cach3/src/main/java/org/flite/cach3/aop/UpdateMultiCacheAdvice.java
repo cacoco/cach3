@@ -1,15 +1,13 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
-import org.apache.commons.logging.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
-import org.flite.cach3.annotations.groups.UpdateMultiCaches;
+import org.flite.cach3.annotations.groups.*;
 import org.flite.cach3.api.*;
 import org.flite.cach3.exceptions.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 import org.springframework.core.*;
 import org.springframework.core.annotation.*;
 
@@ -96,7 +94,8 @@ public class UpdateMultiCacheAdvice extends CacheBase {
                 // but do not let it surface up past the AOP injection itself.
                 final AnnotationData annotationData =
                         AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
-                                UpdateMultiCache.class, methodToCache.getName());
+                                UpdateMultiCache.class, methodToCache.getName(),
+                                getJitterDefault());
                 final List<Object> dataList = (List<Object>) getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());
                 final List<Object> keyObjects = getKeyObjects(annotationData.getKeyIndex(), retVal, jp, methodToCache);
                 final List<String> baseKeys = getBaseKeys(keyObjects, annotationData, retVal, jp.getArgs());
@@ -141,7 +140,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 			final Object result = returnList.get(ix);
 			final String cacheKey = cacheKeys.get(ix);
 			final Object cacheObject = result != null ? result : new PertinentNegativeNull();
-			cache.set(cacheKey, annotationData.getExpiration(), cacheObject);
+			cache.set(cacheKey, annotationData.getJitteredExpiration(), cacheObject);
 		}
 	}
 
