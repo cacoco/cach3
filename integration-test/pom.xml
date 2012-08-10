@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.flite</groupId>
     <artifactId>cach3-parent</artifactId>
-    <version>0.7.1</version>
+    <version>0.8</version>
   </parent>
   <artifactId>integration-test</artifactId>
   <packaging>jar</packaging>
@@ -53,11 +53,6 @@
     </dependency>
 
     <!--test-->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring.jar.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>

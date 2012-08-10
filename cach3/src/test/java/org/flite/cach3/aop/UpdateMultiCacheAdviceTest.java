@@ -75,6 +75,8 @@ public class UpdateMultiCacheAdviceTest {
             public MemcachedClientIF getMemcachedClient() {
                 return cache;
             }
+
+            public void refreshConnection() { }
         });
 
         final List<String> keys = new ArrayList<String>();

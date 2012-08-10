@@ -1,8 +1,8 @@
 package org.flite.cach3.api.impl;
 
-import com.sun.corba.se.impl.orb.DataCollectorFactory;
 import net.spy.memcached.*;
-import org.flite.cach3.api.MemcachedClientProvider;
+import org.flite.cach3.api.*;
+import org.slf4j.*;
 
 /**
  * Copyright (c) 2011-2012 Flite, Inc
@@ -26,15 +26,30 @@ import org.flite.cach3.api.MemcachedClientProvider;
  * THE SOFTWARE.
  */
 public class DefaultMemcachedCacheProviderImpl implements MemcachedClientProvider {
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultMemcachedCacheProviderImpl.class);
 
+    private boolean useConsistentHashing;
+    private String nodeList = null;
     private MemcachedClientIF client;
 
     public DefaultMemcachedCacheProviderImpl(final boolean useConsistentHashing, final String nodeList) throws Exception {
-        final ConnectionFactory cf = useConsistentHashing ? new KetamaConnectionFactory() : new DefaultConnectionFactory();
-        this.client = new MemcachedClient(cf, AddrUtil.getAddresses(nodeList));
+        this.useConsistentHashing = useConsistentHashing;
+        this.nodeList = nodeList;
+        refreshConnection();
     }
 
     public MemcachedClientIF getMemcachedClient() {
         return this.client;
+    }
+
+    public void refreshConnection() {
+        try {
+            LOG.info("Creating a new connection to the memcached server(s)");
+            final ConnectionFactory cf = useConsistentHashing ? new KetamaConnectionFactory() : new DefaultConnectionFactory();
+            this.client = new MemcachedClient(cf, AddrUtil.getAddresses(nodeList));
+        } catch (Exception ex) {
+            LOG.error("Problem creating a new connection!", ex);
+            throw new RuntimeException(ex);
+        }
     }
 }

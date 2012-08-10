@@ -5,6 +5,7 @@ import org.flite.cach3.api.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.*;
 import org.springframework.context.*;
+import org.springframework.jmx.export.annotation.*;
 
 import java.security.*;
 import java.util.*;
@@ -30,6 +31,7 @@ import java.util.*;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+@ManagedResource
 public class Cach3State implements ApplicationContextAware, InitializingBean {
     private static final Logger LOG = LoggerFactory.getLogger(Cach3State.class);
 
@@ -90,23 +92,32 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
         }
     }
 
+    @ManagedAttribute
     public boolean isCacheDisabled() {
         return cacheDisabled || provider == null;
     }
 
+    @ManagedAttribute
     public void setCacheDisabled(boolean cacheDisabled) {
         this.cacheDisabled = cacheDisabled;
     }
 
+    @ManagedAttribute
     public int getJitterDefault() {
         return jitterDefault;
     }
 
+    @ManagedAttribute
     public void setJitterDefault(int jitterDefault) {
         if (jitterDefault < 0 || jitterDefault > 99) {
             throw new InvalidParameterException("Parameter 'jitterDefault' must be between 0 and 99.");
         }
         this.jitterDefault = jitterDefault;
+    }
+
+    @ManagedOperation
+    public void refreshConnection() {
+        if (provider != null) { provider.refreshConnection(); }
     }
 
     public void addListener(final CacheListener listener) {

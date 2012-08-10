@@ -25,4 +25,9 @@ THE SOFTWARE.
  */
 public interface MemcachedClientProvider {
     MemcachedClientIF getMemcachedClient();
+
+    /**
+     * This command tells the provider to re-connect all MemcachedClients it manages.
+     */
+    void refreshConnection();
 }
