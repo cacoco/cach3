@@ -44,6 +44,8 @@ public class ConfigurationHelperTest {
             public MemcachedClientIF getMemcachedClient() {
                 return null;
             }
+
+            public void refreshConnection() { }
         });
 
         for (int ix = 0; ix < 3; ix++) {
@@ -65,6 +67,8 @@ public class ConfigurationHelperTest {
             public MemcachedClientIF getMemcachedClient() {
                 return null;
             }
+
+            public void refreshConnection() { }
         });
 
         for (int ix = 0; ix < 3; ix++) {

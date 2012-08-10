@@ -3,7 +3,6 @@ package org.flite.cach3.api.impl;
 import net.spy.memcached.*;
 import org.flite.cach3.api.*;
 import org.slf4j.*;
-import org.springframework.jmx.export.annotation.*;
 
 /**
  * Copyright (c) 2011-2012 Flite, Inc
@@ -26,7 +25,6 @@ import org.springframework.jmx.export.annotation.*;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@ManagedResource
 public class DefaultMemcachedCacheProviderImpl implements MemcachedClientProvider {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultMemcachedCacheProviderImpl.class);
 
@@ -44,10 +42,14 @@ public class DefaultMemcachedCacheProviderImpl implements MemcachedClientProvide
         return this.client;
     }
 
-    @ManagedOperation
-    public void refreshConnection() throws Exception {
-        LOG.info("Creating a new connection to the memcached server(s)");
-        final ConnectionFactory cf = useConsistentHashing ? new KetamaConnectionFactory() : new DefaultConnectionFactory();
-        this.client = new MemcachedClient(cf, AddrUtil.getAddresses(nodeList));
+    public void refreshConnection() {
+        try {
+            LOG.info("Creating a new connection to the memcached server(s)");
+            final ConnectionFactory cf = useConsistentHashing ? new KetamaConnectionFactory() : new DefaultConnectionFactory();
+            this.client = new MemcachedClient(cf, AddrUtil.getAddresses(nodeList));
+        } catch (Exception ex) {
+            LOG.error("Problem creating a new connection!", ex);
+            throw new RuntimeException(ex);
+        }
     }
 }

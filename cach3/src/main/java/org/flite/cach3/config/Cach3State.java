@@ -115,6 +115,11 @@ public class Cach3State implements ApplicationContextAware, InitializingBean {
         this.jitterDefault = jitterDefault;
     }
 
+    @ManagedOperation
+    public void refreshConnection() {
+        if (provider != null) { provider.refreshConnection(); }
+    }
+
     public void addListener(final CacheListener listener) {
         if (listener == null) { return; }
 

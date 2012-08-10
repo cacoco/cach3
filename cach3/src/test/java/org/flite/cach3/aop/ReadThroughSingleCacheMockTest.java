@@ -61,6 +61,8 @@ public class ReadThroughSingleCacheMockTest {
             public MemcachedClientIF getMemcachedClient() {
                 return cache;
             }
+
+            public void refreshConnection() { }
         });
 	}
 
