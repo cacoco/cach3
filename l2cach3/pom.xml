@@ -1,17 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <!--<parent>-->
-    <!--<groupId>org.flite</groupId>-->
     <!--<artifactId>cach3-parent</artifactId>-->
-    <!--<version>0.X-SNAPSHOT</version>-->
+    <!--<groupId>org.flite</groupId>-->
+    <!--<version>0.8</version>-->
   <!--</parent>-->
 
   <groupId>org.flite</groupId>
-  <artifactId>cach3</artifactId>
+  <artifactId>l2cach3</artifactId>
   <version>0.9-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>cach3</name>
+  <name>l2cach3</name>
   <url>https://github.com/flite/cach3</url>
 
   <properties>
@@ -22,53 +23,7 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>${spring.jar.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring.jar.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjrt</artifactId>
-      <version>${aspectj.jar.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjweaver</artifactId>
-      <version>${aspectj.jar.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.6.4</version>
-    </dependency>
-    <dependency>
-      <groupId>spy</groupId>
-      <artifactId>memcached</artifactId>
-      <version>2.7.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity</artifactId>
-      <version>1.7</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
-      <scope>provided</scope>
-    </dependency>
+
 
     <dependency>
       <groupId>org.testng</groupId>
@@ -77,33 +32,8 @@
       <scope>test</scope>
 	    <classifier>jdk15</classifier>
     </dependency>
-	  <dependency>
-	    <groupId>org.easymock</groupId>
-	    <artifactId>easymock</artifactId>
-	    <version>3.0</version>
-	    <scope>test</scope>
-	  </dependency>
-    <dependency>
-      <groupId>net.vidageek</groupId>
-      <artifactId>mirror</artifactId>
-      <version>1.6.1</version>
-      <scope>test</scope>
-    </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.slf4j</groupId>-->
-      <!--<artifactId>slf4j-log4j12</artifactId>-->
-      <!--<version>1.6.4</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>log4j</groupId>-->
-      <!--<artifactId>log4j</artifactId>-->
-      <!--<version>1.2.16</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
 
   </dependencies>
-
 
   <build>
     <plugins>
