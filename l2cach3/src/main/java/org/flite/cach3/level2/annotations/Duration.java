@@ -1,0 +1,21 @@
+package org.flite.cach3.level2.annotations;
+
+/**
+ * Copyright (c) 2013 Flite, Inc
+ * <p/>
+ * All rights reserved.
+ * THIS PROGRAM IS CONFIDENTIAL AND AN UNPUBLISHED WORK AND TRADE
+ * SECRET OF THE COPYRIGHT HOLDER, AND DISTRIBUTED ONLY UNDER RESTRICTION.
+ */
+
+public enum Duration {
+    ONE_SECOND,
+    FIVE_SECONDS,
+    TEN_SECONDS,
+    FIFTEEN_SECONDS,
+    THIRTY_SECONDS,
+    ONE_MINUTE,
+    NINETY_SECONDS,
+    TWO_MINUTES,
+    FIVE_MINUTES;
+}
