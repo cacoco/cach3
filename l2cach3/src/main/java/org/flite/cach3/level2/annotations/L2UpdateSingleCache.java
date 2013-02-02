@@ -1,5 +1,7 @@
 package org.flite.cach3.level2.annotations;
 
+import java.lang.annotation.*;
+
 /**
  * Copyright (c) 2013 Flite, Inc
  * <p/>
@@ -8,5 +10,7 @@ package org.flite.cach3.level2.annotations;
  * SECRET OF THE COPYRIGHT HOLDER, AND DISTRIBUTED ONLY UNDER RESTRICTION.
  */
 
-public class L2UpdateSingleCache {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface L2UpdateSingleCache {
 }

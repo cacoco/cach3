@@ -9,4 +9,13 @@ package org.flite.cach3.level2.annotations;
  */
 
 public enum Duration {
+    ONE_SECOND,
+    FIVE_SECONDS,
+    TEN_SECONDS,
+    FIFTEEN_SECONDS,
+    THIRTY_SECONDS,
+    ONE_MINUTE,
+    NINETY_SECONDS,
+    TWO_MINUTES,
+    FIVE_MINUTES;
 }
