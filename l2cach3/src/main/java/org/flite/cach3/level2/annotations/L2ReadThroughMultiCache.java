@@ -22,6 +22,8 @@
 
 package org.flite.cach3.level2.annotations;
 
+import org.flite.cach3.annotations.AnnotationConstants;
+
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -65,7 +67,7 @@ public @interface L2ReadThroughMultiCache {
      * of the value in the cache.
      *
      */
-    Duration expiration() default null;
+    Duration expiration() default Duration.UNDEFINED;
 
     /**
      * An optional String prefix that will be pre-pended to the id returned by the object

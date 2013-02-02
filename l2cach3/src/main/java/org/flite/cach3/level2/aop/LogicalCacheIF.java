@@ -22,11 +22,13 @@
 
 package org.flite.cach3.level2.aop;
 
-import org.aspectj.lang.annotation.*;
-import org.springframework.core.*;
-import org.springframework.core.annotation.*;
+import org.flite.cach3.level2.annotations.Duration;
 
-@Aspect
-@Order((Ordered.HIGHEST_PRECEDENCE / 2) - 10)
-public class L2UpdateAssignCacheAdvice extends L2CacheBase {
+import java.util.Collection;
+import java.util.Map;
+
+public interface LogicalCacheIF {
+
+    Map<String,Object> getBulk(Collection<String> strings, Duration duration);
+
 }

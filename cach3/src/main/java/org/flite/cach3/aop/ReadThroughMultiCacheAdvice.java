@@ -30,6 +30,7 @@ import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.api.*;
+import org.flite.cach3.config.VelocityContextFactory;
 import org.flite.cach3.exceptions.*;
 import org.slf4j.*;
 import org.springframework.core.*;
@@ -149,15 +150,30 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 	protected MapHolder convertIdObjectsToKeyMap(final List<Object> idObjects,
 	                                              final AnnotationData data,
                                                   final Object[] args) throws Exception {
-		final MapHolder holder = new MapHolder();
+        return convertIdObjectsToKeyMap(idObjects,
+                data.getNamespace(),
+                data.getKeyPrefix(),
+                data.getKeyTemplate(),
+                factory,
+                methodStore,
+                args);
+	}
+
+    public static MapHolder convertIdObjectsToKeyMap(final List<Object> idObjects,
+                                                 final String namespace,
+                                                 final String prefix,
+                                                 final String template,
+                                                 final VelocityContextFactory factory,
+                                                 final CacheKeyMethodStore methodStore,
+                                                 final Object[] args) throws Exception {
+        final MapHolder holder = new MapHolder();
         for (int ix = 0; ix < idObjects.size(); ix++) {
             final Object obj = idObjects.get(ix);
-			if (obj == null) { throw new InvalidParameterException("One of the passed in key objects is null"); }
+            if (obj == null) { throw new InvalidParameterException("One of the passed in key objects is null"); }
 
-            final String template = data.getKeyTemplate();
             final String base;
             if (StringUtils.isBlank(template)) {
-                final Method method = getKeyMethod(obj);
+                final Method method = getKeyMethod(obj,methodStore);
                 base = generateObjectId(method, obj);
             } else {
                 final VelocityContext context = factory.getNewExtendedContext();
@@ -166,25 +182,25 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
                 context.put("indexObject", obj);
 
                 final StringWriter writer = new StringWriter(250);
-                Velocity.evaluate(context, writer, this.getClass().getSimpleName() , template);
+                Velocity.evaluate(context, writer, ReadThroughMultiCacheAdvice.class.getSimpleName() , template);
                 base = writer.toString();
                 if (template.equals(base)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
             }
-            final String key = buildCacheKey(base,data);
+            final String key = buildCacheKey(base, namespace, prefix);
 
-			if (holder.getObj2Key().get(obj) == null) {
-				holder.getObj2Key().put(obj, key);
+            if (holder.getObj2Key().get(obj) == null) {
+                holder.getObj2Key().put(obj, key);
                 holder.getObj2Base().put(obj, base);
-			}
-			if (holder.getKey2Obj().get(key) == null) {
-				holder.getKey2Obj().put(key, obj);
-			}
-		}
+            }
+            if (holder.getKey2Obj().get(key) == null) {
+                holder.getKey2Obj().put(key, obj);
+            }
+        }
 
-		return holder;
-	}
+        return holder;
+    }
 
-	protected List<Object> getKeyObjectList(final int keyIndex,
+    public static List<Object> getKeyObjectList(final int keyIndex,
 	                                            final JoinPoint jp,
 	                                            final Method method) throws Exception {
         final Object keyObjects = getIndexObject(keyIndex, jp.getArgs(), method.toString());
@@ -199,7 +215,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 		));
 	}
 
-	static class MapHolder {
+	public static class MapHolder {
 		final Map<String, Object> key2Obj = new HashMap<String, Object>();
 		final Map<Object, String> obj2Key = new HashMap<Object, String>();
         final Map<Object, String> obj2Base = new HashMap<Object, String>();
@@ -217,7 +233,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
         }
     }
 
-	static class MultiCacheCoordinator {
+	public static class MultiCacheCoordinator {
 		private Method method;
 //		private ReadThroughMultiCache annotation;
         private AnnotationData annotationData;

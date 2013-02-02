@@ -68,7 +68,7 @@ public class CacheBase {
 		this.methodStore = methodStore;
 	}
 
-	protected Method getMethodToCache(final JoinPoint jp) throws NoSuchMethodException {
+	public static Method getMethodToCache(final JoinPoint jp) throws NoSuchMethodException {
 		final Signature sig = jp.getSignature();
 		if (!(sig instanceof MethodSignature)) {
 			throw new InvalidAnnotationException("This annotation is only valid on a method.");
@@ -78,7 +78,7 @@ public class CacheBase {
 		return target.getClass().getMethod(msig.getName(), msig.getParameterTypes());
 	}
 
-	protected static String generateObjectId(final Method keyMethod, final Object keyObject) throws Exception {
+	public static String generateObjectId(final Method keyMethod, final Object keyObject) throws Exception {
 		final String objectId = (String) keyMethod.invoke(keyObject, null);
 		if (objectId == null || objectId.length() < 1) {
 			throw new RuntimeException("Got an empty key value from " + keyMethod.getName());
@@ -88,12 +88,16 @@ public class CacheBase {
 
     protected static final char[] WS = new char[] {' ', '\n', '\t'};
     protected static String buildCacheKey(final String objectId, final AnnotationData data) {
+        return buildCacheKey(objectId, data.getNamespace(), data.getKeyPrefix());
+    }
+
+    public static String buildCacheKey(final String objectId, final String namespace, final String prefix) {
         if (objectId == null || objectId.length() < 1) {
             throw new InvalidParameterException("Ids for objects in the cache must be at least 1 character long.");
         }
-        final StringBuilder result = new StringBuilder(data.getNamespace()).append(SEPARATOR);
-        if (StringUtils.isNotBlank(data.getKeyPrefix())) {
-            result.append(data.getKeyPrefix());
+        final StringBuilder result = new StringBuilder(namespace).append(SEPARATOR);
+        if (StringUtils.isNotBlank(prefix)) {
+            result.append(prefix);
         }
         result.append(objectId);
         if (result.length() > 255) {
@@ -156,46 +160,50 @@ public class CacheBase {
 	}
 
 	protected Method getKeyMethod(final Object keyObject) throws NoSuchMethodException {
-		final Method storedMethod = methodStore.find(keyObject.getClass());
-		if (storedMethod != null) { return storedMethod; }
-		final Method[] methods = keyObject.getClass().getDeclaredMethods();
-		Method targetMethod = null;
-		for (final Method method : methods) {
-			if (method != null && method.getAnnotation(CacheKeyMethod.class) != null) {
-				if (method.getParameterTypes().length > 0) {
-					throw new InvalidAnnotationException(String.format(
-							"Method [%s] must have 0 arguments to be annotated with [%s]",
-							method.toString(),
-							CacheKeyMethod.class.getName()));
-				}
-				if (!String.class.equals(method.getReturnType())) {
-					throw new InvalidAnnotationException(String.format(
-							"Method [%s] must return a String to be annotated with [%s]",
-							method.toString(),
-							CacheKeyMethod.class.getName()));
-				}
-				if (targetMethod != null) {
-					throw new InvalidAnnotationException(String.format(
-							"Class [%s] should have only one method annotated with [%s]. See [%s] and [%s]",
-							keyObject.getClass().getName(),
-							CacheKeyMethod.class.getName(),
-							targetMethod.getName(),
-							method.getName()));
-				}
-				targetMethod = method;
-			}
-		}
-
-		if (targetMethod == null) {
-			targetMethod = keyObject.getClass().getMethod("toString", null);
-		}
-
-		methodStore.add(keyObject.getClass(), targetMethod);
-
-		return targetMethod;
+        return getKeyMethod(keyObject, methodStore);
 	}
 
-	protected void verifyReturnTypeIsList(final Method method, final Class annotationClass) {
+    public static Method getKeyMethod(final Object keyObject, final CacheKeyMethodStore methodStore) throws NoSuchMethodException {
+        final Method storedMethod = methodStore.find(keyObject.getClass());
+        if (storedMethod != null) { return storedMethod; }
+        final Method[] methods = keyObject.getClass().getDeclaredMethods();
+        Method targetMethod = null;
+        for (final Method method : methods) {
+            if (method != null && method.getAnnotation(CacheKeyMethod.class) != null) {
+                if (method.getParameterTypes().length > 0) {
+                    throw new InvalidAnnotationException(String.format(
+                            "Method [%s] must have 0 arguments to be annotated with [%s]",
+                            method.toString(),
+                            CacheKeyMethod.class.getName()));
+                }
+                if (!String.class.equals(method.getReturnType())) {
+                    throw new InvalidAnnotationException(String.format(
+                            "Method [%s] must return a String to be annotated with [%s]",
+                            method.toString(),
+                            CacheKeyMethod.class.getName()));
+                }
+                if (targetMethod != null) {
+                    throw new InvalidAnnotationException(String.format(
+                            "Class [%s] should have only one method annotated with [%s]. See [%s] and [%s]",
+                            keyObject.getClass().getName(),
+                            CacheKeyMethod.class.getName(),
+                            targetMethod.getName(),
+                            method.getName()));
+                }
+                targetMethod = method;
+            }
+        }
+
+        if (targetMethod == null) {
+            targetMethod = keyObject.getClass().getMethod("toString", null);
+        }
+
+        methodStore.add(keyObject.getClass(), targetMethod);
+
+        return targetMethod;
+    }
+
+    public static void verifyReturnTypeIsList(final Method method, final Class annotationClass) {
 		if (verifyTypeIsList(method.getReturnType())) { return; }
 		throw new InvalidAnnotationException(String.format(
 				"The annotation [%s] is only valid on a method that returns a [%s]. " +

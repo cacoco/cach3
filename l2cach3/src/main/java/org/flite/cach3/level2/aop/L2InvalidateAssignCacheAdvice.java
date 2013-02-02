@@ -27,7 +27,7 @@ import org.springframework.core.*;
 import org.springframework.core.annotation.*;
 
 @Aspect
-@Order((Ordered.HIGHEST_PRECEDENCE / 2) - 1)
-public class L2InvalidateAssignCacheAdvice {
+@Order((Ordered.HIGHEST_PRECEDENCE / 2) - 10)
+public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
 
 }

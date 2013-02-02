@@ -82,22 +82,22 @@ public class CacheBaseTest {
 
 	@Test
 	public void testBuildCacheKey() {
-		try {
-			cut.buildCacheKey(null, (AnnotationData) null);
-			fail("Expected exception.");
-		} catch (InvalidParameterException ex) {
-			assertTrue(ex.getMessage().indexOf("at least 1 character") != -1);
-		}
-
-		try {
-			cut.buildCacheKey("", (AnnotationData) null);
-			fail("Expected exception.");
-		} catch (InvalidParameterException ex) {
-			assertTrue(ex.getMessage().indexOf("at least 1 character") != -1);
-		}
-
         final AnnotationData annotationData = new AnnotationData();
         annotationData.setNamespace(RandomStringUtils.randomAlphanumeric(235));
+
+		try {
+			cut.buildCacheKey(null, annotationData);
+			fail("Expected exception.");
+		} catch (InvalidParameterException ex) {
+			assertTrue(ex.getMessage().indexOf("at least 1 character") != -1);
+		}
+
+		try {
+			cut.buildCacheKey("", annotationData);
+			fail("Expected exception.");
+		} catch (InvalidParameterException ex) {
+			assertTrue(ex.getMessage().indexOf("at least 1 character") != -1);
+		}
 
         final String space = RandomStringUtils.randomAlphanumeric(8) + " " + RandomStringUtils.randomAlphanumeric(8);
         try {
