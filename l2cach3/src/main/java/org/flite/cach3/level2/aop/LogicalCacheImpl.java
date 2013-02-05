@@ -24,38 +24,79 @@ package org.flite.cach3.level2.aop;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.flite.cach3.aop.*;
 import org.flite.cach3.level2.annotations.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.*;
 
 import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class LogicalCacheImpl implements LogicalCacheIF {
+public class LogicalCacheImpl implements LogicalCacheIF, InitializingBean {
     private static final Logger LOG = LoggerFactory.getLogger(LogicalCacheImpl.class);
 
-    final Cache<String, Duration> nanny;
+    private Cache<String, Duration> nanny;
+    private Map<Duration, Cache<String, Object>> caches = new HashMap<Duration, Cache<String, Object>>(10);
 
-    public LogicalCacheImpl() {
+    public void afterPropertiesSet() throws Exception {
         this.nanny = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(5, TimeUnit.MINUTES).build();
+
+        // TODO: Refactor to use a configurable set of cache sizes.
+        for (final Duration duration : EnumSet.complementOf(EnumSet.of(Duration.UNDEFINED))) {
+            final Cache<String, Object> single = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MILLISECONDS).build();
+            caches.put(duration, single);
+        }
     }
 
+    /**
+     * Returns only the id & object pairs that are actually in the cache.
+     * @param ids
+     * @param duration
+     * @return
+     */
     public Map<String, Object> getBulk(Collection<String> ids, Duration duration) {
-        if (Duration.UNDEFINED == duration) { throw new InvalidParameterException("UNDEFINED is not an allowed value"); }
+        if (duration == null || Duration.UNDEFINED == duration) { throw new InvalidParameterException("UNDEFINED is not an allowed value"); }
         warnOfDuplication(ids, duration);
 
-        throw new RuntimeException("Not Yet Implemented!");
-//        return null;
+        final Map<String, Object> partial = caches.get(duration).getAllPresent(ids);
+        if (partial.size() == 0) { return partial; }
+
+        final Map<String, Object> results = new HashMap<String, Object>(partial.size());
+        for (Map.Entry<String, Object> entry : partial.entrySet()) {
+            final Object value = entry.getValue() instanceof PertinentNegativeNull ? null : entry.getValue();
+            results.put(entry.getKey(), value);
+        }
+        return results;
     }
 
-    /*default*/ static final String ERROR = "WARNING! Conflicting expiration durations for a given key will result in " +
+    public void setBulk(Map<String, Object> contents, Duration duration) {
+        setBulk(contents, duration, true);
+    }
+
+    public void setBulk(Map<String, Object> contents, Duration duration, boolean checkIds) {
+        if (duration == null || Duration.UNDEFINED == duration) { throw new InvalidParameterException("UNDEFINED is not an allowed value"); }
+        if (contents.size() == 0) { return; }
+
+        if (checkIds) { warnOfDuplication(contents.keySet(), duration); }
+
+        final Cache<String, Object> cache = caches.get(duration);
+        for (final Map.Entry<String, Object> entry : contents.entrySet()) {
+            final String key = entry.getKey();
+            final Object value = entry.getValue() == null ? new PertinentNegativeNull() : entry.getValue();
+            nanny.put(key, duration);
+            cache.put(key, value);
+        }
+    }
+    
+    /*default*/ static final String WARNING = "WARNING! Conflicting expiration durations for a given key will result in " +
             "duplicate cache entries. Evidence of conflicts found for the given key(s):";
     /*default*/ void warnOfDuplication(final Collection<String> ids, final Duration duration) {
         if (ids == null || ids.size() < 1) { return; }
         final Set<String> results = checkIdsForDuplication(ids, duration);
         if (results.size() > 0) {
-            final StringBuilder sb = new StringBuilder(ERROR);
+            final StringBuilder sb = new StringBuilder(WARNING);
             for (final String single : results) {
                 sb.append('\n').append(single);
             }
