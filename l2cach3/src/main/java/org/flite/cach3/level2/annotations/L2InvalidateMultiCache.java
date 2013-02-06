@@ -22,6 +22,8 @@
 
 package org.flite.cach3.level2.annotations;
 
+import org.flite.cach3.annotations.*;
+
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)

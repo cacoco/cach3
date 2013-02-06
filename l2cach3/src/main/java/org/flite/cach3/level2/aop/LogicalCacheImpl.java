@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 public class LogicalCacheImpl implements LogicalCacheIF, InitializingBean {
     private static final Logger LOG = LoggerFactory.getLogger(LogicalCacheImpl.class);
 
+    /*default*/ static final Set<Duration> DURATION_SET = EnumSet.complementOf(EnumSet.of(Duration.UNDEFINED));
     private Cache<String, Duration> nanny;
     private Map<Duration, Cache<String, Object>> caches = new HashMap<Duration, Cache<String, Object>>(10);
 
@@ -44,7 +45,7 @@ public class LogicalCacheImpl implements LogicalCacheIF, InitializingBean {
         this.nanny = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(5, TimeUnit.MINUTES).build();
 
         // TODO: Refactor to use a configurable set of cache sizes.
-        for (final Duration duration : EnumSet.complementOf(EnumSet.of(Duration.UNDEFINED))) {
+        for (final Duration duration : DURATION_SET) {
             final Cache<String, Object> single = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MILLISECONDS).build();
             caches.put(duration, single);
         }
@@ -89,19 +90,20 @@ public class LogicalCacheImpl implements LogicalCacheIF, InitializingBean {
             cache.put(key, value);
         }
     }
-    
+
     /*default*/ static final String WARNING = "WARNING! Conflicting expiration durations for a given key will result in " +
             "duplicate cache entries. Evidence of conflicts found for the given key(s):";
-    /*default*/ void warnOfDuplication(final Collection<String> ids, final Duration duration) {
-        if (ids == null || ids.size() < 1) { return; }
+    /*default*/ String warnOfDuplication(final Collection<String> ids, final Duration duration) {
+        if (ids == null || ids.size() < 1) { return null; }
         final Set<String> results = checkIdsForDuplication(ids, duration);
-        if (results.size() > 0) {
-            final StringBuilder sb = new StringBuilder(WARNING);
-            for (final String single : results) {
-                sb.append('\n').append(single);
-            }
-            LOG.warn(sb.toString());
+        if (results.size() == 0) { return null; }
+        final StringBuilder sb = new StringBuilder(WARNING);
+        for (final String single : results) {
+            sb.append('\n').append(single);
         }
+        final String resultString = sb.toString();
+        LOG.warn(resultString);
+        return resultString;
     }
 
     /*default*/ Set<String> checkIdsForDuplication(final Collection<String> ids, final Duration duration) {

@@ -25,7 +25,7 @@ package org.flite.cach3.aop;
 import org.apache.commons.lang.math.*;
 import org.flite.cach3.annotations.*;
 
-class AnnotationData {
+public class AnnotationData {
 
     /*default*/ static final int JITTER_BOUND = 60 * 60 * 24 * 30;
 

@@ -31,4 +31,8 @@ public interface LogicalCacheIF {
 
     Map<String,Object> getBulk(Collection<String> strings, Duration duration);
 
+    void setBulk(Map<String, Object> contents, Duration duration);
+
+    void setBulk(Map<String, Object> contents, Duration duration, boolean checkIds);
+
 }
