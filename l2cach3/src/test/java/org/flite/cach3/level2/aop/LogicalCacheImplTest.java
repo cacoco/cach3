@@ -23,6 +23,7 @@
 package org.flite.cach3.level2.aop;
 
 import org.apache.commons.lang.*;
+import org.apache.commons.lang.math.*;
 import org.easymock.*;
 import org.flite.cach3.level2.annotations.*;
 import org.testng.annotations.*;
@@ -93,7 +94,7 @@ public class LogicalCacheImplTest extends EasyMockSupport {
 //            System.out.println(notifyIds);
             assertEquals(putIds.size(), notifyIds.size());
             final String warningText = impl.warnOfDuplication(putIds, duration);
-            System.out.println(warningText);
+//            System.out.println(warningText);
             assertNotNull(warningText);
             for (final String id : putIds) {
                 assertTrue(warningText.contains(id));
@@ -101,11 +102,53 @@ public class LogicalCacheImplTest extends EasyMockSupport {
         }
 
         // And test the last little pre-expectations
-        assertNotNull(impl.checkIdsForDuplication(null, Duration.ONE_MINUTE));
-        assertNotNull(impl.checkIdsForDuplication(Collections.EMPTY_SET, Duration.ONE_MINUTE));
+        assertEquals(0, impl.checkIdsForDuplication(null, Duration.ONE_MINUTE).size());
+        assertEquals(0, impl.checkIdsForDuplication(Collections.EMPTY_SET, Duration.ONE_MINUTE).size());
         assertNull(impl.warnOfDuplication(null, Duration.FIVE_MINUTES));
         assertNull(impl.warnOfDuplication(Collections.EMPTY_LIST, Duration.FIVE_MINUTES));
+    }
 
+    @Test
+    public void testRoundTrip() {
+        final String prefix = "roundTrip-";
+
+        final Map<String, Object> submission = new HashMap<String, Object>();
+        final List<String> keys = new ArrayList<String>();
+        for (int ix = 0; ix < 25; ix++) {
+            final String key = prefix + RandomStringUtils.randomAlphanumeric(5 + ix%5);
+            keys.add(key);
+            submission.put(key, RandomUtils.nextBoolean() ? null : RandomStringUtils.randomAlphanumeric(2 + ix%7));
+        }
+
+        final Duration target = Duration.NINETY_SECONDS;
+        impl.setBulk(submission, target, false);
+
+        final Set<String> requests = new HashSet<String>();
+        Collections.shuffle(keys);
+        final int goodSize = 10, badSize = 5;
+        for (int ix = 0; ix < goodSize; ix++) { requests.add(keys.get(ix)); }
+        for (int ix = 0; ix < badSize; ix++) { requests.add(RandomStringUtils.randomAlphanumeric(9)); }
+
+        // Make sure there are NO hits for any other duration.
+        for (final Duration duration : LogicalCacheImpl.DURATION_SET) {
+            if (duration == target) { continue; }
+            final Map<String, Object> attempt = impl.getBulk(requests, duration);
+            assertNotNull(attempt);
+            assertEquals(0, attempt.size());
+        }
+
+        // Now get the subset of the data that is referenced.
+        final Map<String, Object> attempt = impl.getBulk(requests, target);
+        assertNotNull(attempt);
+        assertEquals(goodSize, attempt.size());
+        for (final String request : requests) {
+            if (!keys.contains(request)) {
+                assertFalse(attempt.containsKey(request));
+            } else {
+                assertTrue(attempt.containsKey(request));
+                assertEquals(submission.get(request), attempt.get(request));
+            }
+        }
     }
 
 }

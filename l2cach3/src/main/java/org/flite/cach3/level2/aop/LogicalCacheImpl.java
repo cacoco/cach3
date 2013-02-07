@@ -76,6 +76,11 @@ public class LogicalCacheImpl implements LogicalCacheIF, InitializingBean {
         setBulk(contents, duration, true);
     }
 
+    public void invalidateBulk(final Collection<String> ids) {
+        if (ids == null || ids.size() == 0) { return; }
+        throw new RuntimeException("NOT YET IMPLEMENTED!!");
+    }
+
     public void setBulk(Map<String, Object> contents, Duration duration, boolean checkIds) {
         if (duration == null || Duration.UNDEFINED == duration) { throw new InvalidParameterException("UNDEFINED is not an allowed value"); }
         if (contents.size() == 0) { return; }
