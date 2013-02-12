@@ -40,7 +40,7 @@
   <!--<bean id="cach3-velocityContextFactory" class="org.flite.cach3.config.VelocityContextFactory" />-->
 
   <bean id="l2cach3-readThroughMultiCache" class="org.flite.cach3.level2.aop.L2ReadThroughMultiCacheAdvice">
-    <!--<property name="methodStore" ref="methodStore" />-->
+    <property name="methodStore" ref="methodStore" />
     <!--<property name="state" ref="cach3-state" />-->
     <!--<property name="factory" ref="cach3-velocityContextFactory" />-->
   </bean>

@@ -88,5 +88,11 @@ public interface TestSvc {
     long funkySquare(long number);
     long funkyCube(long number);
 
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  L2 Multi cache methods.                                      * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+    public List<String> getL2MultiAlpha(List<Long> ids, String generation);
+
 }
 

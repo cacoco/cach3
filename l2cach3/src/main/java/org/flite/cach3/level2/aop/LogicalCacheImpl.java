@@ -72,20 +72,20 @@ public class LogicalCacheImpl implements LogicalCacheIF, InitializingBean {
         return results;
     }
 
-    public void setBulk(Map<String, Object> contents, Duration duration) {
-        setBulk(contents, duration, true);
-    }
-
     public void invalidateBulk(final Collection<String> ids) {
         if (ids == null || ids.size() == 0) { return; }
-        throw new RuntimeException("NOT YET IMPLEMENTED!!");
+
+        for (final Cache<String, Object> cache : caches.values()) {
+            if (cache != null) { cache.invalidateAll(ids); }
+        }
     }
 
-    public void setBulk(Map<String, Object> contents, Duration duration, boolean checkIds) {
+    public void setBulk(Map<String, Object> contents, Duration duration) {
         if (duration == null || Duration.UNDEFINED == duration) { throw new InvalidParameterException("UNDEFINED is not an allowed value"); }
         if (contents.size() == 0) { return; }
 
-        if (checkIds) { warnOfDuplication(contents.keySet(), duration); }
+        // Only do this on SET, because we want the GET to be super-optimized.
+        warnOfDuplication(contents.keySet(), duration);
 
         final Cache<String, Object> cache = caches.get(duration);
         for (final Map.Entry<String, Object> entry : contents.entrySet()) {

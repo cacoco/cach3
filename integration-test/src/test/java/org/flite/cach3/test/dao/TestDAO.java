@@ -96,4 +96,10 @@ public interface TestDAO {
     Long funkySquare(Long number);
     Long funkyCube(Long number);
 
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  L2 Multi cache methods.                                      * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+    public List<String> getL2MultiAlpha(List<Long> ids, String generation);
+
 }

@@ -161,4 +161,8 @@ public class TestSvcImpl implements TestSvc {
     public long funkyCube(long number) {
         return this.dao.funkyCube(number);
     }
+
+    public List<String> getL2MultiAlpha(List<Long> ids, String generation) {
+        return this.dao.getL2MultiAlpha(ids, generation);
+    }
 }

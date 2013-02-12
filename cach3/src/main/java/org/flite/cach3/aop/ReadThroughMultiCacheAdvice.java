@@ -61,6 +61,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 		// This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
 		// but do not let it surface up past the AOP injection itself.
 		final MultiCacheCoordinator coord = new MultiCacheCoordinator();
+        AnnotationData data;
 		Object [] args = pjp.getArgs();
 		try {
 			// Get the target method being invoked, and make sure it returns the correct info.
@@ -70,14 +71,14 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 			// Get the annotation associated with this method, and make sure the values are valid.
             final ReadThroughMultiCache annotation = coord.getMethod().getAnnotation(ReadThroughMultiCache.class);
 
-            coord.setAnnotationData(AnnotationDataBuilder.buildAnnotationData(
-                    annotation, ReadThroughMultiCache.class, coord.getMethod().getName(), getJitterDefault()));
+            data = AnnotationDataBuilder.buildAnnotationData(
+                    annotation, ReadThroughMultiCache.class, coord.getMethod().getName(), getJitterDefault());
 
 			// Get the list of objects that will provide the keys to all the cache values.
-			coord.setKeyObjects(getKeyObjectList(coord.getAnnotationData().getKeyIndex(), pjp, coord.getMethod()));
+			coord.setKeyObjects(getKeyObjectList(data.getKeyIndex(), pjp, coord.getMethod()));
 
 			// Create key->object and object->key mappings.
-			coord.setHolder(convertIdObjectsToKeyMap(coord.getKeyObjects(), coord.getAnnotationData(), args));
+			coord.setHolder(convertIdObjectsToKeyMap(coord.getKeyObjects(), data, args));
 
 			// Get the full list of cache keys and ask the cache for the corresponding values.
 			coord.setInitialKey2Result(cache.getBulk(coord.getKey2Obj().keySet()));
@@ -88,7 +89,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 			}
 
 			// Create the new list of arguments with a subset of the key objects that aren't in the cache.
-			args = coord.modifyArgumentList(args);
+			args = coord.modifyArgumentList(args, data.getKeyIndex());
 		} catch (Throwable ex) {
             // If there's an exception somewhere in the caching code, then just bail out
             // and call through to the target method with the original parameters.
@@ -117,19 +118,19 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 				final String cacheKey = coord.obj2Key.get(keyObject);
                 final String cacheBase = coord.obj2Base.get(keyObject);
 				cache.set(cacheKey,
-						coord.getAnnotationData().getJitteredExpiration(),
+						data.getJitteredExpiration(),
 						resultObject);
 				coord.getKey2Result().put(cacheKey, resultObject);
                 cacheBaseIds[ix] = cacheBase;
 			}
 
             // Notify the observers that a cache interaction happened.
-            final List<ReadThroughMultiCacheListener> listeners = getPertinentListeners(ReadThroughMultiCacheListener.class,coord.getAnnotationData().getNamespace());
+            final List<ReadThroughMultiCacheListener> listeners = getPertinentListeners(ReadThroughMultiCacheListener.class, data.getNamespace());
             if (listeners != null && !listeners.isEmpty()) {
                 for (final ReadThroughMultiCacheListener listener : listeners) {
                     try {
-                        listener.triggeredReadThroughMultiCache(coord.getAnnotationData().getNamespace(),
-                                coord.getAnnotationData().getKeyPrefix(),
+                        listener.triggeredReadThroughMultiCache(data.getNamespace(),
+                                data.getKeyPrefix(),
                                 Arrays.asList(cacheBaseIds),
                                 results,
                                 args);
@@ -235,8 +236,6 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 
 	public static class MultiCacheCoordinator {
 		private Method method;
-//		private ReadThroughMultiCache annotation;
-        private AnnotationData annotationData;
         private List<Object> keyObjects = new ArrayList<Object>();
 		private Map<String, Object> key2Obj = new HashMap<String, Object>();
 		private Map<Object, String> obj2Key = new HashMap<Object, String>();
@@ -251,14 +250,6 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 		public void setMethod(Method method) {
 			this.method = method;
 		}
-
-        public AnnotationData getAnnotationData() {
-            return annotationData;
-        }
-
-        public void setAnnotationData(AnnotationData annotationData) {
-            this.annotationData = annotationData;
-        }
 
         public List<Object> getKeyObjects() {
 			return keyObjects;
@@ -323,9 +314,13 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 			return missObjects;
 		}
 
-		public Object[] modifyArgumentList(final Object[] args) {
-			args[annotationData.getKeyIndex()] = this.missObjects;
+		public Object[] modifyArgumentList(final Object[] args, final int keyIndex) {
+			args[keyIndex] = this.missObjects;
 			return args;
 		}
-	}
+
+        public Map<Object, String> getObj2Base() {
+            return obj2Base;
+        }
+    }
 }

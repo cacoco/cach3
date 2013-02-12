@@ -67,7 +67,7 @@ public @interface L2ReadThroughMultiCache {
      * of the value in the cache.
      *
      */
-    Duration expiration() default Duration.UNDEFINED;
+    Duration window() default Duration.UNDEFINED;
 
     /**
      * An optional String prefix that will be pre-pended to the id returned by the object

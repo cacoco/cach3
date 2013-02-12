@@ -12,6 +12,7 @@
            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
 
 	<import resource="cach3-context.xml" />
+  <import resource="l2cach3-context.xml" />
 
   <bean class="org.flite.cach3.api.impl.DefaultMemcachedCacheProviderImpl">
     <constructor-arg index="0" value="true" />

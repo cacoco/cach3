@@ -26,6 +26,7 @@ import org.apache.commons.lang.*;
 import org.apache.commons.lang.math.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.annotations.groups.InvalidateSingleCaches;
+import org.flite.cach3.level2.annotations.*;
 
 import java.util.*;
 
@@ -315,6 +316,19 @@ public class TestDAOImpl implements TestDAO {
         return number * number * number + getFunkFactor(number);
     }
 
+
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  L2 Multi cache methods.                                      * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+    @L2ReadThroughMultiCache(namespace = "L2Multi", keyIndex = 0, window = Duration.FIFTEEN_SECONDS)
+    public List<String> getL2MultiAlpha(final List<Long> ids, final String generation) {
+        final List<String> results = new ArrayList<String>(ids.size());
+        for (final Long id : ids) {
+            results.add(generation + id);
+        }
+        return results;
+    }
 
 
 }

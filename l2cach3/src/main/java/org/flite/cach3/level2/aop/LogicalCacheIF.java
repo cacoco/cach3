@@ -33,6 +33,6 @@ public interface LogicalCacheIF {
 
     void setBulk(Map<String, Object> contents, Duration duration);
 
-    void setBulk(Map<String, Object> contents, Duration duration, boolean checkIds);
+    void invalidateBulk(Collection<String> ids);
 
 }

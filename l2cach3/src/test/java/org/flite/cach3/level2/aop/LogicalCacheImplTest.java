@@ -121,7 +121,7 @@ public class LogicalCacheImplTest extends EasyMockSupport {
         }
 
         final Duration target = Duration.NINETY_SECONDS;
-        impl.setBulk(submission, target, false);
+        impl.setBulk(submission, target);
 
         final Set<String> requests = new HashSet<String>();
         Collections.shuffle(keys);
@@ -148,6 +148,48 @@ public class LogicalCacheImplTest extends EasyMockSupport {
                 assertTrue(attempt.containsKey(request));
                 assertEquals(submission.get(request), attempt.get(request));
             }
+        }
+    }
+
+    @Test
+    public void testInvalidation() throws Exception {
+        final String prefix = "roundTrip-";
+
+        final String keyAlpha = prefix + "alpha";
+        final String bodyAlpha = prefix + RandomStringUtils.randomAlphabetic(8);
+        final String keyOmega = prefix + "omega";
+        final String bodyOmega = prefix + RandomStringUtils.randomAlphabetic(9);
+
+        final Map<String, Object> submission = new HashMap<String, Object>();
+        submission.put(keyAlpha, bodyAlpha);
+        submission.put(keyOmega, bodyOmega);
+
+        final List<String> inquiryKeys = Arrays.asList(keyAlpha, prefix+"bubba", keyOmega, prefix+"gump");
+
+        for (final Duration duration : LogicalCacheImpl.DURATION_SET) {
+            final Map<String, Object> attempt = impl.getBulk(inquiryKeys, duration);
+            assertNotNull(attempt);
+            assertEquals(0, attempt.size());
+        }
+
+        // This will blow a bunch of DUPLICATION errors, but we're not testing that right here.
+        for (final Duration duration : LogicalCacheImpl.DURATION_SET) {
+            impl.setBulk(submission, duration);
+
+            // Verify the data got into the caches as we expect.
+            final Map<String, Object> results = impl.getBulk(inquiryKeys, duration);
+            assertEquals(bodyAlpha, results.get(keyAlpha));
+            assertEquals(bodyOmega, results.get(keyOmega));
+        }
+
+        // Now, blow the values away.
+        impl.invalidateBulk(inquiryKeys);
+
+        // No data should be found.
+        for (final Duration duration : LogicalCacheImpl.DURATION_SET) {
+            final Map<String, Object> attempt = impl.getBulk(inquiryKeys, duration);
+            assertNotNull(attempt);
+            assertEquals(0, attempt.size());
         }
     }
 

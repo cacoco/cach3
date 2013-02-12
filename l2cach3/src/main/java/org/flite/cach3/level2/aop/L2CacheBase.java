@@ -32,7 +32,12 @@ import java.lang.reflect.Method;
 public class L2CacheBase {
     protected VelocityContextFactory factory;
     /*default*/ CacheKeyMethodStore methodStore;
-
+    /*default*/ LogicalCacheIF cache = new LogicalCacheImpl(); // TODO: add setter/getter
+    {
+        try {
+            ((LogicalCacheImpl) cache).afterPropertiesSet();
+        } catch (Exception ex) {}
+    }
     public void setFactory(VelocityContextFactory factory) {
         this.factory = factory;
     }
@@ -42,7 +47,8 @@ public class L2CacheBase {
     }
 
     protected boolean isCacheDisabled() {
-        throw new RuntimeException("Not yet implemented!");
+        return false;
+//        throw new RuntimeException("Not yet implemented!");
 //        return state == null ? false : state.isCacheDisabled();
     }
 
