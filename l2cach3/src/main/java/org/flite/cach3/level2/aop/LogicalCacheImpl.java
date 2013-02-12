@@ -91,6 +91,7 @@ public class LogicalCacheImpl implements LogicalCacheIF, InitializingBean {
         for (final Map.Entry<String, Object> entry : contents.entrySet()) {
             final String key = entry.getKey();
             final Object value = entry.getValue() == null ? new PertinentNegativeNull() : entry.getValue();
+            System.out.println("Key: " + key);
             nanny.put(key, duration);
             cache.put(key, value);
         }

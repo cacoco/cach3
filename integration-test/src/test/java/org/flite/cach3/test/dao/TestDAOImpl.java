@@ -321,7 +321,7 @@ public class TestDAOImpl implements TestDAO {
     /** *                  L2 Multi cache methods.                                      * **/
     /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
-    @L2ReadThroughMultiCache(namespace = "L2Multi", keyIndex = 0, window = Duration.FIFTEEN_SECONDS)
+    @L2ReadThroughMultiCache(namespace = "L2Multi", keyIndex = 0, keyPrefix = "prfx-", keyTemplate = "shenanigans-$args[0][$index]-$indexObject", window = Duration.FIFTEEN_SECONDS)
     public List<String> getL2MultiAlpha(final List<Long> ids, final String generation) {
         final List<String> results = new ArrayList<String>(ids.size());
         for (final Long id : ids) {

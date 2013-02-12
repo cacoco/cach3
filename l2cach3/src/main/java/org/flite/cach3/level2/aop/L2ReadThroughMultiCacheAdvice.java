@@ -72,19 +72,19 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
             info = getAnnotationInfo(annotation, coord.getMethod().getName());
 
             // Get the list of objects that will provide the keys to all the cache values.
-            coord.setKeyObjects(ReadThroughMultiCacheAdvice.getKeyObjectList((Integer) info.get(AnnotationTypes.KEY_INDEX).getValue(), pjp, coord.getMethod()));
+            coord.setKeyObjects(ReadThroughMultiCacheAdvice.getKeyObjectList(info.<Integer>getAsType(AnnotationTypes.KEY_INDEX,null), pjp, coord.getMethod()));
 
             // Create key->object and object->key mappings.
             coord.setHolder(ReadThroughMultiCacheAdvice.convertIdObjectsToKeyMap(coord.getKeyObjects(),
-                    (String) info.get(AnnotationTypes.NAMESPACE).getValue(),
-                    info.get(AnnotationTypes.KEY_PREFIX) == null ? "" : (String) info.get(AnnotationTypes.KEY_PREFIX).getValue(),
-                    info.get(AnnotationTypes.KEY_PREFIX) == null ? "" : (String) info.get(AnnotationTypes.KEY_TEMPLATE).getValue(),
+                    info.<String>getAsType(AnnotationTypes.NAMESPACE, ""),
+                    info.<String>getAsType(AnnotationTypes.KEY_PREFIX, ""),
+                    info.<String>getAsType(AnnotationTypes.KEY_TEMPLATE, ""),
                     factory,
                     methodStore,
                     args));
 
             // Get the full list of cache keys and ask the cache for the corresponding values.
-			coord.setInitialKey2Result(cache.getBulk(coord.getKey2Obj().keySet(), (Duration) info.get(AnnotationTypes.WINDOW).getValue()));
+			coord.setInitialKey2Result(cache.getBulk(coord.getKey2Obj().keySet(), info.<Duration>getAsType(AnnotationTypes.WINDOW, null)));
 
 			// We've gotten all positive cache results back, so build up a results list and return it.
 			if (coord.getMissObjects().size() < 1) {
@@ -92,7 +92,7 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
 			}
 
 			// Create the new list of arguments with a subset of the key objects that aren't in the cache.
-			args = coord.modifyArgumentList(args, (Integer) info.get(AnnotationTypes.KEY_INDEX).getValue());
+			args = coord.modifyArgumentList(args, info.<Integer>getAsType(AnnotationTypes.KEY_INDEX, null));
         } catch (Throwable ex) {
             // If there's an exception somewhere in the caching code, then just bail out
             // and call through to the target method with the original parameters.
@@ -121,7 +121,7 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
                 final String cacheKey = coord.getObj2Key().get(keyObject);
                 final String cacheBase = coord.getObj2Base().get(keyObject);
                 final Map<String, Object> input = ImmutableMap.of(cacheKey, resultObject);
-                cache.setBulk(input, (Duration) info.get(AnnotationTypes.WINDOW).getValue());
+                cache.setBulk(input, info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
                 coord.getKey2Result().put(cacheKey, resultObject);
                 cacheBaseIds[ix] = cacheBase;
             }
@@ -166,7 +166,7 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
         result.add(new AnnotationTypes.KeyIndex(keyIndex));
 
         final String keyTemplate = annotation.keyTemplate();
-        if (StringUtils.isNotBlank(keyTemplate)) {
+        if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
             result.add(new AnnotationTypes.KeyTemplate(keyTemplate));
         }
 
