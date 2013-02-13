@@ -173,4 +173,8 @@ public class TestSvcImpl implements TestSvc {
     public List<Long> invalidateL2MultiCharlie(List<Long> ids) {
         return this.dao.invalidateL2MultiCharlie(ids);
     }
+
+    public String getL2SingleDelta(Long id, String generation) {
+        return this.dao.getL2SingleDelta(id, generation);
+    }
 }
