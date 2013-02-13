@@ -101,5 +101,6 @@ public interface TestDAO {
     /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
     public List<String> getL2MultiAlpha(List<Long> ids, String generation);
+    public List<String> getL2MultiBeta(List<Long> ids, String generation);
 
 }

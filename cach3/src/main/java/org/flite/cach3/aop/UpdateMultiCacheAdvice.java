@@ -145,7 +145,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 		}
 	}
 
-	protected List<Object> getKeyObjects(final int keyIndex,
+	public static List<Object> getKeyObjects(final int keyIndex,
 	                             final Object returnValue,
 	                             final JoinPoint jp,
 	                             final Method methodToCache) throws Exception {

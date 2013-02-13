@@ -26,10 +26,13 @@ import org.aspectj.lang.JoinPoint;
 import org.flite.cach3.aop.CacheBase;
 import org.flite.cach3.aop.CacheKeyMethodStore;
 import org.flite.cach3.config.VelocityContextFactory;
+import org.slf4j.*;
 
 import java.lang.reflect.Method;
 
 public class L2CacheBase {
+    private static final Logger LOG = LoggerFactory.getLogger(L2CacheBase.class);
+
     protected VelocityContextFactory factory;
     /*default*/ CacheKeyMethodStore methodStore;
     /*default*/ LogicalCacheIF cache = new LogicalCacheImpl(); // TODO: add setter/getter
@@ -47,8 +50,10 @@ public class L2CacheBase {
     }
 
     protected boolean isCacheDisabled() {
+        try {
+            throw new RuntimeException("Not yet implemented!");
+        } catch (Exception ex) { LOG.debug("ATTENTION!!", ex); }
         return false;
-//        throw new RuntimeException("Not yet implemented!");
 //        return state == null ? false : state.isCacheDisabled();
     }
 
@@ -72,4 +77,4 @@ public class L2CacheBase {
     }
 
 
-    }
+}

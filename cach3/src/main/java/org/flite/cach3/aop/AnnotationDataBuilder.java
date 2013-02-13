@@ -93,7 +93,7 @@ class AnnotationDataBuilder {
                     // For *MultiCache, keyIndex MUST be defined to give the process its dimensionality
                     if (!keyIndexDefined) {
                         throw new InvalidParameterException(String.format(
-                                "KkeyIndex must be defined for annotation [%s] on [%s]",
+                                "KeyIndex must be defined for annotation [%s] on [%s]",
                                 expectedAnnotationClass.getName(),
                                 targetMethodName
                         ));

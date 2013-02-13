@@ -165,4 +165,9 @@ public class TestSvcImpl implements TestSvc {
     public List<String> getL2MultiAlpha(List<Long> ids, String generation) {
         return this.dao.getL2MultiAlpha(ids, generation);
     }
+
+    public List<String> getL2MultiBeta(List<Long> ids, String generation) {
+        return this.dao.getL2MultiBeta(ids, generation);
+    }
+
 }

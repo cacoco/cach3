@@ -16,6 +16,7 @@ public class AnnotationTypes {
     public static final String KEY_TEMPLATE = "tmpl";
     public static final String KEY_PREFIX = "prfx";
     public static final String WINDOW = "wndw";
+    public static final String DATA_INDEX = "didx";
 
     private AnnotationTypes() { }
 
@@ -52,6 +53,13 @@ public class AnnotationTypes {
         public Window(Duration value) { this.value = value; }
         public String getName() { return WINDOW; }
         public Duration getValue() { return value; }
+    }
+
+    public static class DataIndex implements AnnotationDatum<Integer> {
+        private Integer value;
+        public DataIndex(Integer value) { this.value = value; }
+        public String getName() { return DATA_INDEX; }
+        public Integer getValue() { return value; }
     }
 
 }

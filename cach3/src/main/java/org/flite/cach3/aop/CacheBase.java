@@ -110,7 +110,7 @@ public class CacheBase {
         return resultString;
     }
 
-    protected static Object getIndexObject(final int index,
+    public static Object getIndexObject(final int index,
                                            final Object retVal,
                                            final Object[] args,
                                            final String methodString) throws Exception {
@@ -149,7 +149,7 @@ public class CacheBase {
 		return indexObject;
 	}
 
-	protected Object validateReturnValueAsKeyObject(final Object returnValue,
+	public static Object validateReturnValueAsKeyObject(final Object returnValue,
                                              final Method methodToCache) throws Exception {
 		if (returnValue == null) {
 			throw new InvalidParameterException(String.format(
@@ -243,13 +243,21 @@ public class CacheBase {
                                         final AnnotationData annotationData,
                                         final Object retVal,
                                         final Object[] args) throws Exception {
+        return getBaseKeys(keyObjects, annotationData.getKeyTemplate(), retVal, args, factory, methodStore);
+    }
+
+    public static List<String> getBaseKeys(final List<Object> keyObjects,
+                                        final String template,
+                                        final Object retVal,
+                                        final Object[] args,
+                                        final VelocityContextFactory factory,
+                                        final CacheKeyMethodStore methodStore) throws Exception {
         final List<String> results = new ArrayList<String>();
         for (int ix = 0; ix < keyObjects.size(); ix++) {
             final Object object = keyObjects.get(ix);
-            final String template = annotationData.getKeyTemplate();
             final String base;
             if (StringUtils.isBlank(template)) {
-                final Method method = getKeyMethod(object);
+                final Method method = getKeyMethod(object, methodStore);
                 base = generateObjectId(method, object);
             } else {
                 final VelocityContext context = factory.getNewExtendedContext();
@@ -259,7 +267,7 @@ public class CacheBase {
                 context.put("retVal", retVal);
 
                 final StringWriter writer = new StringWriter(250);
-                Velocity.evaluate(context, writer, this.getClass().getSimpleName() , template);
+                Velocity.evaluate(context, writer, CacheBase.class.getSimpleName() , template);
                 base = writer.toString();
                 if (template.equals(base)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
             }
