@@ -35,19 +35,23 @@
 
   <!--<bean id="methodStore" class="org.flite.cach3.aop.CacheKeyMethodStoreImpl" />-->
 
-  <!--<bean id="cach3-state" class="org.flite.cach3.config.Cach3State" />-->
+  <bean id="l2cach3-state" class="org.flite.cach3.level2.config.L2Cach3State">
+    <property name="cache">
+      <bean class="org.flite.cach3.level2.aop.LogicalCacheImpl" />
+    </property>
+  </bean>
 
   <!--<bean id="cach3-velocityContextFactory" class="org.flite.cach3.config.VelocityContextFactory" />-->
 
   <bean id="l2cach3-readThroughMultiCache" class="org.flite.cach3.level2.aop.L2ReadThroughMultiCacheAdvice">
     <property name="methodStore" ref="methodStore" />
-    <!--<property name="state" ref="cach3-state" />-->
+    <property name="state" ref="l2cach3-state" />
     <property name="factory" ref="cach3-velocityContextFactory" />
   </bean>
 
   <bean id="l2cach3-updateMultiCache" class="org.flite.cach3.level2.aop.L2UpdateMultiCacheAdvice">
     <property name="methodStore" ref="methodStore" />
-    <!--<property name="state" ref="cach3-state" />-->
+    <property name="state" ref="l2cach3-state" />
     <property name="factory" ref="cach3-velocityContextFactory" />
   </bean>
 

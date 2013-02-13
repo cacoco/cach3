@@ -104,7 +104,7 @@ public class L2UpdateMultiCacheAdvice extends L2CacheBase {
                             info.<String>getAsType(AnnotationTypes.NAMESPACE,null),
                             info.<String>getAsType(AnnotationTypes.KEY_PREFIX,null)));
                 }
-                updateCache(cacheKeys, dataList, methodToCache, info.<Duration>getAsType(AnnotationTypes.WINDOW, null), cache);
+                updateCache(cacheKeys, dataList, methodToCache, info.<Duration>getAsType(AnnotationTypes.WINDOW, null), getCache());
             } catch (Exception ex) {
                 LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
             }

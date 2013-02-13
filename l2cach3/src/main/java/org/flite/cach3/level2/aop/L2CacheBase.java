@@ -26,6 +26,7 @@ import org.aspectj.lang.JoinPoint;
 import org.flite.cach3.aop.CacheBase;
 import org.flite.cach3.aop.CacheKeyMethodStore;
 import org.flite.cach3.config.VelocityContextFactory;
+import org.flite.cach3.level2.config.L2Cach3State;
 import org.slf4j.*;
 
 import java.lang.reflect.Method;
@@ -35,12 +36,12 @@ public class L2CacheBase {
 
     protected VelocityContextFactory factory;
     /*default*/ CacheKeyMethodStore methodStore;
-    /*default*/ LogicalCacheIF cache = new LogicalCacheImpl(); // TODO: add setter/getter
-    {
-        try {
-            ((LogicalCacheImpl) cache).afterPropertiesSet();
-        } catch (Exception ex) {}
+    protected L2Cach3State state;
+
+    public void setState(L2Cach3State state) {
+        this.state = state;
     }
+
     public void setFactory(VelocityContextFactory factory) {
         this.factory = factory;
     }
@@ -74,5 +75,8 @@ public class L2CacheBase {
         return CacheBase.buildCacheKey(objectId, namespace, prefix);
     }
 
+    public LogicalCacheIF getCache() {
+        return this.state.getCache();
+    }
 
 }

@@ -75,14 +75,11 @@ public class L2UpdateMultiTest {
         // Only the updated ones should be different.
         Collections.shuffle(addls);
         final String g3 = RandomStringUtils.randomAlphabetic(8) + "-";
-        System.out.println("G1: " + g1);
-        System.out.println("G2: " + g2);
-        System.out.println("G3: " + g3);
         final List<String> results = test.getL2MultiAlpha(addls, g3);
+        assertTrue(results.size() > 0);
         for (int ix = 0; ix < addls.size(); ix++) {
             final Long key = addls.get(ix);
             final String result = results.get(ix);
-            System.out.println(result);
             assertTrue(StringUtils.contains(result, key.toString()));
             assertTrue("Key: " + key, result.startsWith(ids.contains(key) ? g2 : g1));
         }

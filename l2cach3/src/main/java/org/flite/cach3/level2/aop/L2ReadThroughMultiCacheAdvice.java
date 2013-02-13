@@ -84,7 +84,7 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
                     args));
 
             // Get the full list of cache keys and ask the cache for the corresponding values.
-			coord.setInitialKey2Result(cache.getBulk(coord.getKey2Obj().keySet(), info.<Duration>getAsType(AnnotationTypes.WINDOW, null)));
+			coord.setInitialKey2Result(getCache().getBulk(coord.getKey2Obj().keySet(), info.<Duration>getAsType(AnnotationTypes.WINDOW, null)));
 
 			// We've gotten all positive cache results back, so build up a results list and return it.
 			if (coord.getMissObjects().size() < 1) {
@@ -125,7 +125,7 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
                 cacheBaseIds[ix] = cacheBase;
             }
             final ImmutableMap<String, Object> input = builder.build();
-            cache.setBulk(input, info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+            getCache().setBulk(input, info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
             coord.getKey2Result().putAll(input);
 
             return coord.generateResultList();
