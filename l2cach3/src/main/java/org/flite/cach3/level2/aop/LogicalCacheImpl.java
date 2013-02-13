@@ -59,7 +59,7 @@ public class LogicalCacheImpl implements LogicalCacheIF, InitializingBean {
      */
     public Map<String, Object> getBulk(Collection<String> ids, Duration duration) {
         if (duration == null || Duration.UNDEFINED == duration) { throw new InvalidParameterException("UNDEFINED is not an allowed value"); }
-        warnOfDuplication(ids, duration);
+//        warnOfDuplication(ids, duration);
 
         final Map<String, Object> partial = caches.get(duration).getAllPresent(ids);
         if (partial.size() == 0) { return partial; }

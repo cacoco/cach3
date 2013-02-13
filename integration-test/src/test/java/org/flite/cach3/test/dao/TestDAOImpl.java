@@ -323,11 +323,12 @@ public class TestDAOImpl implements TestDAO {
 
     private static final String L2_MULTI_NS = "L2Multi";
     private static final String L2_PREFIX = "prfx-";
+    private static final String TMPL_START = "shenanigans-";
     @L2ReadThroughMultiCache(namespace = L2_MULTI_NS,
             keyIndex = 0,
             keyPrefix = L2_PREFIX,
-            keyTemplate = "shenanigans-$args[0][$index]-$indexObject",
-            window = Duration.FIFTEEN_SECONDS)
+            keyTemplate = TMPL_START + "$args[0][$index]-$indexObject",
+            window = Duration.FIVE_MINUTES)
     public List<String> getL2MultiAlpha(final List<Long> ids, final String generation) {
         final List<String> results = new ArrayList<String>(ids.size());
         for (final Long id : ids) {
@@ -339,9 +340,9 @@ public class TestDAOImpl implements TestDAO {
     @L2UpdateMultiCache(namespace = L2_MULTI_NS,
             keyIndex = 0,
             keyPrefix = L2_PREFIX,
-            keyTemplate = "shenanigans-$args[0][$index]-$args[0][$index]",
+            keyTemplate = TMPL_START + "$args[0][$index]-$args[0][$index]",
             dataIndex = -1,
-            window = Duration.FIFTEEN_SECONDS)
+            window = Duration.FIVE_MINUTES)
     public List<String> getL2MultiBeta(final List<Long> ids, final String generation) {
         final List<String> results = new ArrayList<String>(ids.size());
         for (final Long id : ids) {

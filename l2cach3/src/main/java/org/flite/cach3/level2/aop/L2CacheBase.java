@@ -50,9 +50,7 @@ public class L2CacheBase {
     }
 
     protected boolean isCacheDisabled() {
-        try {
-            throw new RuntimeException("Not yet implemented!");
-        } catch (Exception ex) { LOG.debug("ATTENTION!!", ex); }
+        LOG.debug(" > > > > ATTENTION!! - Not Yet Implemented!");
         return false;
 //        return state == null ? false : state.isCacheDisabled();
     }

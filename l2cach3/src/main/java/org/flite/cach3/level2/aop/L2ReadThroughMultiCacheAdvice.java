@@ -115,16 +115,18 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
             }
 
             final String[] cacheBaseIds = new String[results.size()];
+            final ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
             for (int ix = 0; ix < results.size(); ix++) {
                 final Object keyObject = coord.getMissObjects().get(ix);
                 final Object resultObject = results.get(ix) == null ? new PertinentNegativeNull() : results.get(ix);
                 final String cacheKey = coord.getObj2Key().get(keyObject);
                 final String cacheBase = coord.getObj2Base().get(keyObject);
-                final Map<String, Object> input = ImmutableMap.of(cacheKey, resultObject);
-                cache.setBulk(input, info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
-                coord.getKey2Result().put(cacheKey, resultObject);
+                builder.put(cacheKey, resultObject);
                 cacheBaseIds[ix] = cacheBase;
             }
+            final ImmutableMap<String, Object> input = builder.build();
+            cache.setBulk(input, info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+            coord.getKey2Result().putAll(input);
 
             return coord.generateResultList();
         } catch (Throwable ex) {
