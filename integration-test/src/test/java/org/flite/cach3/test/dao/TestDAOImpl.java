@@ -351,4 +351,12 @@ public class TestDAOImpl implements TestDAO {
         return results;
     }
 
+    @L2InvalidateMultiCache(namespace = L2_MULTI_NS,
+            keyIndex = -1,
+            keyPrefix = L2_PREFIX,
+            keyTemplate = TMPL_START + "$retVal[$index]-$indexObject"
+    )
+    public List<Long> invalidateL2MultiCharlie(final List<Long> ids) {
+        return ids;
+    }
 }

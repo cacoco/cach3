@@ -22,17 +22,21 @@
 
 package org.flite.cach3.test.l2;
 
-import org.apache.commons.lang.*;
-import org.flite.cach3.test.svc.*;
-import org.springframework.context.*;
-import org.springframework.context.support.*;
-import org.testng.annotations.*;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.flite.cach3.test.svc.TestSvc;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static org.testng.AssertJUnit.assertTrue;
 
-public class L2UpdateMultiTest {
+public class L2InvalidateMultiTest {
     private ApplicationContext context;
 
     @BeforeClass
@@ -42,7 +46,6 @@ public class L2UpdateMultiTest {
 
     @Test
     public void test() {
-
         final TestSvc test = (TestSvc) context.getBean("testSvc");
 
         final String g1 = RandomStringUtils.randomAlphabetic(4) + "-";
@@ -66,17 +69,13 @@ public class L2UpdateMultiTest {
             assertTrue(out.startsWith(g1));
         }
 
-        // Now call the update
-        final String g2 = RandomStringUtils.randomAlphabetic(6) + "-";
-        final List<String> second = test.getL2MultiBeta(ids, g2);
-        for (final String out : second) {
-            assertTrue(out.startsWith(g2));
-        }
+        // Now call the invalidate
+        test.invalidateL2MultiCharlie(ids);
 
-        // Only the updated ones should be different.
+        // Only the invalidated ones should be different.
         Collections.shuffle(addls);
-        final String g3 = RandomStringUtils.randomAlphabetic(8) + "-";
-        final List<String> results = test.getL2MultiAlpha(addls, g3);
+        final String g2 = RandomStringUtils.randomAlphabetic(8) + "-";
+        final List<String> results = test.getL2MultiAlpha(addls, g2);
         assertTrue(results.size() > 0);
         for (int ix = 0; ix < addls.size(); ix++) {
             final Long key = addls.get(ix);
@@ -84,6 +83,5 @@ public class L2UpdateMultiTest {
             assertTrue(StringUtils.contains(result, key.toString()));
             assertTrue("Key: " + key, result.startsWith(ids.contains(key) ? g2 : g1));
         }
-
     }
 }

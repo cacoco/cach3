@@ -170,4 +170,7 @@ public class TestSvcImpl implements TestSvc {
         return this.dao.getL2MultiBeta(ids, generation);
     }
 
+    public List<Long> invalidateL2MultiCharlie(List<Long> ids) {
+        return this.dao.invalidateL2MultiCharlie(ids);
+    }
 }
