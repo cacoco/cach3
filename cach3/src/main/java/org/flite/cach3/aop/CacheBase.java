@@ -117,7 +117,7 @@ public class CacheBase {
         return getIndexObject(true, index, retVal, args, methodString);
 	}
 
-    protected static Object getIndexObject(final int index,
+    public static Object getIndexObject(final int index,
                                            final Object[] args,
                                            final String methodString) throws Exception {
         return getIndexObject(false, index, null, args, methodString);
