@@ -42,10 +42,10 @@ public class L2ReadThroughAssignCacheAdvice extends L2CacheBase {
     private static final Logger LOG = LoggerFactory.getLogger(L2ReadThroughAssignCacheAdvice.class);
 
     @Pointcut("@annotation(org.flite.cach3.level2.annotations.L2ReadThroughAssignCache)")
-    public void getSingleAssign() {}
+    public void getL2SingleAssign() {}
 
-    @Around("getSingleAssign()")
-    public Object cacheAssign(final ProceedingJoinPoint pjp) throws Throwable {
+    @Around("getL2SingleAssign()")
+    public Object cacheL2Assign(final ProceedingJoinPoint pjp) throws Throwable {
         // If we've disabled the caching programmatically (or via properties file) just flow through.
         if (isCacheDisabled()) {
             LOG.debug("Caching is disabled.");

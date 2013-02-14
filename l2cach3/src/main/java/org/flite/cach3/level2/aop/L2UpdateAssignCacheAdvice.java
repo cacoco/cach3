@@ -41,10 +41,10 @@ public class L2UpdateAssignCacheAdvice extends L2CacheBase {
     private static final Logger LOG = LoggerFactory.getLogger(L2UpdateAssignCacheAdvice.class);
 
     @Pointcut("@annotation(org.flite.cach3.level2.annotations.L2UpdateAssignCache)")
-    public void updateAssign() {}
+    public void updateL2Assign() {}
 
-    @AfterReturning(pointcut="updateAssign()", returning="retVal")
-    public Object cacheUpdateAssign(final JoinPoint jp, final Object retVal) throws Throwable {
+    @AfterReturning(pointcut="updateL2Assign()", returning="retVal")
+    public Object cacheUpdateL2Assign(final JoinPoint jp, final Object retVal) throws Throwable {
         // If we've disabled the caching programmatically (or via properties file) just flow through.
         if (isCacheDisabled()) {
             LOG.debug("Caching is disabled.");

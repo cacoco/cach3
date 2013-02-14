@@ -53,7 +53,7 @@
     <property name="state" ref="l2cach3-state" />
     <property name="factory" ref="cach3-velocityContextFactory" />
  	</bean>
-  <bean id="cach3-readThroughAssignCache" class="org.flite.cach3.level2.aop.L2ReadThroughAssignCacheAdvice">
+  <bean id="l2cach3-readThroughAssignCache" class="org.flite.cach3.level2.aop.L2ReadThroughAssignCacheAdvice">
     <property name="methodStore" ref="methodStore" />
     <property name="state" ref="l2cach3-state" />
     <property name="factory" ref="cach3-velocityContextFactory" />

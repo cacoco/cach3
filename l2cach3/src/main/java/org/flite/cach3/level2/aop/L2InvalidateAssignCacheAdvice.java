@@ -40,10 +40,10 @@ public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
     private static final Logger LOG = LoggerFactory.getLogger(L2InvalidateAssignCacheAdvice.class);
 
     @Pointcut("@annotation(org.flite.cach3.level2.annotations.L2InvalidateAssignCache)")
-    public void invalidateAssign() {}
+    public void invalidateL2Assign() {}
 
-    @AfterReturning(pointcut="invalidateAssign()", returning="retVal")
-    public Object cacheInvalidateAssign(final JoinPoint jp, final Object retVal) throws Throwable {
+    @AfterReturning(pointcut="invalidateL2Assign()", returning="retVal")
+    public Object cacheInvalidateL2Assign(final JoinPoint jp, final Object retVal) throws Throwable {
         try {
             doInvalidate(jp, retVal);
         } catch (Throwable ex) {
