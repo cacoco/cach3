@@ -22,10 +22,48 @@
 
 package org.flite.cach3.level2.annotations;
 
+import org.flite.cach3.annotations.*;
+
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface L2UpdateAssignCache {
+    /**
+     * A namespace that is added to the key as it is stored in the distributed cache.
+     * This allows differing object that may have the same ID to coexist.
+     * This value must be assigned.
+     * @return the namespace for the objects cached in the given method.
+     */
+    String namespace() default AnnotationConstants.DEFAULT_STRING;
+
+    /**
+     * A single key that is updated with data in this method. This key
+     * will be combined with the <code>namespace()</code> value to be used in the distributed cache.
+     * This value must be assigned.
+     * @return the assigned key for the given data
+     */
+    String assignedKey() default AnnotationConstants.DEFAULT_STRING;
+
+    /**
+     * Since keys and the actual data to be cached may be different, we also need to know which
+     * parameter (or output) holds the data that we should update the cache with. This is a
+	 * 0-based array index. This annotation also takes a special value of -1 to signify
+	 * that the object being returned is the data that should be cached.
+     * @return the index into the argument array that holds the actual data to be cached
+     */
+    int dataIndex() default Integer.MIN_VALUE;
+
+    /**
+     * The maximum length of time that a value should live in the cache.
+     *
+     * The user must be careful to ensure that any invocation of the cache for a given
+     * key have the exact same <code>Duration</code>. (In effect, the <code>Duration</code>
+     * becomes a part of the unique key.) If there are multiple invocations for a given
+     * key with different <code>Duration</code>s set, there will be multiple (conflicting?) copies
+     * of the value in the cache.
+     *
+     */
+    Duration window() default Duration.UNDEFINED;
 
 }

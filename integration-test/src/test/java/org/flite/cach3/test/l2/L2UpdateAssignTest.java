@@ -30,8 +30,7 @@ import org.testng.annotations.*;
 
 import static org.testng.AssertJUnit.*;
 
-public class L2ReadThroughAssignTest {
-
+public class L2UpdateAssignTest {
     private ApplicationContext context;
 
     @BeforeClass
@@ -43,15 +42,23 @@ public class L2ReadThroughAssignTest {
     public void test() {
         final TestSvc test = (TestSvc) context.getBean("testSvc");
 
-        final String g1 = RandomStringUtils.randomAlphabetic(4) + "-";
+        // Set the first cached datum
+        final String orig = test.getL2AssignGolf(999L, RandomStringUtils.randomAlphabetic(4) + "-");
 
-        // We are setting the cache value for good, regardless of ID or generation, until the cache times out.
-        final String replay = test.getL2AssignGolf(999L, g1);
-        assertTrue(replay.startsWith(g1));
-
-        // We should only ever get the initial result
-        for (int ix = 0; ix < 10; ix++) {
-            assertEquals(replay, test.getL2AssignGolf(1000L + ix, RandomStringUtils.randomAlphabetic(5 + ix) + "-"));
+        // Make sure the value is definitely in there
+        for (int ix = 0; ix < 3; ix++) {
+            assertEquals(orig, test.getL2AssignGolf(1000L+ix, RandomStringUtils.randomAlphanumeric(4+ix) + "-"));
         }
+
+        // Force the update to happen.
+        final String renew = test.getL2AssignHotel(System.currentTimeMillis(), RandomStringUtils.randomAlphanumeric(8) + "-");
+        assertFalse(orig.equals(renew));
+
+        // Make sure the NEW value is definitely in there
+        for (int ix = 0; ix < 3; ix++) {
+            assertEquals(renew, test.getL2AssignGolf(1000L+ix, RandomStringUtils.randomAlphanumeric(8+ix) + "-"));
+        }
+
     }
+
 }

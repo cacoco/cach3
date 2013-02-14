@@ -69,6 +69,11 @@
     <property name="state" ref="l2cach3-state" />
     <property name="factory" ref="cach3-velocityContextFactory" />
  	</bean>
+  <bean id="l2cach3-updateAssignCache" class="org.flite.cach3.level2.aop.L2UpdateAssignCacheAdvice">
+    <property name="methodStore" ref="methodStore" />
+    <property name="state" ref="l2cach3-state" />
+    <property name="factory" ref="cach3-velocityContextFactory" />
+  </bean>
 
   <bean id="l2cach3-invalidateMultiCache" class="org.flite.cach3.level2.aop.L2InvalidateMultiCacheAdvice">
     <property name="methodStore" ref="methodStore" />

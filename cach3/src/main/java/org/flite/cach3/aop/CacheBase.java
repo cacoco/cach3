@@ -123,7 +123,7 @@ public class CacheBase {
         return getIndexObject(false, index, null, args, methodString);
 	}
 
-    private static Object getIndexObject(final boolean allowRetVal,
+    public static Object getIndexObject(final boolean allowRetVal,
                                            final int index,
                                            final Object retVal,
                                            final Object[] args,

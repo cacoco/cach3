@@ -189,4 +189,8 @@ public class TestSvcImpl implements TestSvc {
     public String getL2AssignGolf(Long id, String generation) {
         return this.dao.getL2AssignGolf(id, generation);
     }
+
+    public String getL2AssignHotel(Long id, String generation) {
+        return this.dao.getL2AssignHotel(id, generation);
+    }
 }

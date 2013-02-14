@@ -396,4 +396,13 @@ public class TestDAOImpl implements TestDAO {
     public String getL2AssignGolf(final Long id, final String generation) {
         return generation + id;
     }
+
+    @L2UpdateAssignCache(namespace = L2_CACHE,
+            assignedKey = L2_ASSIGN,
+            dataIndex = -1,
+            window = Duration.FIVE_MINUTES
+    )
+    public String getL2AssignHotel(final Long id, final String generation) {
+        return generation + id;
+    }
 }
