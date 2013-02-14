@@ -181,4 +181,8 @@ public class TestSvcImpl implements TestSvc {
     public String getL2SingleEcho(Long id, String generation) {
         return this.dao.getL2SingleEcho(id, generation);
     }
+
+    public Long invalidateL2SingleFoxtrot(Long id) {
+        return this.dao.invalidateL2SingleFoxtrot(id);
+    }
 }

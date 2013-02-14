@@ -378,4 +378,12 @@ public class TestDAOImpl implements TestDAO {
     public String getL2SingleEcho(final Long id, final String generation) {
         return generation + id;
     }
+
+    @L2InvalidateSingleCache(namespace = L2_CACHE,
+            keyPrefix = L2_PREFIX,
+            keyTemplate = TMPL_START + "$!{retVal}-$args[0]" // Had to use special delimiting because LONG-XXX looks like math...
+    )
+    public Long invalidateL2SingleFoxtrot(final Long id) {
+        return id;
+    }
 }

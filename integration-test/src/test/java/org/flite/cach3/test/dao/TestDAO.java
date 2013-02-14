@@ -105,5 +105,6 @@ public interface TestDAO {
     public List<Long> invalidateL2MultiCharlie(List<Long> ids);
     public String getL2SingleDelta(Long id, String generation);
     public String getL2SingleEcho(Long id, String generation);
+    public Long invalidateL2SingleFoxtrot(Long id);
 
 }
