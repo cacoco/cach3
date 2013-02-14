@@ -405,4 +405,11 @@ public class TestDAOImpl implements TestDAO {
     public String getL2AssignHotel(final Long id, final String generation) {
         return generation + id;
     }
+
+    @L2InvalidateAssignCache(namespace = L2_CACHE,
+            assignedKey = L2_ASSIGN
+    )
+    public Long invalidateL2AssignIndia(final Long id) {
+        return id;
+    }
 }

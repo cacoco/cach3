@@ -43,6 +43,10 @@ public class L2ReadThroughAssignTest {
     public void test() {
         final TestSvc test = (TestSvc) context.getBean("testSvc");
 
+        // *AssignCache assignments are not very dynamic by their very nature.
+        // Take care to invalidate the caches before each of the *AssignCache tests
+        test.invalidateL2AssignIndia(System.currentTimeMillis());
+
         final String g1 = RandomStringUtils.randomAlphabetic(4) + "-";
 
         // We are setting the cache value for good, regardless of ID or generation, until the cache times out.

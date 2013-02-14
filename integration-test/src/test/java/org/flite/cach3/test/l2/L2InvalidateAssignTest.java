@@ -30,7 +30,7 @@ import org.testng.annotations.*;
 
 import static org.testng.AssertJUnit.*;
 
-public class L2UpdateAssignTest {
+public class L2InvalidateAssignTest {
     private ApplicationContext context;
 
     @BeforeClass
@@ -47,22 +47,26 @@ public class L2UpdateAssignTest {
         test.invalidateL2AssignIndia(System.currentTimeMillis());
 
         // Set the first cached datum
-        final String orig = test.getL2AssignGolf(999L, RandomStringUtils.randomAlphabetic(4) + "-");
+        final String g1 = RandomStringUtils.randomAlphabetic(4) + "-";
+        final String orig = test.getL2AssignGolf(999L, g1);
+        assertTrue(orig.startsWith(g1));
 
         // Make sure the value is definitely in there
         for (int ix = 0; ix < 3; ix++) {
             assertEquals(orig, test.getL2AssignGolf(1000L+ix, RandomStringUtils.randomAlphanumeric(4+ix) + "-"));
         }
 
-        // Force the update to happen.
-        final String renew = test.getL2AssignHotel(System.currentTimeMillis(), RandomStringUtils.randomAlphanumeric(8) + "-");
-        assertFalse(orig.equals(renew));
+        // Force the invalidate to happen.
+        test.invalidateL2AssignIndia(System.currentTimeMillis());
+
+        // Gonna get a new one
+        final String g2 = RandomStringUtils.randomAlphabetic(7) + "-";
+        final String renew = test.getL2AssignGolf(System.currentTimeMillis(), g2);
+        assertTrue(renew.startsWith(g2));
 
         // Make sure the NEW value is definitely in there
         for (int ix = 0; ix < 3; ix++) {
             assertEquals(renew, test.getL2AssignGolf(1000L+ix, RandomStringUtils.randomAlphanumeric(8+ix) + "-"));
         }
 
-    }
-
-}
+    }}

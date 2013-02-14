@@ -193,4 +193,9 @@ public class TestSvcImpl implements TestSvc {
     public String getL2AssignHotel(Long id, String generation) {
         return this.dao.getL2AssignHotel(id, generation);
     }
+
+    public Long invalidateL2AssignIndia(Long id) {
+        return this.dao.invalidateL2AssignIndia(id);
+    }
+
 }
