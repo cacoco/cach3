@@ -324,6 +324,8 @@ public class TestDAOImpl implements TestDAO {
     private static final String L2_CACHE = "L2Cach3";
     private static final String L2_PREFIX = "prfx-";
     private static final String TMPL_START = "shenanigans-";
+    private static final String L2_ASSIGN = "dewey-cheatem-howe";
+
     @L2ReadThroughMultiCache(namespace = L2_CACHE,
             keyIndex = 0,
             keyPrefix = L2_PREFIX,
@@ -385,5 +387,13 @@ public class TestDAOImpl implements TestDAO {
     )
     public Long invalidateL2SingleFoxtrot(final Long id) {
         return id;
+    }
+
+    @L2ReadThroughAssignCache(namespace = L2_CACHE,
+            assignedKey = L2_ASSIGN,
+            window = Duration.FIVE_MINUTES
+    )
+    public String getL2AssignGolf(final Long id, final String generation) {
+        return generation + id;
     }
 }

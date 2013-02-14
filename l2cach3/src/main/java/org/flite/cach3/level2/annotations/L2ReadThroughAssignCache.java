@@ -22,10 +22,39 @@
 
 package org.flite.cach3.level2.annotations;
 
+import org.flite.cach3.annotations.*;
+
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface L2ReadThroughAssignCache {
+    /**
+     * A namespace that is added to the key as it is stored in the distributed cache.
+     * This allows differing object that may have the same ID to coexist.
+     * This value must be assigned.
+     * @return the namespace for the objects cached in the given method.
+     */
+    String namespace() default AnnotationConstants.DEFAULT_STRING;
+
+    /**
+     * A single key that is assigned to the value that is returned from this method. This key
+     * will be combined with the <code>namespace()</code> value to be used in the distributed cache.
+     * This value must be assigned.
+     * @return the assigned key for the given data
+     */
+    String assignedKey() default AnnotationConstants.DEFAULT_STRING;
+
+    /**
+     * The maximum length of time that a value should live in the cache.
+     *
+     * The user must be careful to ensure that any invocation of the cache for a given
+     * key have the exact same <code>Duration</code>. (In effect, the <code>Duration</code>
+     * becomes a part of the unique key.) If there are multiple invocations for a given
+     * key with different <code>Duration</code>s set, there will be multiple (conflicting?) copies
+     * of the value in the cache.
+     *
+     */
+    Duration window() default Duration.UNDEFINED;
 
 }

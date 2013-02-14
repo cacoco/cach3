@@ -98,6 +98,7 @@ public interface TestSvc {
     public String getL2SingleDelta(Long id, String generation);
     public String getL2SingleEcho(Long id, String generation);
     public Long invalidateL2SingleFoxtrot(Long id);
+    public String getL2AssignGolf(Long id, String generation);
 
 }
 

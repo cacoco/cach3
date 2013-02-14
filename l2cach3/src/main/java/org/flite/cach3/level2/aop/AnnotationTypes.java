@@ -17,6 +17,7 @@ public class AnnotationTypes {
     public static final String KEY_PREFIX = "prfx";
     public static final String WINDOW = "wndw";
     public static final String DATA_INDEX = "didx";
+    public static final String ASSIGN_KEY = "assn";
 
     private AnnotationTypes() { }
 
@@ -60,6 +61,13 @@ public class AnnotationTypes {
         public DataIndex(Integer value) { this.value = value; }
         public String getName() { return DATA_INDEX; }
         public Integer getValue() { return value; }
+    }
+
+    public static class AssignKey implements AnnotationDatum<String> {
+        private String value;
+        public AssignKey(String value) { this.value = value; }
+        public String getName() { return ASSIGN_KEY; }
+        public String getValue() { return value; }
     }
 
 }

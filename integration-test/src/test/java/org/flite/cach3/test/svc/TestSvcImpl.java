@@ -185,4 +185,8 @@ public class TestSvcImpl implements TestSvc {
     public Long invalidateL2SingleFoxtrot(Long id) {
         return this.dao.invalidateL2SingleFoxtrot(id);
     }
+
+    public String getL2AssignGolf(Long id, String generation) {
+        return this.dao.getL2AssignGolf(id, generation);
+    }
 }
