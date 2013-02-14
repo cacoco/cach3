@@ -117,29 +117,9 @@ public class UpdateSingleCacheAdvice extends CacheBase {
         }
     }
 
-
 	protected String getObjectId(final Object keyObject) throws Exception {
 		final Method keyMethod = getKeyMethod(keyObject);
 		return generateObjectId(keyMethod, keyObject);
 	}
 
-
-
-
-
-
-
-
-
-//  TODO: Not needed?
-//	protected void validateAnnotation(final UpdateSingleCache annotation,
-//	                                  final Method method) {
-//
-//		final Class annotationClass = UpdateSingleCache.class;
-//		validateAnnotationExists(annotation, annotationClass);
-//		validateAnnotationIndex(annotation.keyIndex(), true, annotationClass, method);
-//		validateAnnotationNamespace(annotation.namespace(), annotationClass, method);
-//		validateAnnotationExpiration(annotation.expiration(), annotationClass, method);
-//	}
-//
 }
