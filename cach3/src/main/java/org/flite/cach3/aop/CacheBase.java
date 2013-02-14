@@ -223,9 +223,25 @@ public class CacheBase {
                                 final Object retVal,
                                 final Object[] args,
                                 final String methodString) throws Exception {
-        if (StringUtils.isBlank(annotationData.getKeyTemplate())) {
-            final Object keyObject = getIndexObject(annotationData.getKeyIndex(), retVal, args, methodString);
-            return generateObjectId(getKeyMethod(keyObject), keyObject);
+        return getBaseKey(annotationData.getKeyTemplate(),
+                annotationData.getKeyIndex(),
+                retVal,
+                args,
+                methodString,
+                factory,
+                methodStore);
+    }
+
+    public static String getBaseKey(final String keyTemplate,
+                                    final Integer keyIndex,
+                                    final Object retVal,
+                                    final Object[] args,
+                                    final String methodString,
+                                    final VelocityContextFactory factory,
+                                    final CacheKeyMethodStore methodStore) throws Exception {
+        if (StringUtils.isBlank(keyTemplate)) {
+            final Object keyObject = getIndexObject(keyIndex, retVal, args, methodString);
+            return generateObjectId(getKeyMethod(keyObject, methodStore), keyObject);
         }
 
         final VelocityContext context = factory.getNewExtendedContext();
@@ -233,9 +249,9 @@ public class CacheBase {
         context.put("retVal", retVal);
 
         final StringWriter writer = new StringWriter(250);
-        Velocity.evaluate(context, writer, this.getClass().getSimpleName() , annotationData.getKeyTemplate());
+        Velocity.evaluate(context, writer, CacheBase.class.getSimpleName() , keyTemplate);
         final String result = writer.toString();
-        if (annotationData.getKeyTemplate().equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
+        if (keyTemplate.equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
         return result;
     }
 

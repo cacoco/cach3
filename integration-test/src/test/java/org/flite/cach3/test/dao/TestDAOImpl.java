@@ -368,4 +368,14 @@ public class TestDAOImpl implements TestDAO {
     public String getL2SingleDelta(final Long id, final String generation) {
         return generation + id;
     }
+
+    @L2UpdateSingleCache(namespace = L2_CACHE,
+            keyPrefix = L2_PREFIX,
+            keyTemplate = TMPL_START + "$args[0]-$args[0]",
+            dataIndex = -1,
+            window = Duration.FIVE_MINUTES
+    )
+    public String getL2SingleEcho(final Long id, final String generation) {
+        return generation + id;
+    }
 }

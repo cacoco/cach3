@@ -22,13 +22,12 @@
 
 package org.flite.cach3.level2.aop;
 
+import com.google.common.collect.*;
 import org.apache.commons.lang.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
-import org.flite.cach3.annotations.groups.*;
 import org.flite.cach3.aop.*;
-import org.flite.cach3.api.*;
 import org.flite.cach3.level2.annotations.*;
 import org.slf4j.*;
 import org.springframework.core.*;
@@ -89,18 +88,25 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
             // but do not let it surface up past the AOP injection itself.
             try {
                 final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName());
-                final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
-                final String cacheKey = buildCacheKey(baseKey, annotationData);
-                final Object dataObject = getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());
+                final String baseKey = CacheBase.getBaseKey(
+                        info.<String>getAsType(AnnotationTypes.KEY_TEMPLATE, ""),
+                        info.<Integer>getAsType(AnnotationTypes.KEY_INDEX, null),
+                        retVal,
+                        jp.getArgs(),
+                        methodToCache.toString(),
+                        factory,
+                        methodStore);
+                final String cacheKey = buildCacheKey(baseKey,
+                        info.<String>getAsType(AnnotationTypes.NAMESPACE,""),
+                        info.<String>getAsType(AnnotationTypes.KEY_PREFIX,""));
+                final Object dataObject = CacheBase.getIndexObject(info.<Integer>getAsType(AnnotationTypes.DATA_INDEX, null), retVal, jp.getArgs(), methodToCache.toString());
                 final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
-                cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
-
+                getCache().setBulk(ImmutableMap.of(cacheKey, submission), info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
             } catch (Exception ex) {
                 LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
             }
         }
     }
-
 
     /*default*/ static AnnotationInfo getAnnotationInfo(final L2UpdateSingleCache annotation, final String targetMethodName) {
         final AnnotationInfo result = new AnnotationInfo();
@@ -120,17 +126,32 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
         }
 
         final Integer keyIndex = annotation.keyIndex();
-        if (keyIndex < 0) {
+        final boolean keyIndexDefined = keyIndex >= -1;
+
+        final String keyTemplate = annotation.keyTemplate();
+        final boolean keyTemplateDefined = !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)
+                && StringUtils.isNotBlank(keyTemplate);
+
+        if (keyIndexDefined == keyTemplateDefined) {
             throw new InvalidParameterException(String.format(
-                    "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                    "Exactly one of [keyIndex,keyTemplate] must be defined for annotation [%s] on [%s]",
                     L2UpdateSingleCache.class.getName(),
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.KeyIndex(keyIndex));
 
-        final String keyTemplate = annotation.keyTemplate();
-        if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+        if (keyIndexDefined) {
+            if (keyIndex < 0) {
+                throw new InvalidParameterException(String.format(
+                        "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                        L2UpdateSingleCache.class.getName(),
+                        targetMethodName
+                ));
+            }
+            result.add(new AnnotationTypes.KeyIndex(keyIndex));
+        }
+
+        if (keyTemplateDefined) {
             result.add(new AnnotationTypes.KeyTemplate(keyTemplate));
         }
 
