@@ -198,4 +198,15 @@ public class TestSvcImpl implements TestSvc {
         return this.dao.invalidateL2AssignIndia(id);
     }
 
+    public Long getCombinedData(String key) {
+        return this.dao.getCombinedData(key);
+    }
+
+    public Long getL1Data(String key) {
+        return this.dao.getL1Data(key);
+    }
+
+    public Long updateL1Data(String key) {
+        return this.dao.updateL1Data(key);
+    }
 }

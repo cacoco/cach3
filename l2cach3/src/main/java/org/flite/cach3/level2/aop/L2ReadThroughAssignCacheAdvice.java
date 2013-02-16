@@ -66,7 +66,7 @@ public class L2ReadThroughAssignCacheAdvice extends L2CacheBase {
             final Map<String, Object> results = getCache().getBulk(Arrays.asList(cacheKey), info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
             final Object result = results == null ? null : results.get(cacheKey);
             if (result != null) {
-                LOG.debug("Cache hit for key " + cacheKey);
+//                LOG.debug("Cache hit for key " + cacheKey);
                 return (result instanceof PertinentNegativeNull) ? null : result;
             }
         } catch (Throwable ex) {

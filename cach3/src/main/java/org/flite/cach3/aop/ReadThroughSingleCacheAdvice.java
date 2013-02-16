@@ -75,7 +75,7 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
             cacheKey = buildCacheKey(baseKey, annotationData);
 			final Object result = cache.get(cacheKey);
 			if (result != null) {
-				LOG.debug("Cache hit for key " + cacheKey);
+//				LOG.debug("Cache hit for key " + cacheKey);
 				return (result instanceof PertinentNegativeNull) ? null : result;
 			}
 		} catch (Throwable ex) {

@@ -23,14 +23,24 @@
 package org.flite.cach3.level2.annotations;
 
 public enum Duration {
-    UNDEFINED,
-    ONE_SECOND,
-    FIVE_SECONDS,
-    TEN_SECONDS,
-    FIFTEEN_SECONDS,
-    THIRTY_SECONDS,
-    ONE_MINUTE,
-    NINETY_SECONDS,
-    TWO_MINUTES,
-    FIVE_MINUTES;
+    UNDEFINED(-1),
+    ONE_SECOND(1000),
+    FIVE_SECONDS(5000),
+    TEN_SECONDS(10000),
+    FIFTEEN_SECONDS(15000),
+    THIRTY_SECONDS(30000),
+    ONE_MINUTE(60000),
+    NINETY_SECONDS(90000),
+    TWO_MINUTES(120000),
+    FIVE_MINUTES(300000);
+
+    private long millis;
+
+    private Duration(long millis) {
+        this.millis = millis;
+    }
+
+    public long getMillis() {
+        return millis;
+    }
 }

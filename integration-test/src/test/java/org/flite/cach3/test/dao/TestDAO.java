@@ -97,7 +97,7 @@ public interface TestDAO {
     Long funkyCube(Long number);
 
     /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
-    /** *                  L2 Multi cache methods.                                      * **/
+    /** *                    L2 cache methods.                                          * **/
     /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
     public List<String> getL2MultiAlpha(List<Long> ids, String generation);
@@ -110,4 +110,10 @@ public interface TestDAO {
     public String getL2AssignHotel(Long id, String generation);
     public Long invalidateL2AssignIndia(Long id);
 
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  Combined L1 & L2 cache methods.                              * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    public Long getCombinedData(String key);
+    public Long getL1Data(String key);
+    public Long updateL1Data(String key);
 }

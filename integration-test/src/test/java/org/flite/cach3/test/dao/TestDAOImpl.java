@@ -318,7 +318,7 @@ public class TestDAOImpl implements TestDAO {
 
 
     /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
-    /** *                  L2 Multi cache methods.                                      * **/
+    /** *                  L2 cache methods.                                            * **/
     /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
     private static final String L2_CACHE = "L2Cach3";
@@ -411,5 +411,28 @@ public class TestDAOImpl implements TestDAO {
     )
     public Long invalidateL2AssignIndia(final Long id) {
         return id;
+    }
+
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+    /** *                  Combined L1 & L2 cache methods.                              * **/
+    /** * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+    private static final String COMBINE_CACHE = "CombiL1L2";
+    private static final String COMBINE_PREFIX = "both-";
+
+    @L2ReadThroughSingleCache(namespace = COMBINE_CACHE, keyPrefix = COMBINE_PREFIX, keyIndex = 0, window = Duration.FIVE_SECONDS)
+    @ReadThroughSingleCache(namespace = COMBINE_CACHE, keyPrefix = COMBINE_PREFIX, keyIndex = 0, expiration = 30)
+    public Long getCombinedData(String key) {
+        return 1000L + RandomUtils.nextInt(8999);
+    }
+
+    @ReadThroughSingleCache(namespace = COMBINE_CACHE, keyPrefix = COMBINE_PREFIX, keyIndex = 0, expiration = 30)
+    public Long getL1Data(String key) {
+        return 10000L + RandomUtils.nextInt(89999);
+    }
+
+    @UpdateSingleCache(namespace = COMBINE_CACHE, keyPrefix = COMBINE_PREFIX, keyIndex = 0, dataIndex = -1, expiration = 30)
+    public Long updateL1Data(String key) {
+        return 100000L + RandomUtils.nextInt(899999);
     }
 }

@@ -46,7 +46,7 @@ public class LogicalCacheImpl implements LogicalCacheIF, InitializingBean {
 
         // TODO: Refactor to use a configurable set of cache sizes.
         for (final Duration duration : DURATION_SET) {
-            final Cache<String, Object> single = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MILLISECONDS).build();
+            final Cache<String, Object> single = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(duration.getMillis(), TimeUnit.MILLISECONDS).build();
             caches.put(duration, single);
         }
     }
@@ -91,7 +91,7 @@ public class LogicalCacheImpl implements LogicalCacheIF, InitializingBean {
         for (final Map.Entry<String, Object> entry : contents.entrySet()) {
             final String key = entry.getKey();
             final Object value = entry.getValue() == null ? new PertinentNegativeNull() : entry.getValue();
-            System.out.println("Key: " + key);
+//            System.out.println("Key: " + key + "; Value: " + value.toString() + "; Duration: " + duration);
             nanny.put(key, duration);
             cache.put(key, value);
         }
