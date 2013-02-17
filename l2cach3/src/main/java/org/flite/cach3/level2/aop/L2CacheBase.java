@@ -51,9 +51,7 @@ public class L2CacheBase {
     }
 
     protected boolean isCacheDisabled() {
-//        LOG.debug(" > > > > ATTENTION!! - Not Yet Implemented!");
-        return false;
-//        return state == null ? false : state.isCacheDisabled();
+        return this.state.isCacheDisabled();
     }
 
     public static Method getMethodToCache(final JoinPoint jp) throws NoSuchMethodException {

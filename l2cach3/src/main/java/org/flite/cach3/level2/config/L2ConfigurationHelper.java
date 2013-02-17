@@ -22,26 +22,17 @@
 
 package org.flite.cach3.level2.config;
 
-import org.flite.cach3.level2.aop.LogicalCacheIF;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class L2Cach3State {
+import java.security.InvalidParameterException;
 
-    private LogicalCacheIF cache;
-    private boolean cacheDisabled;
+public class L2ConfigurationHelper {
+    private static final Logger LOG = LoggerFactory.getLogger(L2ConfigurationHelper.class);
 
-    public LogicalCacheIF getCache() {
-        return cache;
-    }
-
-    public void setCache(LogicalCacheIF cache) {
-        this.cache = cache;
-    }
-
-    public boolean isCacheDisabled() {
-        return cacheDisabled;
-    }
-
-    public void setCacheDisabled(boolean cacheDisabled) {
-        this.cacheDisabled = cacheDisabled;
+    public static Boolean setCacheDisabled(final L2Cach3State state, final boolean disabled) {
+        if (state == null) { throw new InvalidParameterException("Cach3State must be defined."); }
+        state.setCacheDisabled(disabled);
+        return disabled;
     }
 }

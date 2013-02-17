@@ -41,18 +41,4 @@ public class ConfigurationHelper {
         return jitterDefault;
     }
 
-//    Not sure why this method is needed...?
-//    public static boolean addCacheListeners(final Cach3State state, final CacheListener... listeners) {
-//        if (state == null) { throw new InvalidParameterException("Cach3State must be defined."); }
-//        if (listeners != null && listeners.length > 0) {
-//            for (final CacheListener listener : listeners) {
-//                if (listener == null) {
-//                    LOG.info("Skipping null CacheListener");
-//                } else {
-//                    state.addListener(listener);
-//                }
-//            }
-//        }
-//        return true;
-//    }
 }
