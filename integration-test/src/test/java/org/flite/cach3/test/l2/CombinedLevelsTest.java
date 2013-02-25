@@ -22,12 +22,15 @@
 
 package org.flite.cach3.test.l2;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.flite.cach3.test.svc.TestSvc;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.apache.commons.lang.*;
+import org.apache.commons.lang.math.*;
+import org.flite.cach3.test.model.*;
+import org.flite.cach3.test.svc.*;
+import org.springframework.context.*;
+import org.springframework.context.support.*;
+import org.testng.annotations.*;
+
+import java.util.*;
 
 import static org.testng.AssertJUnit.*;
 
@@ -87,4 +90,34 @@ public class CombinedLevelsTest {
 
     }
 
+    @Test
+    public void testCacheConditionally() throws Exception {
+        final TestSvc test = (TestSvc) context.getBean("testSvc");
+
+        final long base = RandomUtils.nextLong();
+
+        final List<Long> ids = new ArrayList<Long>(15);
+        for (int ix = 0; ix < 15; ix++) {
+            ids.add(base + ix);
+        }
+
+        final String gen1 = RandomStringUtils.randomAlphanumeric(10);
+        final List<Example> r1 = test.getExampleObjects(ids, gen1);
+        for (final Example ex : r1) {
+            assertEquals(gen1, ex.getBody());
+        }
+
+        final String gen2 = RandomStringUtils.randomAlphanumeric(14);
+        final List<Example> r2 = test.getExampleObjects(ids, gen2);
+        int found = 0;
+        for (final Example ex : r2) {
+            if (ex.isCacheable()) {
+                assertEquals(gen1, ex.getBody());
+            } else {
+                found++;
+                assertEquals(gen2, ex.getBody());
+            }
+        }
+        assertEquals(3, found);
+    }
 }

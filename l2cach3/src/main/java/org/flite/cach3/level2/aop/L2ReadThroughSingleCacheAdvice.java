@@ -30,6 +30,7 @@ import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.aop.*;
+import org.flite.cach3.api.*;
 import org.flite.cach3.level2.annotations.*;
 import org.slf4j.*;
 import org.springframework.core.*;
@@ -89,7 +90,13 @@ public class L2ReadThroughSingleCacheAdvice extends L2CacheBase {
    		// but do not let it surface up past the AOP injection itself.
    		try {
    			final Object submission = (result == null) ? new PertinentNegativeNull() : result;
-            getCache().setBulk(ImmutableMap.of(cacheKey, submission),  info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+            boolean cacheable = true;
+            if (submission instanceof CacheConditionally) {
+               cacheable = ((CacheConditionally) submission).isCacheable();
+            }
+            if (cacheable) {
+                getCache().setBulk(ImmutableMap.of(cacheKey, submission),  info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+            }
    		} catch (Throwable ex) {
    			LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
    		}

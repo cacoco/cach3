@@ -123,8 +123,6 @@ public class UpdateMultiCacheAdvice extends CacheBase {
         }
     }
 
-
-
 	protected void updateCache(final List<String> cacheKeys,
 	                           final List<Object> returnList,
 	                           final Method methodToCache,
@@ -141,7 +139,13 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 			final Object result = returnList.get(ix);
 			final String cacheKey = cacheKeys.get(ix);
 			final Object cacheObject = result != null ? result : new PertinentNegativeNull();
-			cache.set(cacheKey, annotationData.getJitteredExpiration(), cacheObject);
+            boolean cacheable = true;
+            if (cacheObject instanceof CacheConditionally) {
+                cacheable = ((CacheConditionally) cacheObject).isCacheable();
+            }
+            if (cacheable) {
+			    cache.set(cacheKey, annotationData.getJitteredExpiration(), cacheObject);
+            }
 		}
 	}
 

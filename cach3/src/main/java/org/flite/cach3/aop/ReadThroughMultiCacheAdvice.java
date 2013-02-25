@@ -117,9 +117,15 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 				final Object resultObject = results.get(ix) == null ? new PertinentNegativeNull() : results.get(ix);
 				final String cacheKey = coord.obj2Key.get(keyObject);
                 final String cacheBase = coord.obj2Base.get(keyObject);
-				cache.set(cacheKey,
-						data.getJitteredExpiration(),
-						resultObject);
+                boolean cacheable = true;
+                if (resultObject instanceof CacheConditionally) {
+                    cacheable = ((CacheConditionally) resultObject).isCacheable();
+                }
+                if (cacheable) {
+                    cache.set(cacheKey,
+                            data.getJitteredExpiration(),
+                            resultObject);
+                }
 				coord.getKey2Result().put(cacheKey, resultObject);
                 cacheBaseIds[ix] = cacheBase;
 			}

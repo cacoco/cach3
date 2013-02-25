@@ -27,6 +27,7 @@ import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.aop.*;
+import org.flite.cach3.api.*;
 import org.flite.cach3.level2.annotations.*;
 import org.slf4j.*;
 import org.springframework.core.*;
@@ -66,7 +67,13 @@ public class L2UpdateAssignCacheAdvice extends L2CacheBase {
                     ? retVal
                     : CacheBase.getIndexObject(dataIndex, jp.getArgs(), methodToCache.toString());
             final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
-            getCache().setBulk(ImmutableMap.of(cacheKey, submission), info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+            boolean cacheable = true;
+            if (submission instanceof CacheConditionally) {
+               cacheable = ((CacheConditionally) submission).isCacheable();
+            }
+            if (cacheable) {
+                getCache().setBulk(ImmutableMap.of(cacheKey, submission), info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+            }
 		} catch (Exception ex) {
 			LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
 		}

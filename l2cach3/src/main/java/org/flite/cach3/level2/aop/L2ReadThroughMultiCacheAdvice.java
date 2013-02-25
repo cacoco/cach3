@@ -28,6 +28,7 @@ import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.aop.*;
+import org.flite.cach3.api.*;
 import org.flite.cach3.level2.annotations.*;
 import org.slf4j.*;
 import org.springframework.core.*;
@@ -121,7 +122,15 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
                 final Object resultObject = results.get(ix) == null ? new PertinentNegativeNull() : results.get(ix);
                 final String cacheKey = coord.getObj2Key().get(keyObject);
                 final String cacheBase = coord.getObj2Base().get(keyObject);
-                builder.put(cacheKey, resultObject);
+                boolean cacheable = true;
+                if (resultObject instanceof CacheConditionally) {
+                    cacheable = ((CacheConditionally) resultObject).isCacheable();
+                }
+                if (cacheable) {
+                    builder.put(cacheKey, resultObject);
+                } else {
+                    coord.getKey2Result().put(cacheKey, resultObject);
+                }
                 cacheBaseIds[ix] = cacheBase;
             }
             final ImmutableMap<String, Object> input = builder.build();

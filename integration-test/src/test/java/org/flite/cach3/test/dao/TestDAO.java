@@ -22,6 +22,8 @@
 
 package org.flite.cach3.test.dao;
 
+import org.flite.cach3.test.model.*;
+
 import java.util.*;
 
 public interface TestDAO {
@@ -116,4 +118,6 @@ public interface TestDAO {
     public Long getCombinedData(String key);
     public Long getL1Data(String key);
     public Long updateL1Data(String key);
+    public List<Example> getExampleObjects(List<Long> ids, String gen);
+
 }

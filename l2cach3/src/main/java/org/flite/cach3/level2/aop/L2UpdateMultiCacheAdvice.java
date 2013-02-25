@@ -28,6 +28,7 @@ import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
 import org.flite.cach3.aop.*;
+import org.flite.cach3.api.*;
 import org.flite.cach3.exceptions.*;
 import org.flite.cach3.level2.annotations.*;
 import org.slf4j.*;
@@ -125,7 +126,14 @@ public class L2UpdateMultiCacheAdvice extends L2CacheBase {
 
         final ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
    		for (int ix = 0; ix < returnList.size(); ix++) {
-            builder.put(cacheKeys.get(ix), returnList.get(ix));
+            final Object resultObject = returnList.get(ix);
+            boolean cacheable = true;
+            if (resultObject instanceof CacheConditionally) {
+               cacheable = ((CacheConditionally) resultObject).isCacheable();
+            }
+            if (cacheable) {
+                builder.put(cacheKeys.get(ix), resultObject);
+            }
    		}
 
         cache.setBulk(builder.build(), window);

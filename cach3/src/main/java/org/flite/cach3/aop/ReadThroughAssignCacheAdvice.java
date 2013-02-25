@@ -83,7 +83,13 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
         // but do not let it surface up past the AOP injection itself.
         try {
             final Object submission = (result == null) ? new PertinentNegativeNull() : result;
-            cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
+            boolean cacheable = true;
+            if (submission instanceof CacheConditionally) {
+                cacheable = ((CacheConditionally) submission).isCacheable();
+            }
+            if (cacheable) {
+                cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
+            }
 
             // Notify the observers that a cache interaction happened.
             final List<ReadThroughAssignCacheListener> listeners = getPertinentListeners(ReadThroughAssignCacheListener.class,annotationData.getNamespace());
