@@ -20,7 +20,6 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <spring.jar.version>3.0.5.RELEASE</spring.jar.version>
     <aspectj.jar.version>1.6.11</aspectj.jar.version>
-    <guava.version>13.0.1</guava.version>
   </properties>
 
   <dependencies>
@@ -29,11 +28,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>cach3</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${guava.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
