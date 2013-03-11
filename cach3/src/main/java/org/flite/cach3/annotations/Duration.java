@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package org.flite.cach3.level2.annotations;
+package org.flite.cach3.annotations;
 
 public enum Duration {
     UNDEFINED(-1),
