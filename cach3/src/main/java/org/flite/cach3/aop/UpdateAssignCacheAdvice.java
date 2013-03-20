@@ -33,6 +33,7 @@ import org.springframework.core.*;
 import org.springframework.core.annotation.*;
 
 import java.lang.reflect.*;
+import java.security.*;
 import java.util.*;
 
 @Aspect
@@ -57,29 +58,29 @@ public class UpdateAssignCacheAdvice extends CacheBase {
         try {
             final Method methodToCache = getMethodToCache(jp);
             final UpdateAssignCache annotation = methodToCache.getAnnotation(UpdateAssignCache.class);
-            final AnnotationData annotationData = AnnotationDataBuilder.buildAnnotationData(annotation,
-                            UpdateAssignCache.class,
-                            methodToCache.getName(),
-                            getJitterDefault());
-            final String cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
-            final Object dataObject = annotationData.getDataIndex() == -1
+            final AnnotationInfo info = getAnnotationInfo(annotation, methodToCache.getName(), getJitterDefault());
+            final String cacheKey = buildCacheKey(info.getAsString(AType.ASSIGN_KEY),
+                    info.getAsString(AType.NAMESPACE),
+                    info.getAsString(AType.KEY_PREFIX));
+            final int dataIndex = info.getAsInteger(AType.DATA_INDEX, -2).intValue();
+            final Object dataObject = dataIndex == -1
                     ? retVal
-                    : getIndexObject(annotationData.getDataIndex(), jp.getArgs(), methodToCache.toString());
+                    : getIndexObject(dataIndex, jp.getArgs(), methodToCache.toString());
             final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
             boolean cacheable = true;
             if (submission instanceof CacheConditionally) {
                 cacheable = ((CacheConditionally) submission).isCacheable();
             }
             if (cacheable) {
-			    cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
+			    cache.set(cacheKey, info.getAsInteger(AType.JITTER), submission);
             }
 
             // Notify the observers that a cache interaction happened.
-            final List<UpdateAssignCacheListener> listeners = getPertinentListeners(UpdateAssignCacheListener.class,annotationData.getNamespace());
+            final List<UpdateAssignCacheListener> listeners = getPertinentListeners(UpdateAssignCacheListener.class, info.getAsString(AType.NAMESPACE));
             if (listeners != null && !listeners.isEmpty()) {
                 for (final UpdateAssignCacheListener listener : listeners) {
                     try {
-                        listener.triggeredUpdateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), dataObject, retVal, jp.getArgs());
+                        listener.triggeredUpdateAssignCache(info.getAsString(AType.NAMESPACE), info.getAsString(AType.ASSIGN_KEY), dataObject, retVal, jp.getArgs());
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }
@@ -106,8 +107,6 @@ public class UpdateAssignCacheAdvice extends CacheBase {
         return retVal;
     }
 
-
-
     private void doUpdate(final JoinPoint jp, final Object retVal) throws Throwable {
         // If we've disabled the caching programmatically (or via properties file) just flow through.
         if (isCacheDisabled()) {
@@ -130,23 +129,23 @@ public class UpdateAssignCacheAdvice extends CacheBase {
                 // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
                 // but do not let it surface up past the AOP injection itself.
 
-                final AnnotationData annotationData = AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
-                                UpdateAssignCache.class,
-                                methodToCache.getName(),
-                                getJitterDefault());
-                final String cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
-                final Object dataObject = annotationData.getDataIndex() == -1
+                final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName(), getJitterDefault());
+                final String cacheKey = buildCacheKey(info.getAsString(AType.ASSIGN_KEY),
+                        info.getAsString(AType.NAMESPACE),
+                        info.getAsString(AType.KEY_PREFIX));
+                final int dataIndex = info.getAsInteger(AType.DATA_INDEX, -2).intValue();
+                final Object dataObject = dataIndex == -1
                         ? retVal
-                        : getIndexObject(annotationData.getDataIndex(), jp.getArgs(), methodToCache.toString());
+                        : getIndexObject(dataIndex, jp.getArgs(), methodToCache.toString());
                 final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
-                cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
+                cache.set(cacheKey, info.getAsInteger(AType.JITTER), submission);
 
                 // Notify the observers that a cache interaction happened.
-                final List<UpdateAssignCacheListener> listeners = getPertinentListeners(UpdateAssignCacheListener.class,annotationData.getNamespace());
+                final List<UpdateAssignCacheListener> listeners = getPertinentListeners(UpdateAssignCacheListener.class, info.getAsString(AType.NAMESPACE));
                 if (listeners != null && !listeners.isEmpty()) {
                     for (final UpdateAssignCacheListener listener : listeners) {
                         try {
-                            listener.triggeredUpdateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), dataObject, retVal, jp.getArgs());
+                            listener.triggeredUpdateAssignCache(info.getAsString(AType.NAMESPACE), info.getAsString(AType.ASSIGN_KEY), dataObject, retVal, jp.getArgs());
                         } catch (Exception ex) {
                             LOG.warn("Problem when triggering a listener.", ex);
                         }
@@ -159,6 +158,72 @@ public class UpdateAssignCacheAdvice extends CacheBase {
 
     }
 
+    /*default*/ static AnnotationInfo getAnnotationInfo(final UpdateAssignCache annotation,
+                                                        final String targetMethodName,
+                                                        final int jitterDefault) {
+        final AnnotationInfo result = new AnnotationInfo();
 
+        if (annotation == null) {
+            throw new InvalidParameterException(String.format(
+                    "No annotation of type [%s] found.",
+                    UpdateAssignCache.class.getName()
+            ));
+        }
 
+        final String assignKey = annotation.assignedKey();
+        if (AnnotationConstants.DEFAULT_STRING.equals(assignKey)
+                || assignKey == null
+                || assignKey.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "AssignedKey for annotation [%s] must be defined on [%s]",
+                    UpdateAssignCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.AssignKey(assignKey));
+
+        final int dataIndex = annotation.dataIndex();
+        if (dataIndex < -1) {
+            throw new InvalidParameterException(String.format(
+                    "DataIndex for annotation [%s] must be -1 or greater on [%s]",
+                    UpdateAssignCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.DataIndex(dataIndex));
+
+        final int expiration = annotation.expiration();
+        if (expiration < 0) {
+            throw new InvalidParameterException(String.format(
+                    "Expiration for annotation [%s] must be 0 or greater on [%s]",
+                    UpdateAssignCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Expiration(expiration));
+
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    UpdateAssignCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
+        final int jitter = annotation.jitter();
+        if (jitter < -1 || jitter > 99) {
+            throw new InvalidParameterException(String.format(
+                    "Jitter for annotation [%s] must be -1 <= jitter <= 99 on [%s]",
+                    UpdateAssignCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Jitter(jitter == -1 ? jitterDefault : jitter));
+
+        return result;
+    }
 }

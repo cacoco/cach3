@@ -18,6 +18,8 @@ public class AType {
     public static final String WINDOW = "wndw";
     public static final String DATA_INDEX = "didx";
     public static final String ASSIGN_KEY = "assn";
+    public static final String EXPIRATION = "expn";
+    public static final String JITTER = "jitr";
 
     private AType() { }
 
@@ -68,6 +70,20 @@ public class AType {
         public AssignKey(String value) { this.value = value; }
         public String getName() { return ASSIGN_KEY; }
         public String getValue() { return value; }
+    }
+
+    public static class Expiration implements AnnotationDatum<Integer> {
+        private Integer value;
+        public Expiration(Integer value) { this.value = value; }
+        public String getName() { return EXPIRATION; }
+        public Integer getValue() { return value; }
+    }
+
+    public static class Jitter implements AnnotationDatum<Integer> {
+        private Integer value;
+        public Jitter(Integer value) { this.value = value; }
+        public String getName() { return JITTER; }
+        public Integer getValue() { return value; }
     }
 
 }
