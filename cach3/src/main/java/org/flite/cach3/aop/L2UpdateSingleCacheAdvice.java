@@ -88,24 +88,24 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
             try {
                 final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName());
                 final String baseKey = CacheBase.getBaseKey(
-                        info.<String>getAsType(AnnotationTypes.KEY_TEMPLATE, ""),
-                        info.<Integer>getAsType(AnnotationTypes.KEY_INDEX, null),
+                        info.getAsString(AType.KEY_TEMPLATE),
+                        info.getAsInteger(AType.KEY_INDEX, null),
                         retVal,
                         jp.getArgs(),
                         methodToCache.toString(),
                         factory,
                         methodStore);
                 final String cacheKey = buildCacheKey(baseKey,
-                        info.<String>getAsType(AnnotationTypes.NAMESPACE,""),
-                        info.<String>getAsType(AnnotationTypes.KEY_PREFIX,""));
-                final Object dataObject = CacheBase.getIndexObject(info.<Integer>getAsType(AnnotationTypes.DATA_INDEX, null), retVal, jp.getArgs(), methodToCache.toString());
+                        info.getAsString(AType.NAMESPACE),
+                        info.getAsString(AType.KEY_PREFIX));
+                final Object dataObject = CacheBase.getIndexObject(info.getAsInteger(AType.DATA_INDEX, null), retVal, jp.getArgs(), methodToCache.toString());
                 final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
                 boolean cacheable = true;
                 if (submission instanceof CacheConditionally) {
                    cacheable = ((CacheConditionally) submission).isCacheable();
                 }
                 if (cacheable) {
-                    getCache().setBulk(ImmutableMap.of(cacheKey, submission), info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+                    getCache().setBulk(ImmutableMap.of(cacheKey, submission), info.<Duration>getAsType(AType.WINDOW, null));
                 }
             } catch (Exception ex) {
                 LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
@@ -127,7 +127,7 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
         if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
                 && keyPrefix != null
                 && keyPrefix.length() > 0) {
-            result.add(new AnnotationTypes.KeyPrefix(keyPrefix));
+            result.add(new AType.KeyPrefix(keyPrefix));
         }
 
         final Integer keyIndex = annotation.keyIndex();
@@ -153,11 +153,11 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
                         targetMethodName
                 ));
             }
-            result.add(new AnnotationTypes.KeyIndex(keyIndex));
+            result.add(new AType.KeyIndex(keyIndex));
         }
 
         if (keyTemplateDefined) {
-            result.add(new AnnotationTypes.KeyTemplate(keyTemplate));
+            result.add(new AType.KeyTemplate(keyTemplate));
         }
 
         final int dataIndex = annotation.dataIndex();
@@ -168,7 +168,7 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.DataIndex(dataIndex));
+        result.add(new AType.DataIndex(dataIndex));
 
         final Duration window = annotation.window();
         if (window == Duration.UNDEFINED) {
@@ -178,7 +178,7 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Window(window));
+        result.add(new AType.Window(window));
 
         final String namespace = annotation.namespace();
         if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
@@ -190,7 +190,7 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Namespace(namespace));
+        result.add(new AType.Namespace(namespace));
 
         return result;
     }

@@ -56,11 +56,11 @@ public class L2UpdateAssignCacheAdvice extends L2CacheBase {
             final Method methodToCache = getMethodToCache(jp);
             final L2UpdateAssignCache annotation = methodToCache.getAnnotation(L2UpdateAssignCache.class);
             final AnnotationInfo info = getAnnotationInfo(annotation, methodToCache.getName());
-            final String cacheKey = buildCacheKey(info.<String>getAsType(AnnotationTypes.ASSIGN_KEY, ""),
-                    info.<String>getAsType(AnnotationTypes.NAMESPACE, ""),
-                    info.<String>getAsType(AnnotationTypes.KEY_PREFIX, ""));
+            final String cacheKey = buildCacheKey(info.getAsString(AType.ASSIGN_KEY),
+                    info.getAsString(AType.NAMESPACE),
+                    info.getAsString(AType.KEY_PREFIX));
 
-            final int dataIndex = info.<Integer>getAsType(AnnotationTypes.DATA_INDEX, -2).intValue();
+            final int dataIndex = info.getAsInteger(AType.DATA_INDEX, -2).intValue();
             final Object dataObject = dataIndex == -1
                     ? retVal
                     : CacheBase.getIndexObject(dataIndex, jp.getArgs(), methodToCache.toString());
@@ -70,7 +70,7 @@ public class L2UpdateAssignCacheAdvice extends L2CacheBase {
                cacheable = ((CacheConditionally) submission).isCacheable();
             }
             if (cacheable) {
-                getCache().setBulk(ImmutableMap.of(cacheKey, submission), info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+                getCache().setBulk(ImmutableMap.of(cacheKey, submission), info.<Duration>getAsType(AType.WINDOW, null));
             }
 		} catch (Exception ex) {
 			LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
@@ -99,7 +99,7 @@ public class L2UpdateAssignCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.AssignKey(assignKey));
+        result.add(new AType.AssignKey(assignKey));
 
         final int dataIndex = annotation.dataIndex();
         if (dataIndex < -1) {
@@ -109,7 +109,7 @@ public class L2UpdateAssignCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.DataIndex(dataIndex));
+        result.add(new AType.DataIndex(dataIndex));
 
         final Duration window = annotation.window();
         if (window == Duration.UNDEFINED) {
@@ -119,7 +119,7 @@ public class L2UpdateAssignCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Window(window));
+        result.add(new AType.Window(window));
 
         final String namespace = annotation.namespace();
         if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
@@ -131,7 +131,7 @@ public class L2UpdateAssignCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Namespace(namespace));
+        result.add(new AType.Namespace(namespace));
 
         return result;
     }

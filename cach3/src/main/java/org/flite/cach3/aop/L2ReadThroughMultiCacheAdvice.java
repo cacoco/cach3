@@ -70,19 +70,19 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
             info = getAnnotationInfo(annotation, coord.getMethod().getName());
 
             // Get the list of objects that will provide the keys to all the cache values.
-            coord.setKeyObjects(ReadThroughMultiCacheAdvice.getKeyObjectList(info.<Integer>getAsType(AnnotationTypes.KEY_INDEX,null), pjp, coord.getMethod()));
+            coord.setKeyObjects(ReadThroughMultiCacheAdvice.getKeyObjectList(info.getAsInteger(AType.KEY_INDEX,null), pjp, coord.getMethod()));
 
             // Create key->object and object->key mappings.
             coord.setHolder(ReadThroughMultiCacheAdvice.convertIdObjectsToKeyMap(coord.getKeyObjects(),
-                    info.<String>getAsType(AnnotationTypes.NAMESPACE, ""),
-                    info.<String>getAsType(AnnotationTypes.KEY_PREFIX, ""),
-                    info.<String>getAsType(AnnotationTypes.KEY_TEMPLATE, ""),
+                    info.getAsString(AType.NAMESPACE),
+                    info.getAsString(AType.KEY_PREFIX),
+                    info.getAsString(AType.KEY_TEMPLATE),
                     factory,
                     methodStore,
                     args));
 
             // Get the full list of cache keys and ask the cache for the corresponding values.
-			coord.setInitialKey2Result(getCache().getBulk(coord.getKey2Obj().keySet(), info.<Duration>getAsType(AnnotationTypes.WINDOW, null)));
+			coord.setInitialKey2Result(getCache().getBulk(coord.getKey2Obj().keySet(), info.<Duration>getAsType(AType.WINDOW, null)));
 
 			// We've gotten all positive cache results back, so build up a results list and return it.
 			if (coord.getMissObjects().size() < 1) {
@@ -90,7 +90,7 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
 			}
 
 			// Create the new list of arguments with a subset of the key objects that aren't in the cache.
-			args = coord.modifyArgumentList(args, info.<Integer>getAsType(AnnotationTypes.KEY_INDEX, null));
+			args = coord.modifyArgumentList(args, info.getAsInteger(AType.KEY_INDEX, null));
         } catch (Throwable ex) {
             // If there's an exception somewhere in the caching code, then just bail out
             // and call through to the target method with the original parameters.
@@ -131,7 +131,7 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
                 cacheBaseIds[ix] = cacheBase;
             }
             final ImmutableMap<String, Object> input = builder.build();
-            getCache().setBulk(input, info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+            getCache().setBulk(input, info.<Duration>getAsType(AType.WINDOW, null));
             coord.getKey2Result().putAll(input);
 
             return coord.generateResultList();
@@ -160,7 +160,7 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
         if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
                 && keyPrefix != null
                 && keyPrefix.length() > 0) {
-            result.add(new AnnotationTypes.KeyPrefix(keyPrefix));
+            result.add(new AType.KeyPrefix(keyPrefix));
         }
 
         final Integer keyIndex = annotation.keyIndex();
@@ -171,11 +171,11 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.KeyIndex(keyIndex));
+        result.add(new AType.KeyIndex(keyIndex));
 
         final String keyTemplate = annotation.keyTemplate();
         if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
-            result.add(new AnnotationTypes.KeyTemplate(keyTemplate));
+            result.add(new AType.KeyTemplate(keyTemplate));
         }
 
         final Duration window = annotation.window();
@@ -186,7 +186,7 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Window(window));
+        result.add(new AType.Window(window));
 
         final String namespace = annotation.namespace();
         if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
@@ -198,7 +198,7 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Namespace(namespace));
+        result.add(new AType.Namespace(namespace));
 
         return result;
     }

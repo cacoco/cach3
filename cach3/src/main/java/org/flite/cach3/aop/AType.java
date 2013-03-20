@@ -10,7 +10,7 @@ import org.flite.cach3.annotations.*;
  * SECRET OF THE COPYRIGHT HOLDER, AND DISTRIBUTED ONLY UNDER RESTRICTION.
  */
 
-public class AnnotationTypes {
+public class AType {
     public static final String NAMESPACE = "ns";
     public static final String KEY_INDEX = "idx";
     public static final String KEY_TEMPLATE = "tmpl";
@@ -19,7 +19,7 @@ public class AnnotationTypes {
     public static final String DATA_INDEX = "didx";
     public static final String ASSIGN_KEY = "assn";
 
-    private AnnotationTypes() { }
+    private AType() { }
 
     public static class Namespace implements AnnotationDatum<String> {
         private String value;

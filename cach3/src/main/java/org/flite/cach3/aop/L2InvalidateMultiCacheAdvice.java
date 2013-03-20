@@ -98,13 +98,13 @@ public class L2InvalidateMultiCacheAdvice extends L2CacheBase {
             // but do not let it surface up past the AOP injection itself.
             try {
                 final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName());
-                final List<Object> keyObjects = (List<Object>) UpdateMultiCacheAdvice.getIndexObject(info.<Integer>getAsType(AnnotationTypes.KEY_INDEX, Integer.MIN_VALUE), retVal, jp.getArgs(), methodToCache.toString());
-                final List<String> baseKeys = UpdateMultiCacheAdvice.getBaseKeys(keyObjects, info.<String>getAsType(AnnotationTypes.KEY_TEMPLATE, ""), retVal, jp.getArgs(), factory, methodStore);
+                final List<Object> keyObjects = (List<Object>) UpdateMultiCacheAdvice.getIndexObject(info.getAsInteger(AType.KEY_INDEX), retVal, jp.getArgs(), methodToCache.toString());
+                final List<String> baseKeys = UpdateMultiCacheAdvice.getBaseKeys(keyObjects, info.getAsString(AType.KEY_TEMPLATE), retVal, jp.getArgs(), factory, methodStore);
                 final List<String> fullKeys = new ArrayList<String>(baseKeys.size());
                 for (final String base : baseKeys) {
                     final String cacheKey = buildCacheKey(base,
-                            info.<String>getAsType(AnnotationTypes.NAMESPACE, ""),
-                            info.<String>getAsType(AnnotationTypes.KEY_PREFIX, ""));
+                            info.getAsString(AType.NAMESPACE),
+                            info.getAsString(AType.KEY_PREFIX));
                     fullKeys.add(cacheKey);
                 }
                 getCache().invalidateBulk(fullKeys);
@@ -128,7 +128,7 @@ public class L2InvalidateMultiCacheAdvice extends L2CacheBase {
         if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
                 && keyPrefix != null
                 && keyPrefix.length() > 0) {
-            result.add(new AnnotationTypes.KeyPrefix(keyPrefix));
+            result.add(new AType.KeyPrefix(keyPrefix));
         }
 
         final Integer keyIndex = annotation.keyIndex();
@@ -139,11 +139,11 @@ public class L2InvalidateMultiCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.KeyIndex(keyIndex));
+        result.add(new AType.KeyIndex(keyIndex));
 
         final String keyTemplate = annotation.keyTemplate();
         if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
-            result.add(new AnnotationTypes.KeyTemplate(keyTemplate));
+            result.add(new AType.KeyTemplate(keyTemplate));
         }
 
         final String namespace = annotation.namespace();
@@ -156,7 +156,7 @@ public class L2InvalidateMultiCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Namespace(namespace));
+        result.add(new AType.Namespace(namespace));
 
         return result;
     }

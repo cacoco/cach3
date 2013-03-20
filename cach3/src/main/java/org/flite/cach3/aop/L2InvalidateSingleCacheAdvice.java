@@ -94,16 +94,16 @@ public class L2InvalidateSingleCacheAdvice extends L2CacheBase {
             try {
                 final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName());
                 final String baseKey = CacheBase.getBaseKey(
-                        info.<String>getAsType(AnnotationTypes.KEY_TEMPLATE,""),
-                        info.<Integer>getAsType(AnnotationTypes.KEY_INDEX,null),
+                        info.getAsString(AType.KEY_TEMPLATE),
+                        info.getAsInteger(AType.KEY_INDEX,null),
                         retVal,
                         jp.getArgs(),
                         methodToCache.toString(),
                         factory,
                         methodStore);
                 final String cacheKey = buildCacheKey(baseKey,
-                        info.<String>getAsType(AnnotationTypes.NAMESPACE,""),
-                        info.<String>getAsType(AnnotationTypes.KEY_PREFIX,""));
+                        info.getAsString(AType.NAMESPACE),
+                        info.getAsString(AType.KEY_PREFIX));
 
                 LOG.debug("Invalidating cache for key " + cacheKey);
                 getCache().invalidateBulk(Arrays.asList(cacheKey));
@@ -127,7 +127,7 @@ public class L2InvalidateSingleCacheAdvice extends L2CacheBase {
         if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
                 && keyPrefix != null
                 && keyPrefix.length() > 0) {
-            result.add(new AnnotationTypes.KeyPrefix(keyPrefix));
+            result.add(new AType.KeyPrefix(keyPrefix));
         }
 
         final Integer keyIndex = annotation.keyIndex();
@@ -153,11 +153,11 @@ public class L2InvalidateSingleCacheAdvice extends L2CacheBase {
                         targetMethodName
                 ));
             }
-            result.add(new AnnotationTypes.KeyIndex(keyIndex));
+            result.add(new AType.KeyIndex(keyIndex));
         }
 
         if (keyTemplateDefined) {
-            result.add(new AnnotationTypes.KeyTemplate(keyTemplate));
+            result.add(new AType.KeyTemplate(keyTemplate));
         }
 
         final String namespace = annotation.namespace();
@@ -170,7 +170,7 @@ public class L2InvalidateSingleCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Namespace(namespace));
+        result.add(new AType.Namespace(namespace));
 
         return result;
     }

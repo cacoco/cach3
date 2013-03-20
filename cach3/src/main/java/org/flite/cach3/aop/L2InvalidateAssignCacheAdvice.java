@@ -85,9 +85,9 @@ public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
             // but do not let it surface up past the AOP injection itself.
             try {
                 final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName());
-                final String cacheKey = buildCacheKey(info.<String>getAsType(AnnotationTypes.ASSIGN_KEY, ""),
-                        info.<String>getAsType(AnnotationTypes.NAMESPACE, ""),
-                        info.<String>getAsType(AnnotationTypes.KEY_PREFIX, ""));
+                final String cacheKey = buildCacheKey(info.getAsString(AType.ASSIGN_KEY),
+                        info.getAsString(AType.NAMESPACE),
+                        info.getAsString(AType.KEY_PREFIX));
                 if (cacheKey == null || cacheKey.trim().length() == 0) {
                     throw new InvalidParameterException("Unable to find a cache key");
                 }
@@ -118,7 +118,7 @@ public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.AssignKey(assignKey));
+        result.add(new AType.AssignKey(assignKey));
 
         final String namespace = annotation.namespace();
         if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
@@ -130,7 +130,7 @@ public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Namespace(namespace));
+        result.add(new AType.Namespace(namespace));
 
         return result;
     }

@@ -59,10 +59,10 @@ public class L2ReadThroughAssignCacheAdvice extends L2CacheBase {
             final Method methodToCache = getMethodToCache(pjp);
             final L2ReadThroughAssignCache annotation = methodToCache.getAnnotation(L2ReadThroughAssignCache.class);
             info = getAnnotationInfo(annotation, methodToCache.getName());
-            cacheKey = buildCacheKey(info.<String>getAsType(AnnotationTypes.ASSIGN_KEY, ""),
-                    info.<String>getAsType(AnnotationTypes.NAMESPACE, ""),
-                    info.<String>getAsType(AnnotationTypes.KEY_PREFIX, ""));
-            final Map<String, Object> results = getCache().getBulk(Arrays.asList(cacheKey), info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+            cacheKey = buildCacheKey(info.getAsString(AType.ASSIGN_KEY),
+                    info.getAsString(AType.NAMESPACE),
+                    info.getAsString(AType.KEY_PREFIX));
+            final Map<String, Object> results = getCache().getBulk(Arrays.asList(cacheKey), info.<Duration>getAsType(AType.WINDOW, null));
             final Object result = results == null ? null : results.get(cacheKey);
             if (result != null) {
 //                LOG.debug("Cache hit for key " + cacheKey);
@@ -84,7 +84,7 @@ public class L2ReadThroughAssignCacheAdvice extends L2CacheBase {
                cacheable = ((CacheConditionally) submission).isCacheable();
             }
             if (cacheable) {
-                getCache().setBulk(ImmutableMap.of(cacheKey, submission), info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+                getCache().setBulk(ImmutableMap.of(cacheKey, submission), info.<Duration>getAsType(AType.WINDOW, null));
             }
         } catch (Throwable ex) {
             LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
@@ -112,7 +112,7 @@ public class L2ReadThroughAssignCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.AssignKey(assignKey));
+        result.add(new AType.AssignKey(assignKey));
 
         final Duration window = annotation.window();
         if (window == Duration.UNDEFINED) {
@@ -122,7 +122,7 @@ public class L2ReadThroughAssignCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Window(window));
+        result.add(new AType.Window(window));
 
         final String namespace = annotation.namespace();
         if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
@@ -134,7 +134,7 @@ public class L2ReadThroughAssignCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Namespace(namespace));
+        result.add(new AType.Namespace(namespace));
 
         return result;
     }

@@ -68,10 +68,10 @@ public class L2ReadThroughSingleCacheAdvice extends L2CacheBase {
             info = getAnnotationInfo(annotation, methodToCache.getName());
    			baseKey = generateBaseKeySingle(args, info, methodToCache.toString());
             cacheKey = buildCacheKey(baseKey,
-                    info.<String>getAsType(AnnotationTypes.NAMESPACE, null),
-                    info.<String>getAsType(AnnotationTypes.KEY_PREFIX, null));
+                    info.getAsString(AType.NAMESPACE, null),
+                    info.getAsString(AType.KEY_PREFIX, null));
 
-            final Map<String, Object> results = getCache().getBulk(Arrays.asList(cacheKey), info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+            final Map<String, Object> results = getCache().getBulk(Arrays.asList(cacheKey), info.<Duration>getAsType(AType.WINDOW, null));
    			final Object result = results == null ? null : results.get(cacheKey);
    			if (result != null) {
 //   				LOG.debug("Cache hit for key " + cacheKey);
@@ -93,7 +93,7 @@ public class L2ReadThroughSingleCacheAdvice extends L2CacheBase {
                cacheable = ((CacheConditionally) submission).isCacheable();
             }
             if (cacheable) {
-                getCache().setBulk(ImmutableMap.of(cacheKey, submission),  info.<Duration>getAsType(AnnotationTypes.WINDOW, null));
+                getCache().setBulk(ImmutableMap.of(cacheKey, submission),  info.<Duration>getAsType(AType.WINDOW, null));
             }
    		} catch (Throwable ex) {
    			LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
@@ -109,9 +109,9 @@ public class L2ReadThroughSingleCacheAdvice extends L2CacheBase {
     protected String generateBaseKeySingle(final Object[] args,
                                            final AnnotationInfo info,
                                            final String methodString) throws Exception {
-        final String keyTemplate = info.<String>getAsType(AnnotationTypes.KEY_TEMPLATE, null);
+        final String keyTemplate = info.getAsString(AType.KEY_TEMPLATE, null);
         if (StringUtils.isBlank(keyTemplate)) {
-            return getObjectId(CacheBase.getIndexObject(info.<Integer>getAsType(AnnotationTypes.KEY_INDEX, Integer.MIN_VALUE), args, methodString));
+            return getObjectId(CacheBase.getIndexObject(info.getAsInteger(AType.KEY_INDEX), args, methodString));
         }
 
         final VelocityContext context = factory.getNewExtendedContext();
@@ -138,7 +138,7 @@ public class L2ReadThroughSingleCacheAdvice extends L2CacheBase {
         if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
                 && keyPrefix != null
                 && keyPrefix.length() > 0) {
-            result.add(new AnnotationTypes.KeyPrefix(keyPrefix));
+            result.add(new AType.KeyPrefix(keyPrefix));
         }
 
         final Integer keyIndex = annotation.keyIndex();
@@ -164,11 +164,11 @@ public class L2ReadThroughSingleCacheAdvice extends L2CacheBase {
                         targetMethodName
                 ));
             }
-            result.add(new AnnotationTypes.KeyIndex(keyIndex));
+            result.add(new AType.KeyIndex(keyIndex));
         }
 
         if (keyTemplateDefined) {
-            result.add(new AnnotationTypes.KeyTemplate(keyTemplate));
+            result.add(new AType.KeyTemplate(keyTemplate));
         }
 
         final Duration window = annotation.window();
@@ -179,7 +179,7 @@ public class L2ReadThroughSingleCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Window(window));
+        result.add(new AType.Window(window));
 
         final String namespace = annotation.namespace();
         if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
@@ -191,7 +191,7 @@ public class L2ReadThroughSingleCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Namespace(namespace));
+        result.add(new AType.Namespace(namespace));
 
         return result;
     }

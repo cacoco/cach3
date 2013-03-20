@@ -94,16 +94,16 @@ public class L2UpdateMultiCacheAdvice extends L2CacheBase {
                 // but do not let it surface up past the AOP injection itself.
                 final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName());
 
-                final List<Object> dataList = (List<Object>) UpdateMultiCacheAdvice.getIndexObject(info.<Integer>getAsType(AnnotationTypes.DATA_INDEX, Integer.MIN_VALUE), retVal, jp.getArgs(), methodToCache.toString());
-                final List<Object> keyObjects = UpdateMultiCacheAdvice.getKeyObjects(info.<Integer>getAsType(AnnotationTypes.KEY_INDEX, Integer.MIN_VALUE), retVal, jp, methodToCache);
-                final List<String> baseKeys = UpdateMultiCacheAdvice.getBaseKeys(keyObjects, info.<String>getAsType(AnnotationTypes.KEY_TEMPLATE, null), retVal, jp.getArgs(), factory, methodStore);
+                final List<Object> dataList = (List<Object>) UpdateMultiCacheAdvice.getIndexObject(info.getAsInteger(AType.DATA_INDEX), retVal, jp.getArgs(), methodToCache.toString());
+                final List<Object> keyObjects = UpdateMultiCacheAdvice.getKeyObjects(info.getAsInteger(AType.KEY_INDEX), retVal, jp, methodToCache);
+                final List<String> baseKeys = UpdateMultiCacheAdvice.getBaseKeys(keyObjects, info.getAsString(AType.KEY_TEMPLATE, null), retVal, jp.getArgs(), factory, methodStore);
                 final List<String> cacheKeys = new ArrayList<String>(baseKeys.size());
                 for (final String base : baseKeys) {
                     cacheKeys.add(buildCacheKey(base,
-                            info.<String>getAsType(AnnotationTypes.NAMESPACE,null),
-                            info.<String>getAsType(AnnotationTypes.KEY_PREFIX,null)));
+                            info.getAsString(AType.NAMESPACE,null),
+                            info.getAsString(AType.KEY_PREFIX,null)));
                 }
-                updateCache(cacheKeys, dataList, methodToCache, info.<Duration>getAsType(AnnotationTypes.WINDOW, null), getCache());
+                updateCache(cacheKeys, dataList, methodToCache, info.<Duration>getAsType(AType.WINDOW, null), getCache());
             } catch (Exception ex) {
                 LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
             }
@@ -152,7 +152,7 @@ public class L2UpdateMultiCacheAdvice extends L2CacheBase {
         if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
                 && keyPrefix != null
                 && keyPrefix.length() > 0) {
-            result.add(new AnnotationTypes.KeyPrefix(keyPrefix));
+            result.add(new AType.KeyPrefix(keyPrefix));
         }
 
         final Integer keyIndex = annotation.keyIndex();
@@ -163,11 +163,11 @@ public class L2UpdateMultiCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.KeyIndex(keyIndex));
+        result.add(new AType.KeyIndex(keyIndex));
 
         final String keyTemplate = annotation.keyTemplate();
         if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
-            result.add(new AnnotationTypes.KeyTemplate(keyTemplate));
+            result.add(new AType.KeyTemplate(keyTemplate));
         }
 
         final int dataIndex = annotation.dataIndex();
@@ -178,7 +178,7 @@ public class L2UpdateMultiCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.DataIndex(dataIndex));
+        result.add(new AType.DataIndex(dataIndex));
 
         final Duration window = annotation.window();
         if (window == Duration.UNDEFINED) {
@@ -188,7 +188,7 @@ public class L2UpdateMultiCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Window(window));
+        result.add(new AType.Window(window));
 
         final String namespace = annotation.namespace();
         if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
@@ -200,7 +200,7 @@ public class L2UpdateMultiCacheAdvice extends L2CacheBase {
                     targetMethodName
             ));
         }
-        result.add(new AnnotationTypes.Namespace(namespace));
+        result.add(new AType.Namespace(namespace));
 
         return result;
     }
