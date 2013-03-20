@@ -95,7 +95,7 @@ public class L2InvalidateSingleCacheAdvice extends L2CacheBase {
                 final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName());
                 final String baseKey = CacheBase.getBaseKey(
                         info.getAsString(AType.KEY_TEMPLATE),
-                        info.getAsInteger(AType.KEY_INDEX,null),
+                        info.getAsInteger(AType.KEY_INDEX, null),
                         retVal,
                         jp.getArgs(),
                         methodToCache.toString(),

@@ -23,6 +23,7 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
+import org.apache.commons.lang.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
@@ -33,6 +34,7 @@ import org.springframework.core.*;
 import org.springframework.core.annotation.*;
 
 import java.lang.reflect.*;
+import java.security.*;
 import java.util.*;
 
 @Aspect
@@ -41,8 +43,7 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
     private static final Logger LOG = LoggerFactory.getLogger(InvalidateSingleCacheAdvice.class);
 
     @Pointcut("@annotation(org.flite.cach3.annotations.InvalidateSingleCache)")
-    public void invalidateSingle() {
-    }
+    public void invalidateSingle() { }
 
     // For Invalidate*Cache, an AfterReturning aspect is fine. We will only apply our caching
     // after the underlying method completes successfully, and we will have the same
@@ -61,10 +62,8 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
         return retVal;
     }
 
-
     @Pointcut("@annotation(org.flite.cach3.annotations.groups.InvalidateSingleCaches)")
-    public void invalidateSingles() {
-    }
+    public void invalidateSingles() { }
 
     @AfterReturning(pointcut = "invalidateSingles()", returning = "retVal")
     public Object cacheInvalidateSingles(final JoinPoint jp, final Object retVal) throws Throwable {
@@ -97,24 +96,26 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
             // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
             // but do not let it surface up past the AOP injection itself.
             try {
-                final AnnotationData annotationData =
-                        AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
-                                InvalidateSingleCache.class,
-                                methodToCache.getName(),
-                                getJitterDefault());
-                final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
-                final String cacheKey = buildCacheKey(baseKey, annotationData);
+                final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName());
+                final String baseKey = getBaseKey(
+                        info.getAsString(AType.KEY_TEMPLATE),
+                        info.getAsInteger(AType.KEY_INDEX, null),
+                        retVal,
+                        jp.getArgs(),
+                        methodToCache.toString(),
+                        factory,
+                        methodStore);
+                final String cacheKey = buildCacheKey(baseKey, info.getAsString(AType.NAMESPACE), info.getAsString(AType.KEY_PREFIX));
 
                 LOG.debug("Invalidating cache for key " + cacheKey);
                 cache.delete(cacheKey);
 
                 // Notify the observers that a cache interaction happened.
-                final List<InvalidateSingleCacheListener> listeners = getPertinentListeners(InvalidateSingleCacheListener.class, annotationData.getNamespace());
+                final List<InvalidateSingleCacheListener> listeners = getPertinentListeners(InvalidateSingleCacheListener.class, info.getAsString(AType.NAMESPACE));
                 if (listeners != null && !listeners.isEmpty()) {
                     for (final InvalidateSingleCacheListener listener : listeners) {
                         try {
-//                        listener.triggeredInvalidateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), keyObject);
-                            listener.triggeredInvalidateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKey, retVal, jp.getArgs());
+                            listener.triggeredInvalidateSingleCache(info.getAsString(AType.NAMESPACE), info.getAsString(AType.KEY_PREFIX, null), baseKey, retVal, jp.getArgs());
                         } catch (Exception ex) {
                             LOG.warn("Problem when triggering a listener.", ex);
                         }
@@ -126,7 +127,67 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
         }
     }
 
+    /*default*/ static AnnotationInfo getAnnotationInfo(final InvalidateSingleCache annotation, final String targetMethodName) {
+        final AnnotationInfo result = new AnnotationInfo();
 
+        if (annotation == null) {
+            throw new InvalidParameterException(String.format(
+                    "No annotation of type [%s] found.",
+                    InvalidateSingleCache.class.getName()
+            ));
+        }
+
+        final String keyPrefix = annotation.keyPrefix();
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
+                && keyPrefix != null
+                && keyPrefix.length() > 0) {
+            result.add(new AType.KeyPrefix(keyPrefix));
+        }
+
+        final Integer keyIndex = annotation.keyIndex();
+        final boolean keyIndexDefined = keyIndex >= -1;
+
+        final String keyTemplate = annotation.keyTemplate();
+        final boolean keyTemplateDefined = !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)
+                && StringUtils.isNotBlank(keyTemplate);
+
+        if (keyIndexDefined == keyTemplateDefined) {
+            throw new InvalidParameterException(String.format(
+                    "Exactly one of [keyIndex,keyTemplate] must be defined for annotation [%s] on [%s]",
+                    InvalidateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+
+        if (keyIndexDefined) {
+            if (keyIndex < 0) {
+                throw new InvalidParameterException(String.format(
+                        "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                        InvalidateSingleCache.class.getName(),
+                        targetMethodName
+                ));
+            }
+            result.add(new AType.KeyIndex(keyIndex));
+        }
+
+        if (keyTemplateDefined) {
+            result.add(new AType.KeyTemplate(keyTemplate));
+        }
+
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    InvalidateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
+        return result;
+    }
 
 
 }
