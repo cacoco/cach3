@@ -51,7 +51,6 @@ public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
         return retVal;
     }
 
-
 //    @Pointcut("@annotation(org.flite.cach3.annotations.groups.InvalidateAssignCaches)")
 //    public void invalidateAssigns() {}
 //
@@ -104,7 +103,7 @@ public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
         if (annotation == null) {
             throw new InvalidParameterException(String.format(
                     "No annotation of type [%s] found.",
-                    L2UpdateAssignCache.class.getName()
+                    L2InvalidateAssignCache.class.getName()
             ));
         }
 
@@ -114,7 +113,7 @@ public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
                 || assignKey.length() < 1) {
             throw new InvalidParameterException(String.format(
                     "AssignedKey for annotation [%s] must be defined on [%s]",
-                    L2UpdateAssignCache.class.getName(),
+                    L2InvalidateAssignCache.class.getName(),
                     targetMethodName
             ));
         }
@@ -126,7 +125,7 @@ public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
                 || namespace.length() < 1) {
             throw new InvalidParameterException(String.format(
                     "Namespace for annotation [%s] must be defined on [%s]",
-                    L2UpdateAssignCache.class.getName(),
+                    L2InvalidateAssignCache.class.getName(),
                     targetMethodName
             ));
         }
