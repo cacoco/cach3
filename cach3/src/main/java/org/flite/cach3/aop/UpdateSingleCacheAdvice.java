@@ -23,6 +23,7 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
+import org.apache.commons.lang.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
@@ -33,6 +34,7 @@ import org.springframework.core.*;
 import org.springframework.core.annotation.*;
 
 import java.lang.reflect.*;
+import java.security.*;
 import java.util.*;
 
 @Aspect
@@ -89,29 +91,34 @@ public class UpdateSingleCacheAdvice extends CacheBase {
             // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
             // but do not let it surface up past the AOP injection itself.
             try {
-                final AnnotationData annotationData =
-                        AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
-                                UpdateSingleCache.class,
-                                methodToCache.getName(),
-                                getJitterDefault());
-                final String baseKey = getBaseKey(annotationData, retVal, jp.getArgs(), methodToCache.toString());
-                final String cacheKey = buildCacheKey(baseKey, annotationData);
-                final Object dataObject = getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());
+                final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName(), getJitterDefault());
+                final String baseKey = CacheBase.getBaseKey(
+                        info.getAsString(AType.KEY_TEMPLATE),
+                        info.getAsInteger(AType.KEY_INDEX, null),
+                        retVal,
+                        jp.getArgs(),
+                        methodToCache.toString(),
+                        factory,
+                        methodStore);
+                final String cacheKey = buildCacheKey(baseKey,
+                        info.getAsString(AType.NAMESPACE),
+                        info.getAsString(AType.KEY_PREFIX));
+                final Object dataObject = CacheBase.getIndexObject(info.getAsInteger(AType.DATA_INDEX, null), retVal, jp.getArgs(), methodToCache.toString());
                 final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
                 boolean cacheable = true;
                 if (submission instanceof CacheConditionally) {
                     cacheable = ((CacheConditionally) submission).isCacheable();
                 }
                 if (cacheable) {
-                    cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
+                    cache.set(cacheKey, info.getAsInteger(AType.JITTER), submission);
                 }
 
                 // Notify the observers that a cache interaction happened.
-                final List<UpdateSingleCacheListener> listeners = getPertinentListeners(UpdateSingleCacheListener.class,annotationData.getNamespace());
+                final List<UpdateSingleCacheListener> listeners = getPertinentListeners(UpdateSingleCacheListener.class, info.getAsString(AType.NAMESPACE));
                 if (listeners != null && !listeners.isEmpty()) {
                     for (final UpdateSingleCacheListener listener : listeners) {
                         try {
-                            listener.triggeredUpdateSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKey, dataObject, retVal, jp.getArgs());
+                            listener.triggeredUpdateSingleCache(info.getAsString(AType.NAMESPACE), info.getAsString(AType.KEY_PREFIX, null), baseKey, dataObject, retVal, jp.getArgs());
                         } catch (Exception ex) {
                             LOG.warn("Problem when triggering a listener.", ex);
                         }
@@ -128,4 +135,98 @@ public class UpdateSingleCacheAdvice extends CacheBase {
 		return generateObjectId(keyMethod, keyObject);
 	}
 
+
+    /*default*/ static AnnotationInfo getAnnotationInfo(final UpdateSingleCache annotation,
+                                                        final String targetMethodName,
+                                                        final int jitterDefault) {
+        final AnnotationInfo result = new AnnotationInfo();
+
+        if (annotation == null) {
+            throw new InvalidParameterException(String.format(
+                    "No annotation of type [%s] found.",
+                    UpdateSingleCache.class.getName()
+            ));
+        }
+
+        final String keyPrefix = annotation.keyPrefix();
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
+                && keyPrefix != null
+                && keyPrefix.length() > 0) {
+            result.add(new AType.KeyPrefix(keyPrefix));
+        }
+
+        final Integer keyIndex = annotation.keyIndex();
+        final boolean keyIndexDefined = keyIndex >= -1;
+
+        final String keyTemplate = annotation.keyTemplate();
+        final boolean keyTemplateDefined = !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)
+                && StringUtils.isNotBlank(keyTemplate);
+
+        if (keyIndexDefined == keyTemplateDefined) {
+            throw new InvalidParameterException(String.format(
+                    "Exactly one of [keyIndex,keyTemplate] must be defined for annotation [%s] on [%s]",
+                    UpdateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+
+        if (keyIndexDefined) {
+            if (keyIndex < 0) {
+                throw new InvalidParameterException(String.format(
+                        "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                        UpdateSingleCache.class.getName(),
+                        targetMethodName
+                ));
+            }
+            result.add(new AType.KeyIndex(keyIndex));
+        }
+
+        if (keyTemplateDefined) {
+            result.add(new AType.KeyTemplate(keyTemplate));
+        }
+
+        final int dataIndex = annotation.dataIndex();
+        if (dataIndex < -1) {
+            throw new InvalidParameterException(String.format(
+                    "DataIndex for annotation [%s] must be -1 or greater on [%s]",
+                    UpdateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.DataIndex(dataIndex));
+
+        final int expiration = annotation.expiration();
+        if (expiration < 0) {
+            throw new InvalidParameterException(String.format(
+                    "Expiration for annotation [%s] must be 0 or greater on [%s]",
+                    UpdateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Expiration(expiration));
+
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    UpdateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
+        final int jitter = annotation.jitter();
+        if (jitter < -1 || jitter > 99) {
+            throw new InvalidParameterException(String.format(
+                    "Jitter for annotation [%s] must be -1 <= jitter <= 99 on [%s]",
+                    UpdateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Jitter(jitter == -1 ? jitterDefault : jitter));
+
+        return result;
+    }
 }
