@@ -88,10 +88,6 @@ public class CacheBase {
 	}
 
     protected static final char[] WS = new char[] {' ', '\n', '\t'};
-    protected static String buildCacheKey(final String objectId, final AnnotationData data) {
-        return buildCacheKey(objectId, data.getNamespace(), data.getKeyPrefix());
-    }
-
     public static String buildCacheKey(final String objectId, final String namespace, final String prefix) {
         if (objectId == null || objectId.length() < 1) {
             throw new InvalidParameterException("Ids for objects in the cache must be at least 1 character long.");
@@ -220,19 +216,6 @@ public class CacheBase {
         return java.util.List.class.isAssignableFrom(clazz);
 	}
 
-    protected String getBaseKey(final AnnotationData annotationData,
-                                final Object retVal,
-                                final Object[] args,
-                                final String methodString) throws Exception {
-        return getBaseKey(annotationData.getKeyTemplate(),
-                annotationData.getKeyIndex(),
-                retVal,
-                args,
-                methodString,
-                factory,
-                methodStore);
-    }
-
     public static String getBaseKey(final String keyTemplate,
                                     final Integer keyIndex,
                                     final Object retVal,
@@ -254,13 +237,6 @@ public class CacheBase {
         final String result = writer.toString();
         if (keyTemplate.equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
         return result;
-    }
-
-    protected List<String> getBaseKeys(final List<Object> keyObjects,
-                                        final AnnotationData annotationData,
-                                        final Object retVal,
-                                        final Object[] args) throws Exception {
-        return getBaseKeys(keyObjects, annotationData.getKeyTemplate(), retVal, args, factory, methodStore);
     }
 
     public static List<String> getBaseKeys(final List<Object> keyObjects,

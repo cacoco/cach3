@@ -82,18 +82,17 @@ public class CacheBaseTest {
 
 	@Test
 	public void testBuildCacheKey() {
-        final AnnotationData annotationData = new AnnotationData();
-        annotationData.setNamespace(RandomStringUtils.randomAlphanumeric(235));
+        final String ns = RandomStringUtils.randomAlphanumeric(235);
 
 		try {
-			cut.buildCacheKey(null, annotationData);
+			cut.buildCacheKey(null, ns, null);
 			fail("Expected exception.");
 		} catch (InvalidParameterException ex) {
 			assertTrue(ex.getMessage().indexOf("at least 1 character") != -1);
 		}
 
 		try {
-			cut.buildCacheKey("", annotationData);
+			cut.buildCacheKey("", ns, null);
 			fail("Expected exception.");
 		} catch (InvalidParameterException ex) {
 			assertTrue(ex.getMessage().indexOf("at least 1 character") != -1);
@@ -101,7 +100,7 @@ public class CacheBaseTest {
 
         final String space = RandomStringUtils.randomAlphanumeric(8) + " " + RandomStringUtils.randomAlphanumeric(8);
         try {
-            cut.buildCacheKey(space, annotationData);
+            cut.buildCacheKey(space, ns, null);
             fail("Expected exception.");
         } catch (InvalidParameterException ex) {
             assertTrue(ex.getMessage().indexOf("whitespace") != -1);
@@ -109,7 +108,7 @@ public class CacheBaseTest {
 
         final String endline = RandomStringUtils.randomAlphanumeric(8) + "\n" + RandomStringUtils.randomAlphanumeric(8);
         try {
-            cut.buildCacheKey(endline, annotationData);
+            cut.buildCacheKey(endline, ns, null);
             fail("Expected exception.");
         } catch (InvalidParameterException ex) {
             assertTrue(ex.getMessage().indexOf("whitespace") != -1);
@@ -117,7 +116,7 @@ public class CacheBaseTest {
 
         final String tab = RandomStringUtils.randomAlphanumeric(8) + "\t" + RandomStringUtils.randomAlphanumeric(8);
         try {
-            cut.buildCacheKey(tab, annotationData);
+            cut.buildCacheKey(tab, ns, null);
             fail("Expected exception.");
         } catch (InvalidParameterException ex) {
             assertTrue(ex.getMessage().indexOf("whitespace") != -1);
@@ -125,7 +124,7 @@ public class CacheBaseTest {
 
 		final String objectId = RandomStringUtils.randomAlphanumeric(20);
         try {
-            cut.buildCacheKey(objectId, annotationData);
+            cut.buildCacheKey(objectId, ns, null);
             fail("Expected exception.");
         } catch (InvalidParameterException ex) {
             assertTrue(ex.getMessage().indexOf("255") != -1);
@@ -133,9 +132,8 @@ public class CacheBaseTest {
         }
 
         final String namespace = RandomStringUtils.randomAlphanumeric(12);
-        annotationData.setNamespace(namespace);
 
-		final String result = cut.buildCacheKey(objectId, annotationData);
+		final String result = cut.buildCacheKey(objectId, namespace, null);
 
 		assertTrue(result.indexOf(objectId) != -1);
 		assertTrue(result.indexOf(namespace) != -1);

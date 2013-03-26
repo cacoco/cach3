@@ -62,7 +62,6 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 		// but do not let it surface up past the AOP injection itself.
 		final MultiCacheCoordinator coord = new MultiCacheCoordinator();
         AnnotationInfo info;
-//        AnnotationData data;
 		Object [] args = pjp.getArgs();
 		try {
 			// Get the target method being invoked, and make sure it returns the correct info.
@@ -158,18 +157,6 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 					+ " aborted due to an error. The underlying method will be called twice.", ex);
 			return pjp.proceed();
 		}
-	}
-
-	protected MapHolder convertIdObjectsToKeyMap(final List<Object> idObjects,
-	                                              final AnnotationData data,
-                                                  final Object[] args) throws Exception {
-        return convertIdObjectsToKeyMap(idObjects,
-                data.getNamespace(),
-                data.getKeyPrefix(),
-                data.getKeyTemplate(),
-                factory,
-                methodStore,
-                args);
 	}
 
     public static MapHolder convertIdObjectsToKeyMap(final List<Object> idObjects,
