@@ -374,7 +374,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
         if (expiration < 0) {
             throw new InvalidParameterException(String.format(
                     "Expiration for annotation [%s] must be 0 or greater on [%s]",
-                    UpdateMultiCache.class.getName(),
+                    ReadThroughMultiCache.class.getName(),
                     targetMethodName
             ));
         }
@@ -396,7 +396,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
         if (jitter < -1 || jitter > 99) {
             throw new InvalidParameterException(String.format(
                     "Jitter for annotation [%s] must be -1 <= jitter <= 99 on [%s]",
-                    UpdateSingleCache.class.getName(),
+                    ReadThroughMultiCache.class.getName(),
                     targetMethodName
             ));
         }
