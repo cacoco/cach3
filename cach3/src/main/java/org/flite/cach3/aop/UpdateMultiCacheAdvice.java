@@ -23,6 +23,7 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
+import org.apache.commons.lang.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
 import org.flite.cach3.annotations.*;
@@ -34,6 +35,7 @@ import org.springframework.core.*;
 import org.springframework.core.annotation.*;
 
 import java.lang.reflect.*;
+import java.security.*;
 import java.util.*;
 
 @Aspect
@@ -93,25 +95,24 @@ public class UpdateMultiCacheAdvice extends CacheBase {
             try {
                 // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
                 // but do not let it surface up past the AOP injection itself.
-                final AnnotationData annotationData =
-                        AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
-                                UpdateMultiCache.class, methodToCache.getName(),
-                                getJitterDefault());
-                final List<Object> dataList = (List<Object>) getIndexObject(annotationData.getDataIndex(), retVal, jp.getArgs(), methodToCache.toString());
-                final List<Object> keyObjects = getKeyObjects(annotationData.getKeyIndex(), retVal, jp, methodToCache);
-                final List<String> baseKeys = getBaseKeys(keyObjects, annotationData, retVal, jp.getArgs());
+                final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName(), getJitterDefault());
+                final List<Object> dataList = (List<Object>) getIndexObject(info.getAsInteger(AType.DATA_INDEX), retVal, jp.getArgs(), methodToCache.toString());
+                final List<Object> keyObjects = getKeyObjects(info.getAsInteger(AType.KEY_INDEX), retVal, jp, methodToCache);
+                final List<String> baseKeys = UpdateMultiCacheAdvice.getBaseKeys(keyObjects, info.getAsString(AType.KEY_TEMPLATE, null), retVal, jp.getArgs(), factory, methodStore);
                 final List<String> cacheKeys = new ArrayList<String>(baseKeys.size());
                 for (final String base : baseKeys) {
-                    cacheKeys.add(buildCacheKey(base, annotationData));
+                    cacheKeys.add(buildCacheKey(base,
+                            info.getAsString(AType.NAMESPACE,null),
+                            info.getAsString(AType.KEY_PREFIX,null)));
                 }
-                updateCache(cacheKeys, dataList, methodToCache, annotationData, cache);
+                updateCache(cacheKeys, dataList, methodToCache, info.getAsInteger(AType.JITTER), info.getAsInteger(AType.EXPIRATION), cache);
 
                 // Notify the observers that a cache interaction happened.
-                final List<UpdateMultiCacheListener> listeners = getPertinentListeners(UpdateMultiCacheListener.class,annotationData.getNamespace());
+                final List<UpdateMultiCacheListener> listeners = getPertinentListeners(UpdateMultiCacheListener.class, info.getAsString(AType.NAMESPACE));
                 if (listeners != null && !listeners.isEmpty()) {
                     for (final UpdateMultiCacheListener listener : listeners) {
                         try {
-                            listener.triggeredUpdateMultiCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKeys, dataList, retVal, jp.getArgs());
+                            listener.triggeredUpdateMultiCache(info.getAsString(AType.NAMESPACE), info.getAsString(AType.KEY_PREFIX, null), baseKeys, dataList, retVal, jp.getArgs());
                         } catch (Exception ex) {
                             LOG.warn("Problem when triggering a listener.", ex);
                         }
@@ -126,7 +127,8 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 	protected void updateCache(final List<String> cacheKeys,
 	                           final List<Object> returnList,
 	                           final Method methodToCache,
-	                           final AnnotationData annotationData,
+	                           final int jitter,
+                               final int expiration,
                                final MemcachedClientIF cache) {
 		if (returnList.size() != cacheKeys.size()) {
 			throw new InvalidAnnotationException(String.format(
@@ -144,7 +146,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
                 cacheable = ((CacheConditionally) cacheObject).isCacheable();
             }
             if (cacheable) {
-			    cache.set(cacheKey, annotationData.getJitteredExpiration(), cacheObject);
+			    cache.set(cacheKey, calculateJitteredExpiration(expiration, jitter), cacheObject);
             }
 		}
 	}
@@ -168,4 +170,83 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 				methodToCache.toString()
 		));
 	}
+
+    /*default*/ static AnnotationInfo getAnnotationInfo(final UpdateMultiCache annotation,
+                                                        final String targetMethodName,
+                                                        final int jitterDefault) {
+        final AnnotationInfo result = new AnnotationInfo();
+
+        if (annotation == null) {
+            throw new InvalidParameterException(String.format(
+                    "No annotation of type [%s] found.",
+                    UpdateMultiCache.class.getName()
+            ));
+        }
+
+        final String keyPrefix = annotation.keyPrefix();
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
+                && keyPrefix != null
+                && keyPrefix.length() > 0) {
+            result.add(new AType.KeyPrefix(keyPrefix));
+        }
+
+        final Integer keyIndex = annotation.keyIndex();
+        if (keyIndex < 0) {
+            throw new InvalidParameterException(String.format(
+                    "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                    UpdateMultiCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.KeyIndex(keyIndex));
+
+        final String keyTemplate = annotation.keyTemplate();
+        if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+            result.add(new AType.KeyTemplate(keyTemplate));
+        }
+
+        final int dataIndex = annotation.dataIndex();
+        if (dataIndex < -1) {
+            throw new InvalidParameterException(String.format(
+                    "DataIndex for annotation [%s] must be -1 or greater on [%s]",
+                    UpdateMultiCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.DataIndex(dataIndex));
+
+        final int expiration = annotation.expiration();
+        if (expiration < 0) {
+            throw new InvalidParameterException(String.format(
+                    "Expiration for annotation [%s] must be 0 or greater on [%s]",
+                    UpdateMultiCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Expiration(expiration));
+
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    UpdateMultiCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
+        final int jitter = annotation.jitter();
+        if (jitter < -1 || jitter > 99) {
+            throw new InvalidParameterException(String.format(
+                    "Jitter for annotation [%s] must be -1 <= jitter <= 99 on [%s]",
+                    UpdateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Jitter(jitter == -1 ? jitterDefault : jitter));
+
+        return result;
+    }
 }

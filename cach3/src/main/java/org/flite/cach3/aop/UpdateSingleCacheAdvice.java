@@ -55,7 +55,6 @@ public class UpdateSingleCacheAdvice extends CacheBase {
         return retVal;
 	}
 
-
     @Pointcut("@annotation(org.flite.cach3.annotations.groups.UpdateSingleCaches)")
 	public void updateSingles() {}
 
@@ -68,8 +67,6 @@ public class UpdateSingleCacheAdvice extends CacheBase {
         }
         return retVal;
     }
-
-
 
     private void doUpdate(final JoinPoint jp, final Object retVal) throws Throwable {
         if (isCacheDisabled()) {
@@ -103,14 +100,14 @@ public class UpdateSingleCacheAdvice extends CacheBase {
                 final String cacheKey = buildCacheKey(baseKey,
                         info.getAsString(AType.NAMESPACE),
                         info.getAsString(AType.KEY_PREFIX));
-                final Object dataObject = CacheBase.getIndexObject(info.getAsInteger(AType.DATA_INDEX, null), retVal, jp.getArgs(), methodToCache.toString());
+                final Object dataObject = getIndexObject(info.getAsInteger(AType.DATA_INDEX, null), retVal, jp.getArgs(), methodToCache.toString());
                 final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
                 boolean cacheable = true;
                 if (submission instanceof CacheConditionally) {
                     cacheable = ((CacheConditionally) submission).isCacheable();
                 }
                 if (cacheable) {
-                    cache.set(cacheKey, info.getAsInteger(AType.JITTER), submission);
+                    cache.set(cacheKey, calculateJitteredExpiration(info.getAsInteger(AType.EXPIRATION), info.getAsInteger(AType.JITTER)), submission);
                 }
 
                 // Notify the observers that a cache interaction happened.
@@ -129,12 +126,6 @@ public class UpdateSingleCacheAdvice extends CacheBase {
             }
         }
     }
-
-	protected String getObjectId(final Object keyObject) throws Exception {
-		final Method keyMethod = getKeyMethod(keyObject);
-		return generateObjectId(keyMethod, keyObject);
-	}
-
 
     /*default*/ static AnnotationInfo getAnnotationInfo(final UpdateSingleCache annotation,
                                                         final String targetMethodName,

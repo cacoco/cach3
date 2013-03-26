@@ -24,6 +24,7 @@ package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
 import org.apache.commons.lang.*;
+import org.apache.commons.lang.math.*;
 import org.apache.velocity.*;
 import org.apache.velocity.app.*;
 import org.aspectj.lang.*;
@@ -316,4 +317,15 @@ public class CacheBase {
     protected MemcachedClientIF getMemcachedClient() {
         return state.getMemcachedClient();
     }
+
+    /*default*/ static final int JITTER_BOUND = 60 * 60 * 24 * 30;
+    public int calculateJitteredExpiration(final int expiration, final int jitter) {
+        if (jitter <= 0 || jitter > 99) { return expiration; }
+        if (expiration >= JITTER_BOUND) { return expiration; }
+
+        final double seed = RandomUtils.nextDouble() * expiration * jitter;
+        final int difference = (int) Math.floor(seed/100);
+        return (expiration - difference);
+    }
+
 }
