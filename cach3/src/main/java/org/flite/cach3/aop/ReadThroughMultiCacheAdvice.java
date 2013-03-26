@@ -61,7 +61,8 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 		// This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
 		// but do not let it surface up past the AOP injection itself.
 		final MultiCacheCoordinator coord = new MultiCacheCoordinator();
-        AnnotationData data;
+        AnnotationInfo info;
+//        AnnotationData data;
 		Object [] args = pjp.getArgs();
 		try {
 			// Get the target method being invoked, and make sure it returns the correct info.
@@ -71,14 +72,19 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 			// Get the annotation associated with this method, and make sure the values are valid.
             final ReadThroughMultiCache annotation = coord.getMethod().getAnnotation(ReadThroughMultiCache.class);
 
-            data = AnnotationDataBuilder.buildAnnotationData(
-                    annotation, ReadThroughMultiCache.class, coord.getMethod().getName(), getJitterDefault());
+            info = getAnnotationInfo(annotation, coord.getMethod().getName(), getJitterDefault());
 
 			// Get the list of objects that will provide the keys to all the cache values.
-			coord.setKeyObjects(getKeyObjectList(data.getKeyIndex(), pjp, coord.getMethod()));
+			coord.setKeyObjects(getKeyObjectList(info.getAsInteger(AType.KEY_INDEX,null), pjp, coord.getMethod()));
 
 			// Create key->object and object->key mappings.
-			coord.setHolder(convertIdObjectsToKeyMap(coord.getKeyObjects(), data, args));
+			coord.setHolder(convertIdObjectsToKeyMap(coord.getKeyObjects(),
+                    info.getAsString(AType.NAMESPACE),
+                    info.getAsString(AType.KEY_PREFIX),
+                    info.getAsString(AType.KEY_TEMPLATE),
+                    factory,
+                    methodStore,
+                    args));
 
 			// Get the full list of cache keys and ask the cache for the corresponding values.
 			coord.setInitialKey2Result(cache.getBulk(coord.getKey2Obj().keySet()));
@@ -89,7 +95,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 			}
 
 			// Create the new list of arguments with a subset of the key objects that aren't in the cache.
-			args = coord.modifyArgumentList(args, data.getKeyIndex());
+			args = coord.modifyArgumentList(args, info.getAsInteger(AType.KEY_INDEX, null));
 		} catch (Throwable ex) {
             // If there's an exception somewhere in the caching code, then just bail out
             // and call through to the target method with the original parameters.
@@ -123,7 +129,7 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
                 }
                 if (cacheable) {
                     cache.set(cacheKey,
-                            data.getJitteredExpiration(),
+                            calculateJitteredExpiration(info.getAsInteger(AType.EXPIRATION), info.getAsInteger(AType.JITTER)),
                             resultObject);
                 }
 				coord.getKey2Result().put(cacheKey, resultObject);
@@ -131,12 +137,12 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 			}
 
             // Notify the observers that a cache interaction happened.
-            final List<ReadThroughMultiCacheListener> listeners = getPertinentListeners(ReadThroughMultiCacheListener.class, data.getNamespace());
+            final List<ReadThroughMultiCacheListener> listeners = getPertinentListeners(ReadThroughMultiCacheListener.class, info.getAsString(AType.NAMESPACE));
             if (listeners != null && !listeners.isEmpty()) {
                 for (final ReadThroughMultiCacheListener listener : listeners) {
                     try {
-                        listener.triggeredReadThroughMultiCache(data.getNamespace(),
-                                data.getKeyPrefix(),
+                        listener.triggeredReadThroughMultiCache(info.getAsString(AType.NAMESPACE),
+                                info.getAsString(AType.KEY_PREFIX, null),
                                 Arrays.asList(cacheBaseIds),
                                 results,
                                 args);
@@ -329,4 +335,74 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
             return obj2Base;
         }
     }
+
+    static AnnotationInfo getAnnotationInfo(final ReadThroughMultiCache annotation,
+                                            final String targetMethodName,
+                                            final int jitterDefault) {
+        final AnnotationInfo result = new AnnotationInfo();
+
+        if (annotation == null) {
+            throw new InvalidParameterException(String.format(
+                    "No annotation of type [%s] found.",
+                    ReadThroughMultiCache.class.getName()
+            ));
+        }
+
+        final String keyPrefix = annotation.keyPrefix();
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
+                && keyPrefix != null
+                && keyPrefix.length() > 0) {
+            result.add(new AType.KeyPrefix(keyPrefix));
+        }
+
+        final Integer keyIndex = annotation.keyIndex();
+        if (keyIndex < 0) {
+            throw new InvalidParameterException(String.format(
+                    "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                    ReadThroughMultiCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.KeyIndex(keyIndex));
+
+        final String keyTemplate = annotation.keyTemplate();
+        if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+            result.add(new AType.KeyTemplate(keyTemplate));
+        }
+
+        final int expiration = annotation.expiration();
+        if (expiration < 0) {
+            throw new InvalidParameterException(String.format(
+                    "Expiration for annotation [%s] must be 0 or greater on [%s]",
+                    UpdateMultiCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Expiration(expiration));
+
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    ReadThroughMultiCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
+        final int jitter = annotation.jitter();
+        if (jitter < -1 || jitter > 99) {
+            throw new InvalidParameterException(String.format(
+                    "Jitter for annotation [%s] must be -1 <= jitter <= 99 on [%s]",
+                    UpdateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Jitter(jitter == -1 ? jitterDefault : jitter));
+
+        return result;
+    }
+
 }

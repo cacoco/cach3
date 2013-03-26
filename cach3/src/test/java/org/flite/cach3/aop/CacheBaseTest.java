@@ -321,4 +321,33 @@ public class CacheBaseTest {
 		public String toString() { return result; }
 	}
 
+    @Test
+    public void testJitterCalculation() {
+        final int base_exp = 100 + RandomUtils.nextInt(100);
+
+        // Jitter percent is not between 1 and 99
+        assertEquals(base_exp, CacheBase.calculateJitteredExpiration(base_exp, -2));
+        assertEquals(base_exp, CacheBase.calculateJitteredExpiration(base_exp, -1));
+        assertEquals(base_exp, CacheBase.calculateJitteredExpiration(base_exp, 0));
+        assertEquals(base_exp, CacheBase.calculateJitteredExpiration(base_exp, 100));
+        assertEquals(base_exp, CacheBase.calculateJitteredExpiration(base_exp, 101));
+
+        // Expiration is over the boundary, so it is representing an actual date/time
+        assertEquals(CacheBase.JITTER_BOUND, CacheBase.calculateJitteredExpiration(CacheBase.JITTER_BOUND, 20));
+        assertEquals(CacheBase.JITTER_BOUND + base_exp, CacheBase.calculateJitteredExpiration((CacheBase.JITTER_BOUND + base_exp), 20));
+
+        // Now, we are working with actual jitter.
+        int exp = 10000;
+        int lower = 8000;
+        int previous = 0;
+        for (int ix = 0; ix < 25; ix++) {
+            final int attempt = CacheBase.calculateJitteredExpiration(exp, 20);
+            // System.out.println(attempt);
+            assertTrue(previous != attempt);
+            assertTrue(attempt <= exp);
+            assertTrue(attempt > lower);
+
+            previous = attempt;
+        }
+    }
 }

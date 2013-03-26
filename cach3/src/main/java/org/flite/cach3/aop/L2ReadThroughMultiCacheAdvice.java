@@ -64,9 +64,6 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
             // Get the annotation associated with this method, and make sure the values are valid.
             final L2ReadThroughMultiCache annotation = coord.getMethod().getAnnotation(L2ReadThroughMultiCache.class);
 
-//            // TODO: Remove soon?
-//            coord.setL2annotationData(L2AnnotationDataBuilder.buildAnnotationData(
-//                    annotation, L2ReadThroughMultiCache.class, coord.getMethod().getName()));
             info = getAnnotationInfo(annotation, coord.getMethod().getName());
 
             // Get the list of objects that will provide the keys to all the cache values.

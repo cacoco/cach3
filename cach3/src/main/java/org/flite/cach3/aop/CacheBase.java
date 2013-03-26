@@ -319,7 +319,7 @@ public class CacheBase {
     }
 
     /*default*/ static final int JITTER_BOUND = 60 * 60 * 24 * 30;
-    public int calculateJitteredExpiration(final int expiration, final int jitter) {
+    public static int calculateJitteredExpiration(final int expiration, final int jitter) {
         if (jitter <= 0 || jitter > 99) { return expiration; }
         if (expiration >= JITTER_BOUND) { return expiration; }
 
