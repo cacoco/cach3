@@ -100,14 +100,8 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
             // but do not let it surface up past the AOP injection itself.
             try {
                 final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName());
-//                final AnnotationData annotationData =
-//                        AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
-//                                InvalidateMultiCache.class,
-//                                methodToCache.getName(),
-//                                getJitterDefault());
                 final List<Object> keyObjects = (List<Object>) getIndexObject(info.getAsInteger(AType.KEY_INDEX), retVal, jp.getArgs(), methodToCache.toString());
                 final List<String> baseKeys = UpdateMultiCacheAdvice.getBaseKeys(keyObjects, info.getAsString(AType.KEY_TEMPLATE), retVal, jp.getArgs(), factory, methodStore);
-//                final List<String> baseKeys = getBaseKeys(keyObjects, annotationData, retVal, jp.getArgs());
                 for (final String base : baseKeys) {
                     final String cacheKey = buildCacheKey(base,
                             info.getAsString(AType.NAMESPACE),
