@@ -22,13 +22,13 @@
 
 package org.flite.cach3.config;
 
+import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.*;
 
 import java.security.*;
 
 public class ConfigurationHelper {
-    private static final Logger LOG = LoggerFactory.getLogger(ConfigurationHelper.class);
-
     public static Boolean setCacheDisabled(final Cach3State state, final boolean disabled) {
         if (state == null) { throw new InvalidParameterException("Cach3State must be defined."); }
         state.setCacheDisabled(disabled);
@@ -39,6 +39,18 @@ public class ConfigurationHelper {
         if (state == null) { throw new InvalidParameterException("Cach3State must be defined."); }
         state.setJitterDefault(jitterDefault);
         return jitterDefault;
+    }
+
+    public static String addVelocityContextItems(final VelocityContextFactory factory, final String key, final Object value) {
+        if (factory == null) { throw new InvalidParameterException("VelocityContextFactory must be defined."); }
+        factory.addVelocityContextItems(ImmutableMap.of(key, value));
+        return key;
+    }
+
+    public static Boolean setL2CacheDisabled(final L2Cach3State state, final boolean disabled) {
+        if (state == null) { throw new InvalidParameterException("L2Cach3State must be defined."); }
+        state.setCacheDisabled(disabled);
+        return disabled;
     }
 
 }
