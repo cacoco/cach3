@@ -26,6 +26,9 @@
 		<property name="dao" ref="testDao" />
 	</bean>
 
+    <bean id="ListenerTestDAO" class="org.flite.cach3.test.dao.ListenerTestDAOImpl"/>
+
+
   <bean id="stubIA" class="org.flite.cach3.test.listeners.StubInvalidateAssignCacheListenerImpl" />
   <bean id="stubIS" class="org.flite.cach3.test.listeners.StubInvalidateSingleCacheListenerImpl" />
   <bean id="stubIM" class="org.flite.cach3.test.listeners.StubInvalidateMultiCacheListenerImpl" />
