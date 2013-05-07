@@ -2,6 +2,7 @@ package org.flite.cach3.aop;
 
 import net.vidageek.mirror.dsl.Mirror;
 import org.flite.cach3.annotations.AnnotationConstants;
+import org.flite.cach3.annotations.AnnotationsTest;
 import org.flite.cach3.annotations.InvalidateAssignCache;
 import org.flite.cach3.annotations.L2InvalidateAssignCache;
 import org.testng.annotations.Test;
@@ -9,7 +10,9 @@ import org.testng.annotations.Test;
 import java.lang.reflect.Method;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.testng.AssertJUnit.*;
 
@@ -47,8 +50,8 @@ public class InvalidateAssignCacheAnnotationTest {
         }
 
         try {
-            final Method m03 = new Mirror().on(this.getClass()).reflect().method("m03").withAnyArgs();
-            InvalidateAssignCacheAdvice.getAnnotationInfo(m03.getAnnotation(InvalidateAssignCache.class), m03.getName());
+            final Method m02 = new Mirror().on(this.getClass()).reflect().method("m02").withAnyArgs();
+            InvalidateAssignCacheAdvice.getAnnotationInfo(m02.getAnnotation(InvalidateAssignCache.class), m02.getName());
             fail("Expected Exception.");
         } catch (InvalidParameterException ex) {
             assertTrue(ex.getMessage().contains("Namespace for annotation"));
@@ -66,8 +69,8 @@ public class InvalidateAssignCacheAnnotationTest {
         }
 
         try {
-            final Method m03 = new Mirror().on(this.getClass()).reflect().method("m03").withAnyArgs();
-            L2InvalidateAssignCacheAdvice.getAnnotationInfo(m03.getAnnotation(L2InvalidateAssignCache.class), m03.getName());
+            final Method m02 = new Mirror().on(this.getClass()).reflect().method("m02").withAnyArgs();
+            L2InvalidateAssignCacheAdvice.getAnnotationInfo(m02.getAnnotation(L2InvalidateAssignCache.class), m02.getName());
             fail("Expected Exception.");
         } catch (InvalidParameterException ex) {
             assertTrue(ex.getMessage().contains("Namespace for annotation"));
@@ -128,6 +131,7 @@ public class InvalidateAssignCacheAnnotationTest {
         assertEquals(NS, r2.getAsString(AType.NAMESPACE));
         assertEquals(KEY, r2.getAsString(AType.ASSIGN_KEY));
 
+        // Make sure no other unexpected annotation datas are defined.
         final List<String> types = Arrays.asList(AType.KEY_INDEX,
                 AType.KEY_TEMPLATE, AType.KEY_PREFIX, AType.WINDOW,
                 AType.DATA_INDEX, AType.EXPIRATION, AType.JITTER);
@@ -142,13 +146,14 @@ public class InvalidateAssignCacheAnnotationTest {
     @InvalidateAssignCache(namespace = AnnotationConstants.DEFAULT_STRING, assignedKey = KEY)
     public String m01() { return null; }
 
-//    // Seems we can't assign a null. So, maybe the test is not necessary.
-//    @InvalidateAssignCache(namespace = null, assignedKey = "bubba")
-//    public String m02() { return null; }
-
     @L2InvalidateAssignCache(namespace = "", assignedKey = KEY)
     @InvalidateAssignCache(namespace = "", assignedKey = KEY)
-    public String m03() { return null; }
+    public String m02() { return null; }
+
+//    // Seems we can't assign a null. So, maybe the test is not necessary.
+//    @InvalidateAssignCache(namespace = null, assignedKey = "bubba")
+//    public String m03() { return null; }
+
 
     @L2InvalidateAssignCache(namespace = NS, assignedKey = AnnotationConstants.DEFAULT_STRING)
     @InvalidateAssignCache(namespace = NS, assignedKey = AnnotationConstants.DEFAULT_STRING)
