@@ -3,6 +3,7 @@ package org.flite.cach3.aop;
 import net.vidageek.mirror.dsl.Mirror;
 import org.flite.cach3.annotations.AnnotationConstants;
 import org.flite.cach3.annotations.InvalidateAssignCache;
+import org.flite.cach3.annotations.L2InvalidateAssignCache;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
@@ -53,6 +54,25 @@ public class InvalidateAssignCacheAnnotationTest {
             assertTrue(ex.getMessage().contains("Namespace for annotation"));
             assertTrue(ex.getMessage().contains(InvalidateAssignCache.class.getName()));
         }
+
+        // Testing the L2Cache version of things.
+        try {
+            final Method m01 = new Mirror().on(this.getClass()).reflect().method("m01").withAnyArgs();
+            L2InvalidateAssignCacheAdvice.getAnnotationInfo(m01.getAnnotation(L2InvalidateAssignCache.class), m01.getName());
+            fail("Expected Exception.");
+        } catch (InvalidParameterException ex) {
+            assertTrue(ex.getMessage().contains("Namespace for annotation"));
+            assertTrue(ex.getMessage().contains(L2InvalidateAssignCache.class.getName()));
+        }
+
+        try {
+            final Method m03 = new Mirror().on(this.getClass()).reflect().method("m03").withAnyArgs();
+            L2InvalidateAssignCacheAdvice.getAnnotationInfo(m03.getAnnotation(L2InvalidateAssignCache.class), m03.getName());
+            fail("Expected Exception.");
+        } catch (InvalidParameterException ex) {
+            assertTrue(ex.getMessage().contains("Namespace for annotation"));
+            assertTrue(ex.getMessage().contains(L2InvalidateAssignCache.class.getName()));
+        }
     }
 
     @Test
@@ -74,25 +94,51 @@ public class InvalidateAssignCacheAnnotationTest {
             assertTrue(ex.getMessage().contains("AssignedKey for annotation"));
             assertTrue(ex.getMessage().contains(InvalidateAssignCache.class.getName()));
         }
+
+        // Testing the L2Cache version of things.
+        try {
+            final Method m04 = new Mirror().on(this.getClass()).reflect().method("m04").withAnyArgs();
+            L2InvalidateAssignCacheAdvice.getAnnotationInfo(m04.getAnnotation(L2InvalidateAssignCache.class), m04.getName());
+            fail("Expected Exception.");
+        } catch (InvalidParameterException ex) {
+            assertTrue(ex.getMessage().contains("AssignedKey for annotation"));
+            assertTrue(ex.getMessage().contains(L2InvalidateAssignCache.class.getName()));
+        }
+
+        try {
+            final Method m06 = new Mirror().on(this.getClass()).reflect().method("m06").withAnyArgs();
+            L2InvalidateAssignCacheAdvice.getAnnotationInfo(m06.getAnnotation(L2InvalidateAssignCache.class), m06.getName());
+            fail("Expected Exception.");
+        } catch (InvalidParameterException ex) {
+            assertTrue(ex.getMessage().contains("AssignedKey for annotation"));
+            assertTrue(ex.getMessage().contains(L2InvalidateAssignCache.class.getName()));
+        }
+
     }
 
     @Test
     public void testGood() {
         final Method m07 = new Mirror().on(this.getClass()).reflect().method("m07").withAnyArgs();
-        final AnnotationInfo result = InvalidateAssignCacheAdvice.getAnnotationInfo(m07.getAnnotation(InvalidateAssignCache.class), m07.getName());
 
-        assertEquals(NS, result.getAsString(AType.NAMESPACE));
-        assertEquals(KEY, result.getAsString(AType.ASSIGN_KEY));
+        final AnnotationInfo r1 = InvalidateAssignCacheAdvice.getAnnotationInfo(m07.getAnnotation(InvalidateAssignCache.class), m07.getName());
+        assertEquals(NS, r1.getAsString(AType.NAMESPACE));
+        assertEquals(KEY, r1.getAsString(AType.ASSIGN_KEY));
+
+        final AnnotationInfo r2 = L2InvalidateAssignCacheAdvice.getAnnotationInfo(m07.getAnnotation(L2InvalidateAssignCache.class), m07.getName());
+        assertEquals(NS, r2.getAsString(AType.NAMESPACE));
+        assertEquals(KEY, r2.getAsString(AType.ASSIGN_KEY));
 
         final List<String> types = Arrays.asList(AType.KEY_INDEX,
                 AType.KEY_TEMPLATE, AType.KEY_PREFIX, AType.WINDOW,
                 AType.DATA_INDEX, AType.EXPIRATION, AType.JITTER);
 
         for (final String type : types) {
-            assertNull(type, result.get(type));
+            assertNull(type, r1.get(type));
+            assertNull(type, r2.get(type));
         }
     }
 
+    @L2InvalidateAssignCache(namespace = AnnotationConstants.DEFAULT_STRING, assignedKey = KEY)
     @InvalidateAssignCache(namespace = AnnotationConstants.DEFAULT_STRING, assignedKey = KEY)
     public String m01() { return null; }
 
@@ -100,9 +146,11 @@ public class InvalidateAssignCacheAnnotationTest {
 //    @InvalidateAssignCache(namespace = null, assignedKey = "bubba")
 //    public String m02() { return null; }
 
+    @L2InvalidateAssignCache(namespace = "", assignedKey = KEY)
     @InvalidateAssignCache(namespace = "", assignedKey = KEY)
     public String m03() { return null; }
 
+    @L2InvalidateAssignCache(namespace = NS, assignedKey = AnnotationConstants.DEFAULT_STRING)
     @InvalidateAssignCache(namespace = NS, assignedKey = AnnotationConstants.DEFAULT_STRING)
     public String m04() { return null; }
 
@@ -110,11 +158,12 @@ public class InvalidateAssignCacheAnnotationTest {
 //    @InvalidateAssignCache(namespace = NS, assignedKey = null)
 //    public String m05() { return null; }
 
+    @L2InvalidateAssignCache(namespace = NS, assignedKey = "")
     @InvalidateAssignCache(namespace = NS, assignedKey = "")
     public String m06() { return null; }
 
+    @L2InvalidateAssignCache(namespace = NS, assignedKey = KEY)
     @InvalidateAssignCache(namespace = NS, assignedKey = KEY)
     public String m07() { return null; }
-
 
 }
