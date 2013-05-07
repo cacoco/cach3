@@ -22,20 +22,26 @@
 
 package org.flite.cach3.aop;
 
-import net.spy.memcached.*;
-import org.apache.commons.lang.*;
-import org.aspectj.lang.*;
-import org.aspectj.lang.annotation.*;
-import org.flite.cach3.annotations.*;
+import net.spy.memcached.MemcachedClientIF;
+import org.apache.commons.lang.StringUtils;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.flite.cach3.annotations.AnnotationConstants;
+import org.flite.cach3.annotations.UpdateSingleCache;
 import org.flite.cach3.annotations.groups.UpdateSingleCaches;
-import org.flite.cach3.api.*;
-import org.slf4j.*;
-import org.springframework.core.*;
-import org.springframework.core.annotation.*;
+import org.flite.cach3.api.CacheConditionally;
+import org.flite.cach3.api.UpdateSingleCacheListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
-import java.lang.reflect.*;
-import java.security.*;
-import java.util.*;
+import java.lang.reflect.Method;
+import java.security.InvalidParameterException;
+import java.util.Arrays;
+import java.util.List;
 
 @Aspect
 @Order(Ordered.HIGHEST_PRECEDENCE / 2)
@@ -164,7 +170,7 @@ public class UpdateSingleCacheAdvice extends CacheBase {
         if (keyIndexDefined) {
             if (keyIndex < -1) {
                 throw new InvalidParameterException(String.format(
-                        "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                        "KeyIndex for annotation [%s] must be -1 or greater on [%s]",
                         UpdateSingleCache.class.getName(),
                         targetMethodName
                 ));

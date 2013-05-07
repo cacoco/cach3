@@ -147,7 +147,7 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
         final Integer keyIndex = annotation.keyIndex();
         if (keyIndex < -1) {
             throw new InvalidParameterException(String.format(
-                    "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                    "KeyIndex for annotation [%s] must be -1 or greater on [%s]",
                     InvalidateMultiCache.class.getName(),
                     targetMethodName
             ));

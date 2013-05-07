@@ -146,9 +146,9 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
         }
 
         if (keyIndexDefined) {
-            if (keyIndex < 0) {
+            if (keyIndex < -1) {
                 throw new InvalidParameterException(String.format(
-                        "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                        "KeyIndex for annotation [%s] must be -1 or greater on [%s]",
                         L2UpdateSingleCache.class.getName(),
                         targetMethodName
                 ));

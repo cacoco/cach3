@@ -156,9 +156,9 @@ public class L2UpdateMultiCacheAdvice extends L2CacheBase {
         }
 
         final Integer keyIndex = annotation.keyIndex();
-        if (keyIndex < 0) {
+        if (keyIndex < -1) {
             throw new InvalidParameterException(String.format(
-                    "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
+                    "KeyIndex for annotation [%s] must be -1 or greater on [%s]",
                     L2UpdateMultiCache.class.getName(),
                     targetMethodName
             ));
