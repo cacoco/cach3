@@ -24,13 +24,15 @@ package org.flite.cach3.aop;
 
 import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.flite.cach3.annotations.AnnotationConstants;
 import org.flite.cach3.annotations.L2InvalidateMultiCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.*;
-import org.springframework.core.annotation.*;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.Method;
 import java.security.InvalidParameterException;
@@ -124,10 +126,27 @@ public class L2InvalidateMultiCacheAdvice extends L2CacheBase {
             ));
         }
 
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    L2InvalidateMultiCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
         final String keyPrefix = annotation.keyPrefix();
-        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
-                && keyPrefix != null
-                && keyPrefix.length() > 0) {
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)) {
+            if (StringUtils.isBlank(keyPrefix)) {
+                throw new InvalidParameterException(String.format(
+                        "KeyPrefix for annotation [%s] must not be defined as an empty string on [%s]",
+                        L2InvalidateMultiCache.class.getName(),
+                        targetMethodName
+                ));
+            }
             result.add(new AType.KeyPrefix(keyPrefix));
         }
 
@@ -142,21 +161,16 @@ public class L2InvalidateMultiCacheAdvice extends L2CacheBase {
         result.add(new AType.KeyIndex(keyIndex));
 
         final String keyTemplate = annotation.keyTemplate();
-        if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+            if (StringUtils.isBlank(keyTemplate)) {
+                throw new InvalidParameterException(String.format(
+                        "KeyTemplate for annotation [%s] must not be defined as an empty string on [%s]",
+                        L2InvalidateMultiCache.class.getName(),
+                        targetMethodName
+                ));
+            }
             result.add(new AType.KeyTemplate(keyTemplate));
         }
-
-        final String namespace = annotation.namespace();
-        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
-                || namespace == null
-                || namespace.length() < 1) {
-            throw new InvalidParameterException(String.format(
-                    "Namespace for annotation [%s] must be defined on [%s]",
-                    L2InvalidateMultiCache.class.getName(),
-                    targetMethodName
-            ));
-        }
-        result.add(new AType.Namespace(namespace));
 
         return result;
     }

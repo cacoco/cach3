@@ -22,18 +22,24 @@
 
 package org.flite.cach3.aop;
 
-import com.google.common.collect.*;
-import org.aspectj.lang.*;
-import org.aspectj.lang.annotation.*;
-import org.flite.cach3.annotations.*;
-import org.flite.cach3.api.*;
-import org.slf4j.*;
-import org.springframework.core.*;
-import org.springframework.core.annotation.*;
+import com.google.common.collect.ImmutableMap;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.flite.cach3.annotations.AnnotationConstants;
+import org.flite.cach3.annotations.Duration;
+import org.flite.cach3.annotations.L2ReadThroughAssignCache;
+import org.flite.cach3.api.CacheConditionally;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
-import java.lang.reflect.*;
-import java.security.*;
-import java.util.*;
+import java.lang.reflect.Method;
+import java.security.InvalidParameterException;
+import java.util.Arrays;
+import java.util.Map;
 
 @Aspect
 @Order((Ordered.HIGHEST_PRECEDENCE / 2) - 10)
@@ -102,6 +108,18 @@ public class L2ReadThroughAssignCacheAdvice extends L2CacheBase {
             ));
         }
 
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    L2ReadThroughAssignCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
         final String assignKey = annotation.assignedKey();
         if (AnnotationConstants.DEFAULT_STRING.equals(assignKey)
                 || assignKey == null
@@ -123,18 +141,6 @@ public class L2ReadThroughAssignCacheAdvice extends L2CacheBase {
             ));
         }
         result.add(new AType.Window(window));
-
-        final String namespace = annotation.namespace();
-        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
-                || namespace == null
-                || namespace.length() < 1) {
-            throw new InvalidParameterException(String.format(
-                    "Namespace for annotation [%s] must be defined on [%s]",
-                    L2ReadThroughAssignCache.class.getName(),
-                    targetMethodName
-            ));
-        }
-        result.add(new AType.Namespace(namespace));
 
         return result;
     }

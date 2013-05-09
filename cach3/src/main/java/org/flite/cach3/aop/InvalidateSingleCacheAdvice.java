@@ -137,43 +137,6 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
             ));
         }
 
-        final String keyPrefix = annotation.keyPrefix();
-        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
-                && keyPrefix != null
-                && keyPrefix.length() > 0) {
-            result.add(new AType.KeyPrefix(keyPrefix));
-        }
-
-        final Integer keyIndex = annotation.keyIndex();
-        final boolean keyIndexDefined = keyIndex >= -1;
-
-        final String keyTemplate = annotation.keyTemplate();
-        final boolean keyTemplateDefined = !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)
-                && StringUtils.isNotBlank(keyTemplate);
-
-        if (keyIndexDefined == keyTemplateDefined) {
-            throw new InvalidParameterException(String.format(
-                    "Exactly one of [keyIndex,keyTemplate] must be defined for annotation [%s] on [%s]",
-                    InvalidateSingleCache.class.getName(),
-                    targetMethodName
-            ));
-        }
-
-        if (keyIndexDefined) {
-            if (keyIndex < -1) {
-                throw new InvalidParameterException(String.format(
-                        "KeyIndex for annotation [%s] must be -1 or greater on [%s]",
-                        InvalidateSingleCache.class.getName(),
-                        targetMethodName
-                ));
-            }
-            result.add(new AType.KeyIndex(keyIndex));
-        }
-
-        if (keyTemplateDefined) {
-            result.add(new AType.KeyTemplate(keyTemplate));
-        }
-
         final String namespace = annotation.namespace();
         if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
                 || namespace == null
@@ -185,6 +148,54 @@ public class InvalidateSingleCacheAdvice extends CacheBase {
             ));
         }
         result.add(new AType.Namespace(namespace));
+
+        final String keyPrefix = annotation.keyPrefix();
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)) {
+            if (StringUtils.isBlank(keyPrefix)) {
+                throw new InvalidParameterException(String.format(
+                        "KeyPrefix for annotation [%s] must not be defined as an empty string on [%s]",
+                        InvalidateSingleCache.class.getName(),
+                        targetMethodName
+                ));
+            }
+            result.add(new AType.KeyPrefix(keyPrefix));
+        }
+
+        final Integer keyIndex = annotation.keyIndex();
+        if (keyIndex != AnnotationConstants.DEFAULT_KEY_INDEX && keyIndex < -1) {
+            throw new InvalidParameterException(String.format(
+                    "KeyIndex for annotation [%s] must be -1 or greater on [%s]",
+                    InvalidateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        final boolean keyIndexDefined = keyIndex >= -1;
+
+        final String keyTemplate = annotation.keyTemplate();
+        if (StringUtils.isBlank(keyTemplate)) {
+            throw new InvalidParameterException(String.format(
+                    "KeyTemplate for annotation [%s] must not be defined as an empty string on [%s]",
+                    InvalidateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        final boolean keyTemplateDefined = !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate);
+
+        if (keyIndexDefined == keyTemplateDefined) {
+            throw new InvalidParameterException(String.format(
+                    "Exactly one of [keyIndex,keyTemplate] must be defined for annotation [%s] on [%s]",
+                    InvalidateSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+
+        if (keyIndexDefined) {
+            result.add(new AType.KeyIndex(keyIndex));
+        }
+
+        if (keyTemplateDefined) {
+            result.add(new AType.KeyTemplate(keyTemplate));
+        }
 
         return result;
     }

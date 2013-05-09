@@ -2,7 +2,6 @@ package org.flite.cach3.aop;
 
 import net.vidageek.mirror.dsl.Mirror;
 import org.flite.cach3.annotations.AnnotationConstants;
-import org.flite.cach3.annotations.AnnotationsTest;
 import org.flite.cach3.annotations.InvalidateAssignCache;
 import org.flite.cach3.annotations.L2InvalidateAssignCache;
 import org.testng.annotations.Test;
@@ -10,9 +9,6 @@ import org.testng.annotations.Test;
 import java.lang.reflect.Method;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 
 import static org.testng.AssertJUnit.*;
 
@@ -116,7 +112,6 @@ public class InvalidateAssignCacheAnnotationTest {
             assertTrue(ex.getMessage().contains("AssignedKey for annotation"));
             assertTrue(ex.getMessage().contains(L2InvalidateAssignCache.class.getName()));
         }
-
     }
 
     @Test
@@ -126,20 +121,12 @@ public class InvalidateAssignCacheAnnotationTest {
         final AnnotationInfo r1 = InvalidateAssignCacheAdvice.getAnnotationInfo(m07.getAnnotation(InvalidateAssignCache.class), m07.getName());
         assertEquals(NS, r1.getAsString(AType.NAMESPACE));
         assertEquals(KEY, r1.getAsString(AType.ASSIGN_KEY));
+        AnnotationInfoTest.ensureValuesNotSet(r1, Arrays.asList(AType.NAMESPACE, AType.ASSIGN_KEY));
 
         final AnnotationInfo r2 = L2InvalidateAssignCacheAdvice.getAnnotationInfo(m07.getAnnotation(L2InvalidateAssignCache.class), m07.getName());
         assertEquals(NS, r2.getAsString(AType.NAMESPACE));
         assertEquals(KEY, r2.getAsString(AType.ASSIGN_KEY));
-
-        // Make sure no other unexpected annotation datas are defined.
-        final List<String> types = Arrays.asList(AType.KEY_INDEX,
-                AType.KEY_TEMPLATE, AType.KEY_PREFIX, AType.WINDOW,
-                AType.DATA_INDEX, AType.EXPIRATION, AType.JITTER);
-
-        for (final String type : types) {
-            assertNull(type, r1.get(type));
-            assertNull(type, r2.get(type));
-        }
+        AnnotationInfoTest.ensureValuesNotSet(r2, Arrays.asList(AType.NAMESPACE, AType.ASSIGN_KEY));
     }
 
     @L2InvalidateAssignCache(namespace = AnnotationConstants.DEFAULT_STRING, assignedKey = KEY)

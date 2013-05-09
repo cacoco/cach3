@@ -170,6 +170,18 @@ public class UpdateAssignCacheAdvice extends CacheBase {
             ));
         }
 
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    UpdateAssignCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
         final String assignKey = annotation.assignedKey();
         if (AnnotationConstants.DEFAULT_STRING.equals(assignKey)
                 || assignKey == null
@@ -201,18 +213,6 @@ public class UpdateAssignCacheAdvice extends CacheBase {
             ));
         }
         result.add(new AType.Expiration(expiration));
-
-        final String namespace = annotation.namespace();
-        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
-                || namespace == null
-                || namespace.length() < 1) {
-            throw new InvalidParameterException(String.format(
-                    "Namespace for annotation [%s] must be defined on [%s]",
-                    UpdateAssignCache.class.getName(),
-                    targetMethodName
-            ));
-        }
-        result.add(new AType.Namespace(namespace));
 
         final int jitter = annotation.jitter();
         if (jitter < -1 || jitter > 99) {

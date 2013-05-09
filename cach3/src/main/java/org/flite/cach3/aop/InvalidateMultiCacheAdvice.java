@@ -137,10 +137,27 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
             ));
         }
 
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    InvalidateMultiCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
         final String keyPrefix = annotation.keyPrefix();
-        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
-                && keyPrefix != null
-                && keyPrefix.length() > 0) {
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)) {
+            if (StringUtils.isBlank(keyPrefix)) {
+                throw new InvalidParameterException(String.format(
+                        "KeyPrefix for annotation [%s] must not be defined as an empty string on [%s]",
+                        InvalidateMultiCache.class.getName(),
+                        targetMethodName
+                ));
+            }
             result.add(new AType.KeyPrefix(keyPrefix));
         }
 
@@ -155,21 +172,16 @@ public class InvalidateMultiCacheAdvice extends CacheBase {
         result.add(new AType.KeyIndex(keyIndex));
 
         final String keyTemplate = annotation.keyTemplate();
-        if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+            if (StringUtils.isBlank(keyTemplate)) {
+                throw new InvalidParameterException(String.format(
+                        "KeyTemplate for annotation [%s] must not be defined as an empty string on [%s]",
+                        InvalidateMultiCache.class.getName(),
+                        targetMethodName
+                ));
+            }
             result.add(new AType.KeyTemplate(keyTemplate));
         }
-
-        final String namespace = annotation.namespace();
-        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
-                || namespace == null
-                || namespace.length() < 1) {
-            throw new InvalidParameterException(String.format(
-                    "Namespace for annotation [%s] must be defined on [%s]",
-                    InvalidateMultiCache.class.getName(),
-                    targetMethodName
-            ));
-        }
-        result.add(new AType.Namespace(namespace));
 
         return result;
     }

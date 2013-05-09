@@ -107,18 +107,6 @@ public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
             ));
         }
 
-        final String assignKey = annotation.assignedKey();
-        if (AnnotationConstants.DEFAULT_STRING.equals(assignKey)
-                || assignKey == null
-                || assignKey.length() < 1) {
-            throw new InvalidParameterException(String.format(
-                    "AssignedKey for annotation [%s] must be defined on [%s]",
-                    L2InvalidateAssignCache.class.getName(),
-                    targetMethodName
-            ));
-        }
-        result.add(new AType.AssignKey(assignKey));
-
         final String namespace = annotation.namespace();
         if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
                 || namespace == null
@@ -130,6 +118,18 @@ public class L2InvalidateAssignCacheAdvice extends L2CacheBase {
             ));
         }
         result.add(new AType.Namespace(namespace));
+
+        final String assignKey = annotation.assignedKey();
+        if (AnnotationConstants.DEFAULT_STRING.equals(assignKey)
+                || assignKey == null
+                || assignKey.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "AssignedKey for annotation [%s] must be defined on [%s]",
+                    L2InvalidateAssignCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.AssignKey(assignKey));
 
         return result;
     }

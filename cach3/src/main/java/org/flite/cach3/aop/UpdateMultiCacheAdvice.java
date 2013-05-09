@@ -183,10 +183,27 @@ public class UpdateMultiCacheAdvice extends CacheBase {
             ));
         }
 
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    UpdateMultiCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
         final String keyPrefix = annotation.keyPrefix();
-        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)
-                && keyPrefix != null
-                && keyPrefix.length() > 0) {
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)) {
+            if (StringUtils.isBlank(keyPrefix)) {
+                throw new InvalidParameterException(String.format(
+                        "KeyPrefix for annotation [%s] must not be defined as an empty string on [%s]",
+                        UpdateMultiCache.class.getName(),
+                        targetMethodName
+                ));
+            }
             result.add(new AType.KeyPrefix(keyPrefix));
         }
 
@@ -225,17 +242,6 @@ public class UpdateMultiCacheAdvice extends CacheBase {
         }
         result.add(new AType.Expiration(expiration));
 
-        final String namespace = annotation.namespace();
-        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
-                || namespace == null
-                || namespace.length() < 1) {
-            throw new InvalidParameterException(String.format(
-                    "Namespace for annotation [%s] must be defined on [%s]",
-                    UpdateMultiCache.class.getName(),
-                    targetMethodName
-            ));
-        }
-        result.add(new AType.Namespace(namespace));
 
         final int jitter = annotation.jitter();
         if (jitter < -1 || jitter > 99) {
