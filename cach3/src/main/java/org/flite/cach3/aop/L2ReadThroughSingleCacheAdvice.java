@@ -159,28 +159,34 @@ public class L2ReadThroughSingleCacheAdvice extends L2CacheBase {
         }
 
         final Integer keyIndex = annotation.keyIndex();
+        if (keyIndex != AnnotationConstants.DEFAULT_KEY_INDEX && keyIndex < -1) {
+            throw new InvalidParameterException(String.format(
+                    "KeyIndex for annotation [%s] must be -1 or greater on [%s]",
+                    L2ReadThroughSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
         final boolean keyIndexDefined = keyIndex >= -1;
 
         final String keyTemplate = annotation.keyTemplate();
-        final boolean keyTemplateDefined = !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)
-                && StringUtils.isNotBlank(keyTemplate);
+        if (StringUtils.isBlank(keyTemplate)) {
+            throw new InvalidParameterException(String.format(
+                    "KeyTemplate for annotation [%s] must not be defined as an empty string on [%s]",
+                    L2ReadThroughSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        final boolean keyTemplateDefined = !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate);
 
         if (keyIndexDefined == keyTemplateDefined) {
             throw new InvalidParameterException(String.format(
                     "Exactly one of [keyIndex,keyTemplate] must be defined for annotation [%s] on [%s]",
-                    L2ReadThroughMultiCache.class.getName(),
+                    L2ReadThroughSingleCache.class.getName(),
                     targetMethodName
             ));
         }
 
         if (keyIndexDefined) {
-            if (keyIndex < 0) {
-                throw new InvalidParameterException(String.format(
-                        "KeyIndex for annotation [%s] must be 0 or greater on [%s]",
-                        L2ReadThroughSingleCache.class.getName(),
-                        targetMethodName
-                ));
-            }
             result.add(new AType.KeyIndex(keyIndex));
         }
 

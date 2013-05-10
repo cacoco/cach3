@@ -188,7 +188,14 @@ public class L2ReadThroughMultiCacheAdvice extends L2CacheBase {
         result.add(new AType.KeyIndex(keyIndex));
 
         final String keyTemplate = annotation.keyTemplate();
-        if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+            if (StringUtils.isBlank(keyTemplate)) {
+                throw new InvalidParameterException(String.format(
+                        "KeyTemplate for annotation [%s] must not be defined as an empty string on [%s]",
+                        L2ReadThroughMultiCache.class.getName(),
+                        targetMethodName
+                ));
+            }
             result.add(new AType.KeyTemplate(keyTemplate));
         }
 
