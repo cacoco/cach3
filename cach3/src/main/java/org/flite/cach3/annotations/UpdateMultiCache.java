@@ -62,7 +62,7 @@ public @interface UpdateMultiCache {
 	 * that the object being returned is the data that should be cached.
      * @return the index into the argument array that holds the actual data to be cached
      */
-    int dataIndex() default Integer.MIN_VALUE;
+    int dataIndex() default AnnotationConstants.DEFAULT_DATA_INDEX;
 
     /**
      * The exp value is passed along to memcached, and will be

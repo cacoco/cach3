@@ -47,6 +47,13 @@ public class InvalidSingleCacheAnnotationTest {
         } catch (InvalidParameterException ex) {
             assertTrue(ex.getMessage().contains("No annotation of type"));
         }
+
+        try {
+            L2InvalidateSingleCacheAdvice.getAnnotationInfo(null, "bubba");
+            fail("Expected Exception.");
+        } catch (InvalidParameterException ex) {
+            assertTrue(ex.getMessage().contains("No annotation of type"));
+        }
     }
 
     @Test

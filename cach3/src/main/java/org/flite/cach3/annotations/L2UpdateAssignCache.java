@@ -22,9 +22,10 @@
 
 package org.flite.cach3.annotations;
 
-import org.flite.cach3.annotations.*;
-
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -52,7 +53,7 @@ public @interface L2UpdateAssignCache {
 	 * that the object being returned is the data that should be cached.
      * @return the index into the argument array that holds the actual data to be cached
      */
-    int dataIndex() default Integer.MIN_VALUE;
+    int dataIndex() default AnnotationConstants.DEFAULT_DATA_INDEX;
 
     /**
      * The maximum length of time that a value should live in the cache.

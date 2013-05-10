@@ -36,7 +36,14 @@ public @interface UpdateSingleCache {
 	 */
 	String namespace() default AnnotationConstants.DEFAULT_STRING;
 
-	/**
+    /**
+     * An optional String prefix that will be pre-pended to the id returned by the object
+     * addressed by the keyIndex. If supplied, must not contain whitespace characters.
+     * @return the defined prefix
+     */
+    String keyPrefix() default AnnotationConstants.DEFAULT_STRING;
+
+    /**
 	 * Of the arguments passed into the cached method, this identifies which
 	 * argument provides the id by which the object will be cached. This is a
 	 * 0-based array index. This annotation also takes a special value of -1 to signify
@@ -65,7 +72,7 @@ public @interface UpdateSingleCache {
 	 * that the object being returned is the data that should be cached.
      * @return the index into the argument array that holds the actual data to be cached
      */
-    int dataIndex() default Integer.MIN_VALUE;
+    int dataIndex() default AnnotationConstants.DEFAULT_DATA_INDEX;
 
     /**
      * The exp value is passed along to memcached, and will be
@@ -102,12 +109,5 @@ public @interface UpdateSingleCache {
      * to a random value between 800 and 1000.
      */
     int jitter() default -1;
-
-    /**
-     * An optional String prefix that will be pre-pended to the id returned by the object
-     * addressed by the keyIndex. If supplied, must not contain whitespace characters.
-     * @return the defined prefix
-     */
-    String keyPrefix() default AnnotationConstants.DEFAULT_STRING;
 
 }

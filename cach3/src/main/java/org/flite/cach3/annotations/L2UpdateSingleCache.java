@@ -22,9 +22,10 @@
 
 package org.flite.cach3.annotations;
 
-import org.flite.cach3.annotations.*;
-
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -37,7 +38,14 @@ public @interface L2UpdateSingleCache {
    	 */
    	String namespace() default AnnotationConstants.DEFAULT_STRING;
 
-   	/**
+    /**
+     * An optional String prefix that will be pre-pended to the id returned by the object
+     * addressed by the keyIndex. If supplied, must not contain whitespace characters.
+     * @return the defined prefix
+     */
+    String keyPrefix() default AnnotationConstants.DEFAULT_STRING;
+
+    /**
    	 * Of the arguments passed into the cached method, this identifies which
    	 * argument provides the id by which the object will be cached. This is a
    	 * 0-based array index. This annotation also takes a special value of -1 to signify
@@ -66,7 +74,7 @@ public @interface L2UpdateSingleCache {
    	 * that the object being returned is the data that should be cached.
      * @return the index into the argument array that holds the actual data to be cached
      */
-    int dataIndex() default Integer.MIN_VALUE;
+    int dataIndex() default AnnotationConstants.DEFAULT_DATA_INDEX;
 
     /**
      * The maximum length of time that a value should live in the cache.
@@ -80,10 +88,4 @@ public @interface L2UpdateSingleCache {
      */
     Duration window() default Duration.UNDEFINED;
 
-    /**
-     * An optional String prefix that will be pre-pended to the id returned by the object
-     * addressed by the keyIndex. If supplied, must not contain whitespace characters.
-     * @return the defined prefix
-     */
-    String keyPrefix() default AnnotationConstants.DEFAULT_STRING;
 }

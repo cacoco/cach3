@@ -218,7 +218,14 @@ public class UpdateMultiCacheAdvice extends CacheBase {
         result.add(new AType.KeyIndex(keyIndex));
 
         final String keyTemplate = annotation.keyTemplate();
-        if (StringUtils.isNotBlank(keyTemplate) && !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyTemplate)) {
+            if (StringUtils.isBlank(keyTemplate)) {
+                throw new InvalidParameterException(String.format(
+                        "KeyTemplate for annotation [%s] must not be defined as an empty string on [%s]",
+                        UpdateMultiCache.class.getName(),
+                        targetMethodName
+                ));
+            }
             result.add(new AType.KeyTemplate(keyTemplate));
         }
 
@@ -247,7 +254,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
         if (jitter < -1 || jitter > 99) {
             throw new InvalidParameterException(String.format(
                     "Jitter for annotation [%s] must be -1 <= jitter <= 99 on [%s]",
-                    UpdateSingleCache.class.getName(),
+                    UpdateMultiCache.class.getName(),
                     targetMethodName
             ));
         }
