@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.flite</groupId>
     <artifactId>cach3-parent</artifactId>
-    <version>0.9</version>
+    <version>0.10</version>
   </parent>
   <artifactId>integration-test</artifactId>
   <packaging>jar</packaging>
@@ -16,6 +16,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <spring.jar.version>3.0.5.RELEASE</spring.jar.version>
     <aspectj.jar.version>1.6.11</aspectj.jar.version>
+    <guava.version>13.0.1</guava.version>
   </properties>
 
 	<dependencies>
@@ -24,11 +25,6 @@
 			<artifactId>cach3</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>l2cach3</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>spy</groupId>
       <artifactId>memcached</artifactId>
@@ -75,6 +71,12 @@
       <artifactId>aspectjweaver</artifactId>
       <version>${aspectj.jar.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.testng</groupId>

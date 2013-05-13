@@ -25,4 +25,5 @@ package org.flite.cach3.annotations;
 public interface AnnotationConstants {
 	public static final String DEFAULT_STRING = "[unassigned]";
     public static final int DEFAULT_KEY_INDEX = Integer.MIN_VALUE;
+    public static final int DEFAULT_DATA_INDEX = Integer.MIN_VALUE;
 }

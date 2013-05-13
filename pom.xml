@@ -5,7 +5,7 @@
   <groupId>org.flite</groupId>
   <artifactId>cach3-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.9</version>
+  <version>0.10</version>
 
   <name>cach3-parent</name>
   <url>https://github.com/flite/cach3</url>
@@ -17,7 +17,7 @@
 
   <modules>
     <module>cach3</module>
-    <module>l2cach3</module>
+    <!--<module>l2cach3</module>-->
     <module>integration-test</module>
   </modules>
 

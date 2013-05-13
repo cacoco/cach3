@@ -22,6 +22,8 @@
 
 package org.flite.cach3.test.svc;
 
+import org.flite.cach3.test.model.*;
+
 import java.util.*;
 
 public interface TestSvc {
@@ -108,6 +110,7 @@ public interface TestSvc {
     public Long getCombinedData(String key);
     public Long getL1Data(String key);
     public Long updateL1Data(String key);
+    public List<Example> getExampleObjects(List<Long> ids, String gen);
 
 }
 

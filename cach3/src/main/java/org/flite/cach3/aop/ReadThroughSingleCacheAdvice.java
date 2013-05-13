@@ -61,21 +61,19 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
         final String baseKey;
 		final String cacheKey;
 		final ReadThroughSingleCache annotation;
-        final AnnotationData annotationData;
+        final AnnotationInfo info;
         final Object[] args = pjp.getArgs();
 		try {
 			final Method methodToCache = getMethodToCache(pjp);
 			annotation = methodToCache.getAnnotation(ReadThroughSingleCache.class);
-            annotationData =
-                    AnnotationDataBuilder.buildAnnotationData(annotation,
-                            ReadThroughSingleCache.class,
-                            methodToCache.getName(),
-                            getJitterDefault());
-			baseKey = generateBaseKeySingle(args, annotationData, methodToCache.toString());
-            cacheKey = buildCacheKey(baseKey, annotationData);
+            info = getAnnotationInfo(annotation, methodToCache.getName(), getJitterDefault());
+            baseKey = generateBaseKeySingle(args, info, methodToCache.toString());
+            cacheKey = buildCacheKey(baseKey,
+                    info.getAsString(AType.NAMESPACE, null),
+                    info.getAsString(AType.KEY_PREFIX, null));
+
 			final Object result = cache.get(cacheKey);
 			if (result != null) {
-//				LOG.debug("Cache hit for key " + cacheKey);
 				return (result instanceof PertinentNegativeNull) ? null : result;
 			}
 		} catch (Throwable ex) {
@@ -89,14 +87,26 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
 		// but do not let it surface up past the AOP injection itself.
 		try {
 			final Object submission = (result == null) ? new PertinentNegativeNull() : result;
-			cache.set(cacheKey, annotationData.getJitteredExpiration(), submission);
+            boolean cacheable = true;
+            if (submission instanceof CacheConditionally) {
+                cacheable = ((CacheConditionally) submission).isCacheable();
+            }
+            if (cacheable) {
+			    cache.set(cacheKey,
+                        calculateJitteredExpiration(info.getAsInteger(AType.EXPIRATION), info.getAsInteger(AType.JITTER)),
+                        submission);
+            }
 
             // Notify the observers that a cache interaction happened.
-            final List<ReadThroughSingleCacheListener> listeners = getPertinentListeners(ReadThroughSingleCacheListener.class,annotationData.getNamespace());
+            final List<ReadThroughSingleCacheListener> listeners = getPertinentListeners(ReadThroughSingleCacheListener.class, info.getAsString(AType.NAMESPACE));
             if (listeners != null && !listeners.isEmpty()) {
                 for (final ReadThroughSingleCacheListener listener : listeners) {
                     try {
-                        listener.triggeredReadThroughSingleCache(annotationData.getNamespace(), annotationData.getKeyPrefix(), baseKey, result, args);
+                        listener.triggeredReadThroughSingleCache(info.getAsString(AType.NAMESPACE),
+                                info.getAsString(AType.KEY_PREFIX, null),
+                                baseKey,
+                                result,
+                                args);
                     } catch (Exception ex) {
                         LOG.warn("Problem when triggering a listener.", ex);
                     }
@@ -114,20 +124,115 @@ public class ReadThroughSingleCacheAdvice extends CacheBase {
 	}
 
     protected String generateBaseKeySingle(final Object[] args,
-                                           final AnnotationData annotationData,
+                                           final AnnotationInfo info,
                                            final String methodString) throws Exception {
-        if (StringUtils.isBlank(annotationData.getKeyTemplate())) {
-            return getObjectId(getIndexObject(annotationData.getKeyIndex(), args, methodString));
+        final String keyTemplate = info.getAsString(AType.KEY_TEMPLATE, null);
+        if (StringUtils.isBlank(keyTemplate)) {
+            return getObjectId(getIndexObject(info.getAsInteger(AType.KEY_INDEX), args, methodString));
         }
 
         final VelocityContext context = factory.getNewExtendedContext();
         context.put("args", args);
 
         final StringWriter writer = new StringWriter(250);
-        Velocity.evaluate(context, writer, this.getClass().getSimpleName(), annotationData.getKeyTemplate());
+        Velocity.evaluate(context, writer, this.getClass().getSimpleName(), keyTemplate);
         final String result = writer.toString();
-        if (annotationData.getKeyTemplate().equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
+        if (keyTemplate.equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
         return result;
     }
 
+    static AnnotationInfo getAnnotationInfo(final ReadThroughSingleCache annotation,
+                                            final String targetMethodName,
+                                            final int jitterDefault) {
+        final AnnotationInfo result = new AnnotationInfo();
+
+        if (annotation == null) {
+            throw new InvalidParameterException(String.format(
+                    "No annotation of type [%s] found.",
+                    ReadThroughSingleCache.class.getName()
+            ));
+        }
+
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    ReadThroughSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
+        final String keyPrefix = annotation.keyPrefix();
+        if (!AnnotationConstants.DEFAULT_STRING.equals(keyPrefix)) {
+            if (StringUtils.isBlank(keyPrefix)) {
+                throw new InvalidParameterException(String.format(
+                        "KeyPrefix for annotation [%s] must not be defined as an empty string on [%s]",
+                        ReadThroughSingleCache.class.getName(),
+                        targetMethodName
+                ));
+            }
+            result.add(new AType.KeyPrefix(keyPrefix));
+        }
+
+        final Integer keyIndex = annotation.keyIndex();
+        if (keyIndex != AnnotationConstants.DEFAULT_KEY_INDEX && keyIndex < -1) {
+            throw new InvalidParameterException(String.format(
+                    "KeyIndex for annotation [%s] must be -1 or greater on [%s]",
+                    ReadThroughSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        final boolean keyIndexDefined = keyIndex >= -1;
+
+        final String keyTemplate = annotation.keyTemplate();
+        if (StringUtils.isBlank(keyTemplate)) {
+            throw new InvalidParameterException(String.format(
+                    "KeyTemplate for annotation [%s] must not be defined as an empty string on [%s]",
+                    ReadThroughSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        final boolean keyTemplateDefined = !AnnotationConstants.DEFAULT_STRING.equals(keyTemplate);
+
+        if (keyIndexDefined == keyTemplateDefined) {
+            throw new InvalidParameterException(String.format(
+                    "Exactly one of [keyIndex,keyTemplate] must be defined for annotation [%s] on [%s]",
+                    ReadThroughSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+
+        if (keyIndexDefined) {
+            result.add(new AType.KeyIndex(keyIndex));
+        }
+
+        if (keyTemplateDefined) {
+            result.add(new AType.KeyTemplate(keyTemplate));
+        }
+
+        final int expiration = annotation.expiration();
+        if (expiration < 0) {
+            throw new InvalidParameterException(String.format(
+                    "Expiration for annotation [%s] must be 0 or greater on [%s]",
+                    ReadThroughSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Expiration(expiration));
+
+        final int jitter = annotation.jitter();
+        if (jitter < -1 || jitter > 99) {
+            throw new InvalidParameterException(String.format(
+                    "Jitter for annotation [%s] must be -1 <= jitter <= 99 on [%s]",
+                    ReadThroughSingleCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Jitter(jitter == -1 ? jitterDefault : jitter));
+
+        return result;
+    }
 }

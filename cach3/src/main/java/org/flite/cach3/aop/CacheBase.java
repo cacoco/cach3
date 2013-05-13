@@ -24,6 +24,7 @@ package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
 import org.apache.commons.lang.*;
+import org.apache.commons.lang.math.*;
 import org.apache.velocity.*;
 import org.apache.velocity.app.*;
 import org.aspectj.lang.*;
@@ -87,10 +88,6 @@ public class CacheBase {
 	}
 
     protected static final char[] WS = new char[] {' ', '\n', '\t'};
-    protected static String buildCacheKey(final String objectId, final AnnotationData data) {
-        return buildCacheKey(objectId, data.getNamespace(), data.getKeyPrefix());
-    }
-
     public static String buildCacheKey(final String objectId, final String namespace, final String prefix) {
         if (objectId == null || objectId.length() < 1) {
             throw new InvalidParameterException("Ids for objects in the cache must be at least 1 character long.");
@@ -219,19 +216,6 @@ public class CacheBase {
         return java.util.List.class.isAssignableFrom(clazz);
 	}
 
-    protected String getBaseKey(final AnnotationData annotationData,
-                                final Object retVal,
-                                final Object[] args,
-                                final String methodString) throws Exception {
-        return getBaseKey(annotationData.getKeyTemplate(),
-                annotationData.getKeyIndex(),
-                retVal,
-                args,
-                methodString,
-                factory,
-                methodStore);
-    }
-
     public static String getBaseKey(final String keyTemplate,
                                     final Integer keyIndex,
                                     final Object retVal,
@@ -253,13 +237,6 @@ public class CacheBase {
         final String result = writer.toString();
         if (keyTemplate.equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
         return result;
-    }
-
-    protected List<String> getBaseKeys(final List<Object> keyObjects,
-                                        final AnnotationData annotationData,
-                                        final Object retVal,
-                                        final Object[] args) throws Exception {
-        return getBaseKeys(keyObjects, annotationData.getKeyTemplate(), retVal, args, factory, methodStore);
     }
 
     public static List<String> getBaseKeys(final List<Object> keyObjects,
@@ -316,4 +293,15 @@ public class CacheBase {
     protected MemcachedClientIF getMemcachedClient() {
         return state.getMemcachedClient();
     }
+
+    /*default*/ static final int JITTER_BOUND = 60 * 60 * 24 * 30;
+    public static int calculateJitteredExpiration(final int expiration, final int jitter) {
+        if (jitter <= 0 || jitter > 99) { return expiration; }
+        if (expiration >= JITTER_BOUND) { return expiration; }
+
+        final double seed = RandomUtils.nextDouble() * expiration * jitter;
+        final int difference = (int) Math.floor(seed/100);
+        return (expiration - difference);
+    }
+
 }

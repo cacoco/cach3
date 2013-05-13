@@ -85,4 +85,60 @@
     <property name="factory" ref="cach3-velocityContextFactory" />
   </bean>
 
+  <!--Level2 Caching-->
+  <bean id="l2cach3-state" class="org.flite.cach3.config.L2Cach3State">
+    <property name="cache">
+      <bean class="org.flite.cach3.aop.LogicalCacheImpl" />
+    </property>
+  </bean>
+
+  <bean id="l2cach3-readThroughMultiCache" class="org.flite.cach3.aop.L2ReadThroughMultiCacheAdvice">
+    <property name="methodStore" ref="methodStore" />
+    <property name="state" ref="l2cach3-state" />
+    <property name="factory" ref="cach3-velocityContextFactory" />
+  </bean>
+  <bean id="l2cach3-readThroughSingleCache" class="org.flite.cach3.aop.L2ReadThroughSingleCacheAdvice">
+ 		<property name="methodStore" ref="methodStore" />
+    <property name="state" ref="l2cach3-state" />
+    <property name="factory" ref="cach3-velocityContextFactory" />
+ 	</bean>
+  <bean id="l2cach3-readThroughAssignCache" class="org.flite.cach3.aop.L2ReadThroughAssignCacheAdvice">
+    <property name="methodStore" ref="methodStore" />
+    <property name="state" ref="l2cach3-state" />
+    <property name="factory" ref="cach3-velocityContextFactory" />
+  </bean>
+
+  <bean id="l2cach3-updateMultiCache" class="org.flite.cach3.aop.L2UpdateMultiCacheAdvice">
+    <property name="methodStore" ref="methodStore" />
+    <property name="state" ref="l2cach3-state" />
+    <property name="factory" ref="cach3-velocityContextFactory" />
+  </bean>
+  <bean id="l2cach3-updateSingleCache" class="org.flite.cach3.aop.L2UpdateSingleCacheAdvice">
+ 		<property name="methodStore" ref="methodStore" />
+    <property name="state" ref="l2cach3-state" />
+    <property name="factory" ref="cach3-velocityContextFactory" />
+ 	</bean>
+  <bean id="l2cach3-updateAssignCache" class="org.flite.cach3.aop.L2UpdateAssignCacheAdvice">
+    <property name="methodStore" ref="methodStore" />
+    <property name="state" ref="l2cach3-state" />
+    <property name="factory" ref="cach3-velocityContextFactory" />
+  </bean>
+
+  <bean id="l2cach3-invalidateMultiCache" class="org.flite.cach3.aop.L2InvalidateMultiCacheAdvice">
+    <property name="methodStore" ref="methodStore" />
+    <property name="state" ref="l2cach3-state" />
+    <property name="factory" ref="cach3-velocityContextFactory" />
+  </bean>
+  <bean id="l2cach3-invalidateSingleCache" class="org.flite.cach3.aop.L2InvalidateSingleCacheAdvice">
+    <property name="methodStore" ref="methodStore" />
+    <property name="state" ref="l2cach3-state" />
+    <property name="factory" ref="cach3-velocityContextFactory" />
+  </bean>
+  <bean id="l2cach3-invalidateAssignCache" class="org.flite.cach3.aop.L2InvalidateAssignCacheAdvice">
+    <property name="methodStore" ref="methodStore" />
+    <property name="state" ref="l2cach3-state" />
+    <property name="factory" ref="cach3-velocityContextFactory" />
+  </bean>
+
+
 </beans>

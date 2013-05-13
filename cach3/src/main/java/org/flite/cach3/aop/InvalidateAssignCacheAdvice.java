@@ -54,8 +54,6 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
         return retVal;
     }
 
-
-
     @Pointcut("@annotation(org.flite.cach3.annotations.groups.InvalidateAssignCaches)")
     public void invalidateAssigns() {}
 
@@ -68,8 +66,6 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
         }
         return retVal;
     }
-
-
 
     private void doInvalidate(final JoinPoint jp, final Object retVal) throws Throwable {
         if (isCacheDisabled()) {
@@ -91,24 +87,21 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
             // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
             // but do not let it surface up past the AOP injection itself.
             try {
-                final AnnotationData annotationData =
-                        AnnotationDataBuilder.buildAnnotationData(lAnnotations.get(i),
-                                InvalidateAssignCache.class,
-                                methodToCache.getName(),
-                                getJitterDefault());
-
-                final String cacheKey = buildCacheKey(annotationData.getAssignedKey(), annotationData);
+                final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName());
+                final String cacheKey = buildCacheKey(info.getAsString(AType.ASSIGN_KEY),
+                                        info.getAsString(AType.NAMESPACE),
+                                        info.getAsString(AType.KEY_PREFIX));
                 if (cacheKey == null || cacheKey.trim().length() == 0) {
                     throw new InvalidParameterException("Unable to find a cache key");
                 }
                 cache.delete(cacheKey);
 
                 // Notify the observers that a cache interaction happened.
-                final List<InvalidateAssignCacheListener> listeners = getPertinentListeners(InvalidateAssignCacheListener.class, annotationData.getNamespace());
+                final List<InvalidateAssignCacheListener> listeners = getPertinentListeners(InvalidateAssignCacheListener.class, info.getAsString(AType.NAMESPACE));
                 if (listeners != null && !listeners.isEmpty()) {
                     for (final InvalidateAssignCacheListener listener : listeners) {
                         try {
-                            listener.triggeredInvalidateAssignCache(annotationData.getNamespace(), annotationData.getAssignedKey(), retVal, jp.getArgs());
+                            listener.triggeredInvalidateAssignCache(info.getAsString(AType.NAMESPACE), info.getAsString(AType.ASSIGN_KEY), retVal, jp.getArgs());
                         } catch (Exception ex) {
                             LOG.warn("Problem when triggering a listener.", ex);
                         }
@@ -120,4 +113,40 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
         }
     }
 
+    /*default*/ static AnnotationInfo getAnnotationInfo(final InvalidateAssignCache annotation, final String targetMethodName) {
+        final AnnotationInfo result = new AnnotationInfo();
+
+        if (annotation == null) {
+            throw new InvalidParameterException(String.format(
+                    "No annotation of type [%s] found.",
+                    InvalidateAssignCache.class.getName()
+            ));
+        }
+
+        final String namespace = annotation.namespace();
+        if (AnnotationConstants.DEFAULT_STRING.equals(namespace)
+                || namespace == null
+                || namespace.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "Namespace for annotation [%s] must be defined on [%s]",
+                    InvalidateAssignCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.Namespace(namespace));
+
+        final String assignKey = annotation.assignedKey();
+        if (AnnotationConstants.DEFAULT_STRING.equals(assignKey)
+                || assignKey == null
+                || assignKey.length() < 1) {
+            throw new InvalidParameterException(String.format(
+                    "AssignedKey for annotation [%s] must be defined on [%s]",
+                    InvalidateAssignCache.class.getName(),
+                    targetMethodName
+            ));
+        }
+        result.add(new AType.AssignKey(assignKey));
+
+        return result;
+    }
 }

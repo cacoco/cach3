@@ -187,11 +187,11 @@ public class ReadThroughSingleCacheMockTest {
 
     @Test
     public void testNonVelocityBaseKey() throws Exception {
-        final AnnotationData data = new AnnotationData();
-        data.setKeyIndex(3);
+        final AnnotationInfo info = new AnnotationInfo();
+        info.add(new AType.KeyIndex(3));
         final String key = RandomStringUtils.randomAlphanumeric(8);
 
-        final String result = cut.generateBaseKeySingle(new Object[]{"alpha", "beta", "gamma", key}, data, "fakeMethodName()");
+        final String result = cut.generateBaseKeySingle(new Object[]{"alpha", "beta", "gamma", key}, info, "fakeMethodName()");
 
         assertEquals(key, result);
     }
@@ -204,10 +204,10 @@ public class ReadThroughSingleCacheMockTest {
         final String delta = RandomStringUtils.randomAlphanumeric(11);
         final String expected = alpha + "-" + arbitrary + "-" + delta;
 
-        final AnnotationData data = new AnnotationData();
-        data.setKeyTemplate(template);
+        final AnnotationInfo info = new AnnotationInfo();
+        info.add(new AType.KeyTemplate(template));
 
-        final String result = cut.generateBaseKeySingle(new Object[]{alpha, "beta", "gamma", delta}, data, "fakeMethodName()");
+        final String result = cut.generateBaseKeySingle(new Object[]{alpha, "beta", "gamma", delta}, info, "fakeMethodName()");
 
         assertEquals(expected, result);
     }
@@ -219,11 +219,11 @@ public class ReadThroughSingleCacheMockTest {
         final String alpha = RandomStringUtils.randomAlphabetic(7);
         final String delta = RandomStringUtils.randomAlphanumeric(11);
 
-        final AnnotationData data = new AnnotationData();
-        data.setKeyTemplate(template);
+        final AnnotationInfo info = new AnnotationInfo();
+        info.add(new AType.KeyTemplate(template));
 
         try {
-            cut.generateBaseKeySingle(new Object[]{alpha, "beta", "gamma", delta}, data, "fakeMethodName()");
+            cut.generateBaseKeySingle(new Object[]{alpha, "beta", "gamma", delta}, info, "fakeMethodName()");
             fail("Expected Exception");
         } catch (InvalidParameterException ex) { }
     }

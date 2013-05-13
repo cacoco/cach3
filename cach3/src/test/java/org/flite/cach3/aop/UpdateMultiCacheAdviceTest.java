@@ -68,8 +68,7 @@ public class UpdateMultiCacheAdviceTest {
     public void testUpdateCache() throws Exception {
         final Method method = AnnotationTest.class.getMethod("cacheMe01", null);
         final UpdateMultiCache annotation = method.getAnnotation(UpdateMultiCache.class);
-        final AnnotationData data = AnnotationDataBuilder.buildAnnotationData(annotation, UpdateMultiCache.class, "cacheMe01", 0);
-
+        final AnnotationInfo info = UpdateMultiCacheAdvice.getAnnotationInfo(annotation, "cacheMe01", 0);
         final MemcachedClientIF cache = EasyMock.createMock(MemcachedClientIF.class);
         state.setProvider(new MemcachedClientProvider() {
             public MemcachedClientIF getMemcachedClient() {
@@ -85,7 +84,7 @@ public class UpdateMultiCacheAdviceTest {
         keys.add("Key2-" + System.currentTimeMillis());
 
         try {
-            cut.updateCache(keys, objs, method, data, cache);
+            cut.updateCache(keys, objs, method, 0, 0, cache);
             fail("Expected Exception.");
         } catch (InvalidAnnotationException ex) {
             assertTrue(ex.getMessage().contains("do not match in size"));
@@ -95,18 +94,17 @@ public class UpdateMultiCacheAdviceTest {
         for (final String key : keys) {
             final String value = "ValueFor-" + key;
             objs.add(value);
-            EasyMock.expect(cache.set(key, data.getExpiration(), value)).andReturn(null);
+            EasyMock.expect(cache.set(key, info.getAsInteger(AType.EXPIRATION), value)).andReturn(null);
         }
         keys.add("BigFatNull");
         objs.add(null);
-        EasyMock.expect(cache.set(keys.get(2), data.getExpiration(), new PertinentNegativeNull())).andReturn(null);
+        EasyMock.expect(cache.set(keys.get(2), info.getAsInteger(AType.EXPIRATION), new PertinentNegativeNull())).andReturn(null);
 
         EasyMock.replay(cache);
 
-        cut.updateCache(keys, objs, method, data, cache);
+        cut.updateCache(keys, objs, method, info.getAsInteger(AType.JITTER), info.getAsInteger(AType.EXPIRATION), cache);
 
         EasyMock.verify(cache);
-
     }
 
     static class AnnotationTest {

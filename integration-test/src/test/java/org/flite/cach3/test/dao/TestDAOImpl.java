@@ -25,8 +25,8 @@ package org.flite.cach3.test.dao;
 import org.apache.commons.lang.*;
 import org.apache.commons.lang.math.*;
 import org.flite.cach3.annotations.*;
-import org.flite.cach3.annotations.groups.InvalidateSingleCaches;
-import org.flite.cach3.level2.annotations.*;
+import org.flite.cach3.annotations.groups.*;
+import org.flite.cach3.test.model.*;
 
 import java.util.*;
 
@@ -435,4 +435,16 @@ public class TestDAOImpl implements TestDAO {
     public Long updateL1Data(String key) {
         return 100000L + RandomUtils.nextInt(899999);
     }
+
+    private static final String EXAMPLE_PREFIX = "both-ex-";
+    @L2ReadThroughMultiCache(namespace = COMBINE_CACHE, keyPrefix = EXAMPLE_PREFIX, keyIndex = 0, window = Duration.FIVE_SECONDS)
+    @ReadThroughMultiCache(namespace = COMBINE_CACHE, keyPrefix = EXAMPLE_PREFIX, keyIndex = 0, expiration = 10)
+    public List<Example> getExampleObjects(final List<Long> ids, final String gen) {
+        final List<Example> results = new ArrayList<Example>(ids.size());
+        for (final Long id : ids) {
+            results.add(new Example().setPk(id).setBody(gen));
+        }
+        return results;
+    }
+
 }

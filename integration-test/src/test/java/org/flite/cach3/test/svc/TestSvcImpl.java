@@ -23,6 +23,7 @@
 package org.flite.cach3.test.svc;
 
 import org.flite.cach3.test.dao.*;
+import org.flite.cach3.test.model.*;
 import org.springframework.stereotype.*;
 
 import java.util.*;
@@ -208,5 +209,9 @@ public class TestSvcImpl implements TestSvc {
 
     public Long updateL1Data(String key) {
         return this.dao.updateL1Data(key);
+    }
+
+    public List<Example> getExampleObjects(List<Long> ids, String gen) {
+        return this.dao.getExampleObjects(ids, gen);
     }
 }
