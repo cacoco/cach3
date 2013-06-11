@@ -54,7 +54,11 @@ public class L2InvalidateSingleCacheAdvice extends L2CacheBase {
         try {
             doInvalidate(jp, retVal);
         } catch (Throwable ex) {
-            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+            } else {
+                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error: " + ex.getMessage());
+            }
         }
         return retVal;
     }
@@ -68,7 +72,11 @@ public class L2InvalidateSingleCacheAdvice extends L2CacheBase {
 //        try {
 //            doInvalidate(jp, retVal);
 //        } catch (Throwable ex) {
-//            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+//    if (LOG.isDebugEnabled()) {
+//        LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+//    } else {
+//        LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error: " + ex.getMessage());
+//    }
 //        }
 //        return retVal;
 //    }
@@ -108,7 +116,11 @@ public class L2InvalidateSingleCacheAdvice extends L2CacheBase {
                 LOG.debug("Invalidating cache for key " + cacheKey);
                 getCache().invalidateBulk(Arrays.asList(cacheKey));
             } catch (Throwable ex) {
-                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+                if (LOG.isDebugEnabled()) {
+                    LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+                } else {
+                    LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error: " + ex.getMessage());
+                }
             }
         }
     }

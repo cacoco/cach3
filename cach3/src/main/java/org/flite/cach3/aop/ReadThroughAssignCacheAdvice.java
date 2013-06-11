@@ -71,7 +71,11 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
                 return (result instanceof PertinentNegativeNull) ? null : result;
             }
         } catch (Throwable ex) {
-            LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
+            } else {
+                LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error: " + ex.getMessage());
+            }
             return pjp.proceed();
         }
 
@@ -106,7 +110,11 @@ public class ReadThroughAssignCacheAdvice extends CacheBase {
                 }
             }
         } catch (Throwable ex) {
-            LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
+            } else {
+                LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error: " + ex.getMessage());
+            }
         }
         return result;
     }
