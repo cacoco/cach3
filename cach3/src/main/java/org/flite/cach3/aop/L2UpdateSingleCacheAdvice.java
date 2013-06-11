@@ -49,7 +49,11 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
            try {
                doUpdate(jp, retVal);
            } catch (Throwable ex) {
-               LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+               if (LOG.isDebugEnabled()) {
+                   LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+               } else {
+                   LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error: " + ex.getMessage());
+               }
            }
            return retVal;
    	}
@@ -62,7 +66,11 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
 //        try {
 //            doUpdate(jp, retVal);
 //        } catch (Throwable ex) {
-//            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+//    if (LOG.isDebugEnabled()) {
+//        LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+//    } else {
+//        LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error: " + ex.getMessage());
+//    }
 //        }
 //        return retVal;
 //    }
@@ -108,7 +116,11 @@ public class L2UpdateSingleCacheAdvice extends L2CacheBase {
                     getCache().setBulk(ImmutableMap.of(cacheKey, submission), info.<Duration>getAsType(AType.WINDOW, null));
                 }
             } catch (Exception ex) {
-                LOG.warn("Updating caching via " + jp.toShortString() + " aborted due to an error.", ex);
+                if (LOG.isDebugEnabled()) {
+                    LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+                } else {
+                    LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error: " + ex.getMessage());
+                }
             }
         }
     }

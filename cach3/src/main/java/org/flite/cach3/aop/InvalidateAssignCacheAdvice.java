@@ -49,7 +49,11 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
         try {
             doInvalidate(jp, retVal);
         } catch (Throwable ex) {
-            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+            } else {
+                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error: " + ex.getMessage());
+            }
         }
         return retVal;
     }
@@ -62,7 +66,11 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
         try {
             doInvalidate(jp, retVal);
         } catch (Throwable ex) {
-            LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+            } else {
+                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error: " + ex.getMessage());
+            }
         }
         return retVal;
     }
@@ -108,7 +116,11 @@ public class InvalidateAssignCacheAdvice extends CacheBase {
                     }
                 }
             } catch (Throwable ex) {
-                LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+                if (LOG.isDebugEnabled()) {
+                    LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error.", ex);
+                } else {
+                    LOG.warn("Caching on " + jp.toShortString() + " aborted due to an error: " + ex.getMessage());
+                }
             }
         }
     }

@@ -98,7 +98,11 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 		} catch (Throwable ex) {
             // If there's an exception somewhere in the caching code, then just bail out
             // and call through to the target method with the original parameters.
-			LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error.", ex);
+            } else {
+                LOG.warn("Caching on " + pjp.toShortString() + " aborted due to an error: " + ex.getMessage());
+            }
 			return pjp.proceed();
 		}
 
@@ -153,8 +157,14 @@ public class ReadThroughMultiCacheAdvice extends CacheBase {
 
 			return coord.generateResultList();
 		} catch (Throwable ex) {
-			LOG.warn("Caching on " + pjp.toShortString()
-					+ " aborted due to an error. The underlying method will be called twice.", ex);
+            if (LOG.isDebugEnabled()) {
+                LOG.warn("Caching on " + pjp.toShortString()
+                        + " aborted due to an error. (The underlying method will be called twice.)", ex);
+            } else {
+                LOG.warn("Caching on " + pjp.toShortString()
+                        + " aborted due to an error. (The underlying method will be called twice.): "
+                        + ex.getMessage());
+            }
 			return pjp.proceed();
 		}
 	}
