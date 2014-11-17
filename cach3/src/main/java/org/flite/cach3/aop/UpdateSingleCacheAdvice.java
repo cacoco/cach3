@@ -119,21 +119,16 @@ public class UpdateSingleCacheAdvice extends CacheBase {
                         info.getAsString(AType.KEY_PREFIX));
                 Object dataObject = getIndexObject(info.getAsInteger(AType.DATA_INDEX, null), retVal, jp.getArgs(), methodToCache.toString());
                 dataObject = UpdateSingleCacheAdvice.getMergedData(dataObject, info.getAsString(AType.DATA_TEMPLATE, null), retVal, jp.getArgs(), factory);
-                final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
+                final Class dataTemplateType = (Class)info.getAsType(AType.DATA_TEMPLATE_TYPE, String.class);
+                final Object submission = (dataObject == null) ? new PertinentNegativeNull() : applyDataTemplateType(dataObject, dataTemplateType);
+
                 boolean cacheable = true;
                 if (submission instanceof CacheConditionally) {
                     cacheable = ((CacheConditionally) submission).isCacheable();
                 }
 
-                final Class dataTemplateType = (Class)info.getAsType(AType.DATA_TEMPLATE_TYPE, String.class);
                 if (cacheable) {
-                    if (verifyTypeIsLong(dataTemplateType)) {
-                        cache.set(cacheKey, calculateJitteredExpiration(info.getAsInteger(AType.EXPIRATION), info.getAsInteger(AType.JITTER)), Long.valueOf((String)submission), new LongTranscoder());
-                    } else if (verifyTypeIsInteger(dataTemplateType)) {
-                        cache.set(cacheKey, calculateJitteredExpiration(info.getAsInteger(AType.EXPIRATION), info.getAsInteger(AType.JITTER)), Integer.valueOf((String)submission), new IntegerTranscoder());
-                    } else {
-                        cache.set(cacheKey, calculateJitteredExpiration(info.getAsInteger(AType.EXPIRATION), info.getAsInteger(AType.JITTER)), submission);
-                    }
+                    cache.set(cacheKey, calculateJitteredExpiration(info.getAsInteger(AType.EXPIRATION), info.getAsInteger(AType.JITTER)), submission);
                 }
 
                 // Notify the observers that a cache interaction happened.

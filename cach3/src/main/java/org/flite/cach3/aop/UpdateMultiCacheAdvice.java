@@ -156,19 +156,13 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 		for (int ix = 0; ix < returnList.size(); ix++) {
 			final Object result = returnList.get(ix);
 			final String cacheKey = cacheKeys.get(ix);
-			final Object cacheObject = result != null ? result : new PertinentNegativeNull();
+			final Object cacheObject = result != null ? applyDataTemplateType(result, dataTemplateType) : new PertinentNegativeNull();
             boolean cacheable = true;
             if (cacheObject instanceof CacheConditionally) {
                 cacheable = ((CacheConditionally) cacheObject).isCacheable();
             }
             if (cacheable) {
-                if (verifyTypeIsLong(dataTemplateType)) {
-                    cache.set(cacheKey, calculateJitteredExpiration(expiration, jitter), Long.valueOf((String)cacheObject), new LongTranscoder());
-                } else if (verifyTypeIsInteger(dataTemplateType)) {
-                    cache.set(cacheKey, calculateJitteredExpiration(expiration, jitter), Integer.valueOf((String)cacheObject), new IntegerTranscoder());
-                } else {
-                    cache.set(cacheKey, calculateJitteredExpiration(expiration, jitter), cacheObject);
-                }
+                cache.set(cacheKey, calculateJitteredExpiration(expiration, jitter), cacheObject);
             }
 		}
 	}

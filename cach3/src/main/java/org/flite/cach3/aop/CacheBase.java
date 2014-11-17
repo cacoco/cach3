@@ -224,6 +224,16 @@ public class CacheBase {
         return Integer.class.isAssignableFrom(clazz);
     }
 
+    protected static Object applyDataTemplateType(Object cacheObject, final Class type) {
+        if (verifyTypeIsLong(type)) {
+            cacheObject = Long.valueOf((String)cacheObject);
+        } else if (verifyTypeIsInteger(type)) {
+            cacheObject = Integer.valueOf((String)cacheObject);
+        }
+
+        return cacheObject;
+    }
+
     public static String getBaseKey(final String keyTemplate,
                                     final Integer keyIndex,
                                     final Object retVal,
@@ -312,7 +322,7 @@ public class CacheBase {
     }
 
     protected static Object applyTemplate(final VelocityContext context, final String template) {
-        final StringWriter writer = new StringWriter(250);
+        final StringWriter writer = new StringWriter(1024);
         Velocity.evaluate(context, writer, CacheBase.class.getSimpleName(), template);
         Object value = writer.toString();
         if (template.equals(value)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
