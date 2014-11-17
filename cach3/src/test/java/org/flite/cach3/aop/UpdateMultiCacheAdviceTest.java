@@ -84,7 +84,7 @@ public class UpdateMultiCacheAdviceTest {
         keys.add("Key2-" + System.currentTimeMillis());
 
         try {
-            cut.updateCache(keys, objs, method, 0, 0, cache);
+            cut.updateCache(keys, objs, method, 0, 0, cache, String.class);
             fail("Expected Exception.");
         } catch (InvalidAnnotationException ex) {
             assertTrue(ex.getMessage().contains("do not match in size"));
@@ -102,7 +102,7 @@ public class UpdateMultiCacheAdviceTest {
 
         EasyMock.replay(cache);
 
-        cut.updateCache(keys, objs, method, info.getAsInteger(AType.JITTER), info.getAsInteger(AType.EXPIRATION), cache);
+        cut.updateCache(keys, objs, method, info.getAsInteger(AType.JITTER), info.getAsInteger(AType.EXPIRATION), cache, String.class);
 
         EasyMock.verify(cache);
     }

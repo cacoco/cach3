@@ -6,4 +6,4 @@
 target/*
 target
 velocity.log
-
+.DS_Store

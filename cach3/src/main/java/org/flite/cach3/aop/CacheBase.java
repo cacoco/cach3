@@ -216,6 +216,24 @@ public class CacheBase {
         return java.util.List.class.isAssignableFrom(clazz);
 	}
 
+    protected static boolean verifyTypeIsLong(final Class clazz) {
+        return Long.class.isAssignableFrom(clazz);
+    }
+
+    protected static boolean verifyTypeIsInteger(final Class clazz) {
+        return Integer.class.isAssignableFrom(clazz);
+    }
+
+    protected static Object applyDataTemplateType(Object cacheObject, final Class type) {
+        if (verifyTypeIsLong(type)) {
+            cacheObject = Long.valueOf((String)cacheObject);
+        } else if (verifyTypeIsInteger(type)) {
+            cacheObject = Integer.valueOf((String)cacheObject);
+        }
+
+        return cacheObject;
+    }
+
     public static String getBaseKey(final String keyTemplate,
                                     final Integer keyIndex,
                                     final Object retVal,
@@ -232,11 +250,7 @@ public class CacheBase {
         context.put("args", args);
         context.put("retVal", retVal);
 
-        final StringWriter writer = new StringWriter(250);
-        Velocity.evaluate(context, writer, CacheBase.class.getSimpleName() , keyTemplate);
-        final String result = writer.toString();
-        if (keyTemplate.equals(result)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
-        return result;
+        return (String)applyTemplate(context, keyTemplate);
     }
 
     public static List<String> getBaseKeys(final List<Object> keyObjects,
@@ -259,15 +273,61 @@ public class CacheBase {
                 context.put("indexObject", object);
                 context.put("retVal", retVal);
 
-                final StringWriter writer = new StringWriter(250);
-                Velocity.evaluate(context, writer, CacheBase.class.getSimpleName() , template);
-                base = writer.toString();
-                if (template.equals(base)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
+                base = (String)applyTemplate(context, template);
             }
             results.add(base);
         }
 
         return results;
+    }
+
+    public static Object getMergedData(final Object dataObject,
+                                        final String template,
+                                        final Object retVal,
+                                        final Object[] args,
+                                        final VelocityContextFactory factory) {
+        if (StringUtils.isBlank(template)) {
+            return dataObject;
+        }
+
+        final VelocityContext context = factory.getNewExtendedContext();
+        context.put("args", args);
+        context.put("retVal", retVal);
+
+        return applyTemplate(context, template);
+    }
+
+    public static List<Object> getMergedDataList(final List<Object> dataList,
+                                                final String template,
+                                                final Object retVal,
+                                                final Object[] args,
+                                                final VelocityContextFactory factory) {
+        if (StringUtils.isBlank(template)) {
+            return dataList;
+        }
+
+        final List<Object> results = new ArrayList<Object>();
+        for (int ix = 0; ix < dataList.size(); ix++) {
+            final Object object = dataList.get(ix);
+            final VelocityContext context = factory.getNewExtendedContext();
+            context.put("args", args);
+            context.put("index", ix);
+            context.put("indexObject", object);
+            context.put("retVal", retVal);
+
+            results.add(applyTemplate(context, template));
+        }
+
+        return results;
+    }
+
+    protected static Object applyTemplate(final VelocityContext context, final String template) {
+        final StringWriter writer = new StringWriter(1024);
+        Velocity.evaluate(context, writer, CacheBase.class.getSimpleName(), template);
+        Object value = writer.toString();
+        if (template.equals(value)) { throw new InvalidParameterException("Calculated key is equal to the velocityTemplate."); }
+
+        return value;
     }
 
     protected <L extends CacheListener> List<L> getPertinentListeners(final Class<L> clazz,

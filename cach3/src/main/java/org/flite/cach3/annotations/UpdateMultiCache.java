@@ -65,6 +65,26 @@ public @interface UpdateMultiCache {
     int dataIndex() default AnnotationConstants.DEFAULT_DATA_INDEX;
 
     /**
+     * This is an <em>optional</em> value for the user to provide a Velocity template
+     * to store the data. In any of the *MultiCache annotations, dataIndex() is still
+     * required, so that the underlying logic has an indication of the dimensionality
+     * of the multi-values.
+     * For the Velocity template Context, there will be two defined variables:
+     *  1 - args: An array of the objects passed into the method as parameters
+     *  2 - index: the integer pointer of where in the list of multi-values that we are creating an id for.
+     *  3 - indexObject: pointer to current index Object
+     *  4 - retVal: pointer to array of objects returned
+     */
+    String dataTemplate() default AnnotationConstants.DEFAULT_STRING;
+
+    /**
+     * This is an <em>optional</em> value which takes in class. If dataTemplate is
+     * provided by default data is stored as string. You can pass in the class you
+     * want the string to be transcoded to. Currently we support only Long and Integer
+     */
+    Class dataTemplateType() default String.class;
+
+    /**
      * The exp value is passed along to memcached, and will be
      * processed per the memcached protocol specification:
      *

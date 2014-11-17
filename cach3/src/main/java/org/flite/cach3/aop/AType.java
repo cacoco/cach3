@@ -17,6 +17,8 @@ public class AType {
     public static final String KEY_PREFIX = "prfx";
     public static final String WINDOW = "wndw";
     public static final String DATA_INDEX = "didx";
+    public static final String DATA_TEMPLATE = "dtmpl";
+    public static final String DATA_TEMPLATE_TYPE = "dtmpltype";
     public static final String ASSIGN_KEY = "assn";
     public static final String EXPIRATION = "expn";
     public static final String JITTER = "jitr";
@@ -63,6 +65,20 @@ public class AType {
         public DataIndex(Integer value) { this.value = value; }
         public String getName() { return DATA_INDEX; }
         public Integer getValue() { return value; }
+    }
+
+    public static class DataTemplate implements AnnotationDatum<String> {
+        private String value;
+        public DataTemplate(String value) { this.value = value; }
+        public String getName() { return DATA_TEMPLATE; }
+        public String getValue() { return value; }
+    }
+
+    public static class DataTemplateType implements AnnotationDatum<Class> {
+        private Class value;
+        public DataTemplateType(Class value) { this.value = value; }
+        public String getName() { return DATA_TEMPLATE_TYPE; }
+        public Class getValue() { return value; }
     }
 
     public static class AssignKey implements AnnotationDatum<String> {
