@@ -23,12 +23,15 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.MemcachedClientIF;
+import net.spy.memcached.transcoders.IntegerTranscoder;
+import net.spy.memcached.transcoders.LongTranscoder;
 import org.apache.commons.lang.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.flite.cach3.annotations.AnnotationConstants;
+import org.flite.cach3.annotations.UpdateMultiCache;
 import org.flite.cach3.annotations.UpdateSingleCache;
 import org.flite.cach3.annotations.groups.UpdateSingleCaches;
 import org.flite.cach3.api.CacheConditionally;
@@ -114,12 +117,16 @@ public class UpdateSingleCacheAdvice extends CacheBase {
                 final String cacheKey = buildCacheKey(baseKey,
                         info.getAsString(AType.NAMESPACE),
                         info.getAsString(AType.KEY_PREFIX));
-                final Object dataObject = getIndexObject(info.getAsInteger(AType.DATA_INDEX, null), retVal, jp.getArgs(), methodToCache.toString());
-                final Object submission = (dataObject == null) ? new PertinentNegativeNull() : dataObject;
+                Object dataObject = getIndexObject(info.getAsInteger(AType.DATA_INDEX, null), retVal, jp.getArgs(), methodToCache.toString());
+                dataObject = UpdateSingleCacheAdvice.getMergedData(dataObject, info.getAsString(AType.DATA_TEMPLATE, null), retVal, jp.getArgs(), factory);
+                final Class dataTemplateType = (Class)info.getAsType(AType.DATA_TEMPLATE_TYPE, String.class);
+                final Object submission = (dataObject == null) ? new PertinentNegativeNull() : applyDataTemplateType(dataObject, dataTemplateType);
+
                 boolean cacheable = true;
                 if (submission instanceof CacheConditionally) {
                     cacheable = ((CacheConditionally) submission).isCacheable();
                 }
+
                 if (cacheable) {
                     cache.set(cacheKey, calculateJitteredExpiration(info.getAsInteger(AType.EXPIRATION), info.getAsInteger(AType.JITTER)), submission);
                 }
@@ -226,6 +233,23 @@ public class UpdateSingleCacheAdvice extends CacheBase {
             ));
         }
         result.add(new AType.DataIndex(dataIndex));
+
+        final String dataTemplate = annotation.dataTemplate();
+        if (!AnnotationConstants.DEFAULT_STRING.equals(dataTemplate)) {
+            if (StringUtils.isBlank(dataTemplate)) {
+                throw new InvalidParameterException(String.format(
+                        "DataTemplate for annotation [%s] must not be defined as an empty string on [%s]",
+                        UpdateMultiCache.class.getName(),
+                        targetMethodName
+                ));
+            }
+            result.add(new AType.DataTemplate(dataTemplate));
+        }
+
+        final Class dataTemplateType = annotation.dataTemplateType();
+        if (!String.class.equals(dataTemplateType)) {
+            result.add(new AType.DataTemplateType(dataTemplateType));
+        }
 
         final int expiration = annotation.expiration();
         if (expiration < 0) {

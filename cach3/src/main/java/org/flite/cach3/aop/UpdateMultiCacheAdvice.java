@@ -23,6 +23,8 @@
 package org.flite.cach3.aop;
 
 import net.spy.memcached.*;
+import net.spy.memcached.transcoders.IntegerTranscoder;
+import net.spy.memcached.transcoders.LongTranscoder;
 import org.apache.commons.lang.*;
 import org.aspectj.lang.*;
 import org.aspectj.lang.annotation.*;
@@ -104,7 +106,8 @@ public class UpdateMultiCacheAdvice extends CacheBase {
                 // This is injected caching.  If anything goes wrong in the caching, LOG the crap outta it,
                 // but do not let it surface up past the AOP injection itself.
                 final AnnotationInfo info = getAnnotationInfo(lAnnotations.get(i), methodToCache.getName(), getJitterDefault());
-                final List<Object> dataList = (List<Object>) getIndexObject(info.getAsInteger(AType.DATA_INDEX), retVal, jp.getArgs(), methodToCache.toString());
+                List<Object> dataList = (List<Object>) getIndexObject(info.getAsInteger(AType.DATA_INDEX), retVal, jp.getArgs(), methodToCache.toString());
+                dataList = UpdateMultiCacheAdvice.getMergedDataList(dataList, info.getAsString(AType.DATA_TEMPLATE, null), retVal, jp.getArgs(), factory);
                 final List<Object> keyObjects = getKeyObjects(info.getAsInteger(AType.KEY_INDEX), retVal, jp, methodToCache);
                 final List<String> baseKeys = UpdateMultiCacheAdvice.getBaseKeys(keyObjects, info.getAsString(AType.KEY_TEMPLATE, null), retVal, jp.getArgs(), factory, methodStore);
                 final List<String> cacheKeys = new ArrayList<String>(baseKeys.size());
@@ -113,7 +116,7 @@ public class UpdateMultiCacheAdvice extends CacheBase {
                             info.getAsString(AType.NAMESPACE,null),
                             info.getAsString(AType.KEY_PREFIX,null)));
                 }
-                updateCache(cacheKeys, dataList, methodToCache, info.getAsInteger(AType.JITTER), info.getAsInteger(AType.EXPIRATION), cache);
+                updateCache(cacheKeys, dataList, methodToCache, info.getAsInteger(AType.JITTER), info.getAsInteger(AType.EXPIRATION), cache, (Class)info.getAsType(AType.DATA_TEMPLATE_TYPE, String.class));
 
                 // Notify the observers that a cache interaction happened.
                 final List<UpdateMultiCacheListener> listeners = getPertinentListeners(UpdateMultiCacheListener.class, info.getAsString(AType.NAMESPACE));
@@ -141,7 +144,8 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 	                           final Method methodToCache,
 	                           final int jitter,
                                final int expiration,
-                               final MemcachedClientIF cache) {
+                               final MemcachedClientIF cache,
+                               final Class dataTemplateType) {
 		if (returnList.size() != cacheKeys.size()) {
 			throw new InvalidAnnotationException(String.format(
 					"The key generation objects, and the resulting objects do not match in size for [%s].",
@@ -152,13 +156,13 @@ public class UpdateMultiCacheAdvice extends CacheBase {
 		for (int ix = 0; ix < returnList.size(); ix++) {
 			final Object result = returnList.get(ix);
 			final String cacheKey = cacheKeys.get(ix);
-			final Object cacheObject = result != null ? result : new PertinentNegativeNull();
+			final Object cacheObject = result != null ? applyDataTemplateType(result, dataTemplateType) : new PertinentNegativeNull();
             boolean cacheable = true;
             if (cacheObject instanceof CacheConditionally) {
                 cacheable = ((CacheConditionally) cacheObject).isCacheable();
             }
             if (cacheable) {
-			    cache.set(cacheKey, calculateJitteredExpiration(expiration, jitter), cacheObject);
+                cache.set(cacheKey, calculateJitteredExpiration(expiration, jitter), cacheObject);
             }
 		}
 	}
@@ -250,6 +254,23 @@ public class UpdateMultiCacheAdvice extends CacheBase {
             ));
         }
         result.add(new AType.DataIndex(dataIndex));
+
+        final String dataTemplate = annotation.dataTemplate();
+        if (!AnnotationConstants.DEFAULT_STRING.equals(dataTemplate)) {
+            if (StringUtils.isBlank(dataTemplate)) {
+                throw new InvalidParameterException(String.format(
+                        "DataTemplate for annotation [%s] must not be defined as an empty string on [%s]",
+                        UpdateMultiCache.class.getName(),
+                        targetMethodName
+                ));
+            }
+            result.add(new AType.DataTemplate(dataTemplate));
+        }
+
+        final Class dataTemplateType = annotation.dataTemplateType();
+        if (!String.class.equals(dataTemplateType)) {
+            result.add(new AType.DataTemplateType(dataTemplateType));
+        }
 
         final int expiration = annotation.expiration();
         if (expiration < 0) {
