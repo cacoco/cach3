@@ -33,4 +33,11 @@ public class SlugifierTest {
         assertEquals("special-characters-sic", Slugifier.slugify("Special Characters \u0161\u00ed\u010d")); // Looks like "Special Characters šíč"
         assertEquals("it-rocks", Slugifier.slugify("It Rocks"));
     }
+
+    @Test
+    public void testHash() throws Exception {
+        assertEquals("", Slugifier.hash(null));
+        assertEquals("", Slugifier.hash(""));
+        assertEquals(32, Slugifier.hash("Some string value that can be hashed").length());
+    }
 }
