@@ -25,6 +25,7 @@ package org.flite.cach3.config;
 import java.io.*;
 import java.net.*;
 import java.text.*;
+import org.apache.commons.codec.digest.DigestUtils;
 
 public class Slugifier {
 
@@ -39,6 +40,11 @@ public class Slugifier {
         } catch (UnsupportedEncodingException ex) {
             throw new IllegalStateException("Problem slugifying the string: " + input, ex);
         }
+    }
+
+    public static String hash(String input) {
+        if (input == null || input.length() == 0) return "";
+        return DigestUtils.md5Hex(input);
     }
 
     private static String normalize(String input) {
